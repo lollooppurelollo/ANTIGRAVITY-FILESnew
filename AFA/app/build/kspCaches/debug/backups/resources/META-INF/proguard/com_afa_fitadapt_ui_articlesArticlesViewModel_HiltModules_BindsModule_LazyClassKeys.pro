@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.articles.ArticlesViewModel
