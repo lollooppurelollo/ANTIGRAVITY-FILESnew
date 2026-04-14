@@ -73,12 +73,14 @@ class PasswordManager @Inject constructor(
      * Verifica se la password è già stata configurata.
      * Flow che emette automaticamente quando lo stato cambia.
      */
+    @Suppress("unused") // Osservata da ProtectedViewModel per stato password
     val isPasswordConfigured: Flow<Boolean> = context.securityDataStore.data
         .map { prefs -> prefs[PASSWORD_CONFIGURED_KEY] ?: false }
 
     /**
      * Verifica sincrona se la password è configurata.
      */
+    @Suppress("unused") // Chiamata dal SetupViewModel per verifica sincrona
     suspend fun isPasswordConfiguredSync(): Boolean {
         return context.securityDataStore.data.first()[PASSWORD_CONFIGURED_KEY] ?: false
     }
@@ -113,6 +115,7 @@ class PasswordManager @Inject constructor(
      * @param newPassword la nuova password
      * @return true se la password è stata cambiata con successo
      */
+    @Suppress("unused") // Chiamata da SettingsViewModel per cambio password
     suspend fun changePassword(currentPassword: String, newPassword: String): Boolean {
         // Prima verifica che la password attuale sia corretta
         if (!verifyPassword(currentPassword)) {

@@ -322,6 +322,7 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
 /**
  * Schermata placeholder per le funzionalità da implementare nelle prossime tranche.
  */
+@Suppress("unused") // Usata per le route non ancora implementate nella navigazione
 @Composable
 private fun PlaceholderScreen(title: String, subtitle: String) {
     Box(

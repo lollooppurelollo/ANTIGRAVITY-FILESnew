@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Regole per l'estrazione dati — disabilitiamo il backup cloud -->
-<data-extraction-rules xmlns:tools="http://schemas.android.com/tools">
+<data-extraction-rules xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedNamespace">
     <cloud-backup>
         <exclude domain="root" path="." />
     </cloud-backup>

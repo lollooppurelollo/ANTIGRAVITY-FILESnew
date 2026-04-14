@@ -42,14 +42,17 @@ class TrainingCardRepository @Inject constructor(
         trainingCardDao.getActiveCardWithExercises()
 
     /** Una scheda con i suoi esercizi */
+    @Suppress("unused") // Usata da CardEditor per mostrare esercizi scheda specifica
     fun getCardWithExercises(cardId: Long): Flow<CardWithExercises?> =
         trainingCardDao.getCardWithExercises(cardId)
 
     /** Le schede in attesa (future) */
+    @Suppress("unused") // Vista schede future dalla sezione protetta
     fun getPendingCards(): Flow<List<TrainingCardEntity>> =
         trainingCardDao.getPendingCards()
 
     /** Le schede completate */
+    @Suppress("unused") // Storico schede completate dalla sezione protetta
     fun getCompletedCards(): Flow<List<TrainingCardEntity>> =
         trainingCardDao.getCompletedCards()
 
@@ -58,12 +61,14 @@ class TrainingCardRepository @Inject constructor(
         trainingCardDao.getById(id)
 
     /** Gli esercizi di una scheda */
+    @Suppress("unused") // Usata da CardEditor per lista esercizi assegnati
     fun getCardExercises(cardId: Long): Flow<List<CardExerciseEntity>> =
         trainingCardDao.getCardExercises(cardId)
 
     // ── Creazione e modifica (dalla sezione protetta) ──
 
     /** Crea una nuova scheda con i suoi esercizi */
+    @Suppress("unused") // Chiamata da CardEditor al salvataggio nuova scheda
     suspend fun createCard(
         card: TrainingCardEntity,
         exercises: List<CardExerciseEntity>
@@ -75,14 +80,17 @@ class TrainingCardRepository @Inject constructor(
     }
 
     /** Aggiorna una scheda esistente */
+    @Suppress("unused") // Chiamata da CardEditor per modifica scheda esistente
     suspend fun updateCard(card: TrainingCardEntity) =
         trainingCardDao.update(card)
 
     /** Elimina una scheda e tutti i suoi esercizi (CASCADE) */
+    @Suppress("unused") // Chiamata quando l'operatore elimina una scheda
     suspend fun deleteCard(card: TrainingCardEntity) =
         trainingCardDao.delete(card)
 
     /** Aggiorna gli esercizi di una scheda (sostituisce tutti) */
+    @Suppress("unused") // Chiamata da CardEditor quando si modifica la lista esercizi
     suspend fun replaceCardExercises(
         cardId: Long,
         exercises: List<CardExerciseEntity>
@@ -93,6 +101,7 @@ class TrainingCardRepository @Inject constructor(
     }
 
     /** Aggiungi un singolo esercizio a una scheda */
+    @Suppress("unused") // Chiamata da ExercisePicker per aggiungere un singolo esercizio
     suspend fun addExerciseToCard(cardExercise: CardExerciseEntity): Long =
         trainingCardDao.insertCardExercise(cardExercise)
 

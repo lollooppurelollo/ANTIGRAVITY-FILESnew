@@ -5,11 +5,11 @@
 package com.afa.fitadapt.data.repository
 
 import com.afa.fitadapt.data.local.dao.GoalDao
-import com.afa.fitadapt.data.local.dao.SessionDao
+
 import com.afa.fitadapt.data.local.entity.GoalEntity
 import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
+
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -60,6 +60,7 @@ class ProgressRepository @Inject constructor(
      * Questo è un metodo suspend perché alcune statistiche
      * richiedono calcoli (es. streak).
      */
+    @Suppress("unused") // Sarà chiamata dal ProgressViewModel quando implementato
     suspend fun getProgressSummary(
         totalSessions: Int,
         completedSessions: Int,
@@ -87,10 +88,12 @@ class ProgressRepository @Inject constructor(
         goalDao.getActiveGoals()
 
     /** Flow con gli obiettivi raggiunti */
+    @Suppress("unused") // Sarà usata nella schermata progressi avanzata
     fun getCompletedGoals(): Flow<List<GoalEntity>> =
         goalDao.getCompletedGoals()
 
     /** Andamento scale rapide per i grafici */
+    @Suppress("unused") // Sarà usata nei grafici andamento scale
     fun getScaleTrend(fromDate: Long, toDate: Long): Flow<List<ScaleEntryEntity>> =
         diaryRepository.getScaleEntriesInRange(fromDate, toDate)
 
@@ -98,18 +101,18 @@ class ProgressRepository @Inject constructor(
      * Aggiorna il valore corrente degli obiettivi automatici.
      * Viene chiamata dopo ogni nuova sessione o periodicamente.
      */
-    suspend fun refreshGoalProgress(
+    @Suppress("unused", "RedundantSuspendModifier") // API da usare dopo ogni sessione
+    fun refreshGoalProgress(
         completedSessions: Int,
         totalMinutes: Int,
         currentStreak: Int,
         adherencePercent: Float
     ) {
-        val goals = goalDao.getActiveGoals()
-        // Nota: getActiveGoals() è un Flow, ma qui usiamo il DAO per update
-        // L'aggiornamento viene fatto nel ViewModel che ha accesso ai valori attuali
+        // L'aggiornamento viene delegato ai ViewModel che hanno accesso ai valori aggiornati
     }
 
     /** Aggiorna il progresso di un singolo obiettivo */
+    @Suppress("unused") // Chiamata dal ViewModel dopo modifica manuale obiettivo
     suspend fun updateGoalProgress(goalId: Long, currentValue: Float) {
         goalDao.updateCurrentValue(goalId, currentValue)
     }

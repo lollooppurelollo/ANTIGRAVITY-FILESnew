@@ -14,8 +14,8 @@ import java.util.Locale
  */
 object DateUtils {
 
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    private val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
+    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.ROOT)
+    private val dateTimeFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.ROOT)
     private val displayFormat = SimpleDateFormat("d MMMM yyyy", Locale.ITALIAN)
     private val shortFormat = SimpleDateFormat("d MMM", Locale.ITALIAN)
 
@@ -30,6 +30,7 @@ object DateUtils {
      * Converte un timestamp in stringa data.
      * Es: "2026-04-13"
      */
+    @Suppress("unused") // Usata per export JSON
     fun toDateString(timestamp: Long): String =
         dateFormat.format(timestamp)
 
@@ -44,6 +45,7 @@ object DateUtils {
      * Converte un timestamp in formato corto.
      * Es: "13 apr"
      */
+    @Suppress("unused") // Usata nei trend grafici e label brevi
     fun toShortString(timestamp: Long): String =
         shortFormat.format(timestamp)
 
@@ -93,6 +95,7 @@ object DateUtils {
     /**
      * Ottieni il numero della settimana corrente nell'anno.
      */
+    @Suppress("unused") // Utility per raggruppamento settimanale
     fun currentWeekNumber(): Int {
         val cal = Calendar.getInstance()
         return cal.get(Calendar.WEEK_OF_YEAR)
@@ -101,6 +104,7 @@ object DateUtils {
     /**
      * Ottieni l'anno corrente.
      */
+    @Suppress("unused") // Utility per header annuali
     fun currentYear(): Int {
         val cal = Calendar.getInstance()
         return cal.get(Calendar.YEAR)
@@ -109,6 +113,7 @@ object DateUtils {
     /**
      * Calcola la differenza in giorni tra due timestamp.
      */
+    @Suppress("unused") // Utility per calcolo differenze di date
     fun daysBetween(from: Long, to: Long): Int {
         val diffMs = to - from
         return (diffMs / (24 * 60 * 60 * 1000)).toInt()

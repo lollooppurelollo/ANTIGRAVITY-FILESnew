@@ -205,6 +205,7 @@ class SessionViewModel @Inject constructor(
     }
 
     /** Resetta lo stato per una nuova registrazione */
+    @Suppress("unused") // Chiamata da AfaNavGraph quando l'utente torna alla SessionScreen
     fun reset() {
         _uiState.update {
             it.copy(

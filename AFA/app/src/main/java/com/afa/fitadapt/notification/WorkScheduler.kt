@@ -12,7 +12,7 @@ import com.afa.fitadapt.notification.workers.MissedSessionWorker
 import com.afa.fitadapt.notification.workers.MotivationalWorker
 import com.afa.fitadapt.notification.workers.ReminderWorker
 import dagger.hilt.android.qualifiers.ApplicationContext
-import java.util.Calendar
+
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -101,6 +101,7 @@ class WorkScheduler @Inject constructor(
     /**
      * Cancella tutti i Worker schedulati (utile quando le notifiche vengono disattivate).
      */
+    @Suppress("unused") // Chiamata quando l'utente disattiva tutte le notifiche
     fun cancelAll() {
         val wm = WorkManager.getInstance(context)
         wm.cancelUniqueWork(ReminderWorker.WORK_NAME)
@@ -109,6 +110,7 @@ class WorkScheduler @Inject constructor(
     }
 
     /** Cancella solo il motivational worker */
+    @Suppress("unused") // Chiamata quando l'utente disattiva i messaggi motivazionali
     fun cancelMotivational() {
         WorkManager.getInstance(context).cancelUniqueWork(MotivationalWorker.WORK_NAME)
     }

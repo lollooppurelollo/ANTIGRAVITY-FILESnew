@@ -8,7 +8,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -86,6 +86,7 @@ class UserPreferences @Inject constructor(
         .map { it[MOTIVATIONAL_MESSAGES_ENABLED] ?: true }
 
     /** Se il setup iniziale è stato completato */
+    @Suppress("unused") // Letta dall'AuthViewModel per decidere la destinazione iniziale
     val firstSetupCompleted: Flow<Boolean> = context.userSettingsDataStore.data
         .map { it[FIRST_SETUP_COMPLETED] ?: false }
 
@@ -103,6 +104,7 @@ class UserPreferences @Inject constructor(
     }
 
     /** Verifica sincrona se la biometria è attiva */
+    @Suppress("unused") // Usata da SettingsViewModel per stato biometria
     suspend fun isBiometricsEnabled(): Boolean {
         return context.userSettingsDataStore.data.first()[BIOMETRICS_ENABLED] ?: true
     }

@@ -12,6 +12,7 @@ package com.afa.fitadapt.model
  * COMPLETED → scheda completata (tutte le sedute fatte o durata scaduta)
  */
 enum class CardStatus {
+    @Suppress("unused") // Stato valido nel ciclo di vita scheda: programmata ma non iniziata
     PENDING,
     ACTIVE,
     COMPLETED

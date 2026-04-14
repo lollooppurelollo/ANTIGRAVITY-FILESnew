@@ -4,7 +4,7 @@
 // =============================================================
 package com.afa.fitadapt.ui.protected_section
 
-import androidx.compose.foundation.background
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,7 +32,7 @@ import com.afa.fitadapt.data.repository.PatientProfileRepository
 import com.afa.fitadapt.security.PasswordManager
 import com.afa.fitadapt.ui.theme.CelestialBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+
 import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.ui.theme.SoftAmber
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -202,7 +203,7 @@ fun ProtectedDashboardScreen(
             Spacer(modifier = Modifier.height(8.dp))
             DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", SoftAmber) { /* TODO: Tranche 5 */ }
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", NavyBlue) { /* TODO: Tranche 5 */ }
+            DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", NavyBlue) { /* TODO: Tranche 5 */ }
 
             Spacer(modifier = Modifier.height(32.dp))
         }

@@ -86,7 +86,7 @@ class MotivationalWorker @AssistedInject constructor(
 
             notificationHelper.showMotivationalNotification(message)
             Result.success()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Result.retry()
         }
     }

@@ -12,7 +12,7 @@ import com.afa.fitadapt.util.QrCodeGenerator
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -50,6 +50,7 @@ sealed class ExportResult {
  * 5. Se il payload è troppo grande, salva come file
  * 6. Registra l'export nel log
  */
+@Suppress("unused") // Repository necessari per export completo (sessioni, diario, profilo, obiettivi)
 @Singleton
 class ExportRepository @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -67,6 +68,7 @@ class ExportRepository @Inject constructor(
     }
 
     /** Log degli export effettuati */
+    @Suppress("unused") // Chiamata dall'ExportViewModel per mostrare lo storico export
     fun getExportLogs(): Flow<List<ExportLogEntity>> =
         exportLogDao.getAll()
 

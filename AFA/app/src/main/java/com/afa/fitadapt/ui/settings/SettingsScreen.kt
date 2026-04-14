@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 // ── ViewModel ──
@@ -55,6 +56,7 @@ class SettingsViewModel @Inject constructor(
     fun toggleNotifications(enabled: Boolean) { viewModelScope.launch { userPreferences.setNotificationEnabled(enabled) } }
     fun toggleBiometrics(enabled: Boolean) { viewModelScope.launch { userPreferences.setBiometricsEnabled(enabled) } }
     fun toggleMotivational(enabled: Boolean) { viewModelScope.launch { userPreferences.setMotivationalMessagesEnabled(enabled) } }
+    @Suppress("unused") // Sarà chiamata dal TimePicker nella schermata impostazioni
     fun setNotificationTime(hour: Int, minute: Int) { viewModelScope.launch { userPreferences.setNotificationTime(hour, minute) } }
 }
 
@@ -88,7 +90,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) {
                         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                             Text("Orario promemoria", style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
                             Text(
-                                String.format("%02d:%02d", uiState.notificationHour, uiState.notificationMinute),
+                                String.format(Locale.ROOT, "%02d:%02d", uiState.notificationHour, uiState.notificationMinute),
                                 style = MaterialTheme.typography.titleSmall, color = CelestialBlue
                             )
                         }

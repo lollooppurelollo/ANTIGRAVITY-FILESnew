@@ -22,8 +22,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportFactory
 import javax.inject.Singleton
 
 /**
@@ -60,16 +59,14 @@ object DatabaseModule {
         @ApplicationContext context: Context,
         cryptoManager: CryptoManager
     ): AfaDatabase {
-        // Passo 1: Carica la libreria nativa SQLCipher (indispensabile prima di qualsiasi accesso al DB)
-        SQLiteDatabase.loadLibs(context)
-
-        // Passo 2: Ottieni la passphrase (genera se primo avvio, altrimenti decifra)
+        // Passo 1: Ottieni la passphrase (genera se primo avvio, altrimenti decifra)
         val passphrase = cryptoManager.getOrCreateDatabasePassphrase()
 
-        // Passo 3: Converti la passphrase in byte[] come richiesto da SQLCipher
-        val passphraseBytes = SQLiteDatabase.getBytes(passphrase)
+        // Passo 2: Converti la passphrase in byte[] come richiesto da SQLCipher
+        // String.toByteArray(Charsets.UTF_8) è il modo idiomatico Kotlin
+        val passphraseBytes = passphrase.toString().toByteArray(Charsets.UTF_8)
 
-        // Passo 4: Crea il SupportFactory — questo è il ponte tra SQLCipher e Room
+        // Passo 3: Crea il SupportFactory — questo è il ponte tra SQLCipher e Room
         val supportFactory = SupportFactory(passphraseBytes)
 
         // Passo 5: Costruisci il database Room con la factory SQLCipher

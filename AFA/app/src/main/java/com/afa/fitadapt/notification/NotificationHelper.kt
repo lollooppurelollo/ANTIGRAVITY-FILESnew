@@ -53,37 +53,35 @@ class NotificationHelper @Inject constructor(
      * Operazione idempotente — può essere chiamata più volte.
      */
     private fun createNotificationChannels() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val manager = context.getSystemService(NotificationManager::class.java)
+        val manager = context.getSystemService(NotificationManager::class.java)
 
-            val reminderChannel = NotificationChannel(
-                CHANNEL_REMINDER,
-                "Promemoria allenamento",
-                NotificationManager.IMPORTANCE_DEFAULT
-            ).apply {
-                description = "Ricorda di fare l'allenamento quotidiano"
-            }
-
-            val missedChannel = NotificationChannel(
-                CHANNEL_MISSED,
-                "Sessione saltata",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Avviso quando una sessione non viene registrata"
-            }
-
-            val motivationalChannel = NotificationChannel(
-                CHANNEL_MOTIVATIONAL,
-                "Messaggi motivazionali",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Messaggi di incoraggiamento periodici"
-            }
-
-            manager.createNotificationChannels(
-                listOf(reminderChannel, missedChannel, motivationalChannel)
-            )
+        val reminderChannel = NotificationChannel(
+            CHANNEL_REMINDER,
+            "Promemoria allenamento",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Ricorda di fare l'allenamento quotidiano"
         }
+
+        val missedChannel = NotificationChannel(
+            CHANNEL_MISSED,
+            "Sessione saltata",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Avviso quando una sessione non viene registrata"
+        }
+
+        val motivationalChannel = NotificationChannel(
+            CHANNEL_MOTIVATIONAL,
+            "Messaggi motivazionali",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Messaggi di incoraggiamento periodici"
+        }
+
+        manager.createNotificationChannels(
+            listOf(reminderChannel, missedChannel, motivationalChannel)
+        )
     }
 
     /**

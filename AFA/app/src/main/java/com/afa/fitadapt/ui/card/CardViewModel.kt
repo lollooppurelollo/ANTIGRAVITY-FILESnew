@@ -87,7 +87,7 @@ class CardViewModel @Inject constructor(
     }
 
     /** Carica il dettaglio di un singolo esercizio */
-    fun loadExerciseDetail(exerciseId: Long, cardExerciseId: Long = -1) {
+    fun loadExerciseDetail(exerciseId: Long, @Suppress("UNUSED_PARAMETER") cardExerciseId: Long = -1) {
         viewModelScope.launch {
             val exercise = exerciseRepository.getById(exerciseId)
             _exerciseDetailState.update {

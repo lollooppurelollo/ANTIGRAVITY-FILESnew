@@ -19,6 +19,7 @@ import dagger.hilt.components.SingletonComponent
  * Si usa questo modulo per dipendenze future che non rientrano
  * nelle altre categorie (es. serializer, utility condivise, ecc.).
  */
+@Suppress("unused") // Hilt module: consumato implicitamente dal framework DI
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {

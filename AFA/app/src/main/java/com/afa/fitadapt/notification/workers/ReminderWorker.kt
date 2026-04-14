@@ -53,7 +53,7 @@ class ReminderWorker @AssistedInject constructor(
             }
 
             Result.success()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Result.retry()
         }
     }

@@ -66,44 +66,44 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation("androidx.activity:activity-compose:1.9.3")
+    implementation("androidx.activity:activity-compose:1.10.1")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // ══════════════════════════════════════════════════════════
     // NAVIGAZIONE
     // ══════════════════════════════════════════════════════════
-    implementation("androidx.navigation:navigation-compose:2.8.6")
+    implementation("androidx.navigation:navigation-compose:2.8.9")
 
     // ══════════════════════════════════════════════════════════
     // LIFECYCLE + VIEWMODEL
     // ══════════════════════════════════════════════════════════
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.9.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.0")
 
     // ══════════════════════════════════════════════════════════
     // ROOM (database locale) + SQLCipher (cifratura database)
     // ══════════════════════════════════════════════════════════
-    val roomVersion = "2.6.1"
+    val roomVersion = "2.7.0"
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-ktx:$roomVersion")
     ksp("androidx.room:room-compiler:$roomVersion")
 
     // SQLCipher — cifratura trasparente del database SQLite
-    // Usiamo android-database-sqlcipher (net.sqlcipher.*) che è compatibile con Room
+    // Usiamo android-database-sqlcipher (net.sqlcipher.*) compatibile con Room
     implementation("net.zetetic:android-database-sqlcipher:4.6.1")
-    implementation("androidx.sqlite:sqlite-ktx:2.4.0")
+    implementation("androidx.sqlite:sqlite-ktx:2.5.0")
 
     // ══════════════════════════════════════════════════════════
     // DATASTORE (preferenze e impostazioni locali)
     // ══════════════════════════════════════════════════════════
-    implementation("androidx.datastore:datastore-preferences:1.1.2")
+    implementation("androidx.datastore:datastore-preferences:1.1.3")
 
     // ══════════════════════════════════════════════════════════
     // HILT (iniezione dipendenze)
     // ══════════════════════════════════════════════════════════
-    implementation("com.google.dagger:hilt-android:2.54")
-    ksp("com.google.dagger:hilt-compiler:2.54")
+    implementation("com.google.dagger:hilt-android:2.59.2")
+    ksp("com.google.dagger:hilt-compiler:2.59.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.hilt:hilt-work:1.2.0")
     ksp("androidx.hilt:hilt-compiler:1.2.0")
@@ -117,7 +117,7 @@ dependencies {
     // ══════════════════════════════════════════════════════════
     // WORKMANAGER (notifiche programmate in background)
     // ══════════════════════════════════════════════════════════
-    implementation("androidx.work:work-runtime-ktx:2.10.0")
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
 
     // ══════════════════════════════════════════════════════════
     // QR CODE (generazione QR per export dati)
@@ -127,17 +127,18 @@ dependencies {
     // ══════════════════════════════════════════════════════════
     // VIDEO PLAYER (riproduzione video esercizi)
     // ══════════════════════════════════════════════════════════
-    implementation("androidx.media3:media3-exoplayer:1.5.1")
-    implementation("androidx.media3:media3-ui:1.5.1")
+    implementation("androidx.media3:media3-exoplayer:1.6.1")
+    implementation("androidx.media3:media3-ui:1.6.1")
 
     // ══════════════════════════════════════════════════════════
     // SERIALIZZAZIONE JSON (per export dati)
     // ══════════════════════════════════════════════════════════
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
     // ══════════════════════════════════════════════════════════
     // CORE ANDROID
     // ══════════════════════════════════════════════════════════
-    implementation("androidx.core:core-ktx:1.15.0")
+    implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
 }
+

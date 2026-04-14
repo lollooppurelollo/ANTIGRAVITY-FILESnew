@@ -53,7 +53,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.afa.fitadapt.ui.theme.CelestialBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
 import com.afa.fitadapt.ui.theme.PastelBlue
 import com.afa.fitadapt.ui.theme.SageGreen

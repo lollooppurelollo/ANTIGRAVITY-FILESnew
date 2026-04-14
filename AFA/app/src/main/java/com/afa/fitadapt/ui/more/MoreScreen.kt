@@ -20,7 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.outlined.BarChart
+
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.QrCode
@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.ui.theme.CelestialBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+
 import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.ui.theme.SoftAmber
 

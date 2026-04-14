@@ -14,7 +14,6 @@ import androidx.compose.ui.graphics.Color
 // Blu Navy — colore primario, trasmette serietà e professionalità
 val NavyBlue = Color(0xFF1B3A5C)
 val NavyBlueDark = Color(0xFF0F1E33)
-val NavyBlueLight = Color(0xFF2C5A8C)
 
 // Azzurro Pastello — contenitore primario, calmo e rassicurante
 val PastelBlue = Color(0xFFDCEEFB)
@@ -22,7 +21,6 @@ val PastelBlueLight = Color(0xFFE8F4FD)
 
 // Celeste — colore secondario, vivace ma delicato
 val CelestialBlue = Color(0xFF4A90D9)
-val CelestialBlueSoft = Color(0xFF7BB3E8)
 
 // Bianchi e superfici
 val WarmWhite = Color(0xFFFAFCFE)
@@ -41,7 +39,7 @@ val SoftRoseLight = Color(0xFFFDE8E8)   // Sfondo rosa chiaro
 val TextPrimary = Color(0xFF1A1C1E)
 val TextSecondary = Color(0xFF44474E)
 val TextTertiary = Color(0xFF74777F)
-val TextOnDark = Color(0xFFFFFFFF)
+
 
 // ══════════════════════════════════════════════════════════
 // SCHEMA COLORI MATERIAL 3 (tema chiaro)

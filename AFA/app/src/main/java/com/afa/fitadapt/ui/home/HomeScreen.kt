@@ -23,10 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Article
+import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.LocalFireDepartment
-import androidx.compose.material.icons.outlined.Timer
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -247,7 +247,7 @@ fun HomeScreen(
                                 .background(PastelBlue),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Outlined.Article, "Articolo", tint = NavyBlue, modifier = Modifier.size(24.dp))
+                            Icon(Icons.AutoMirrored.Outlined.Article, "Articolo", tint = NavyBlue, modifier = Modifier.size(24.dp))
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {

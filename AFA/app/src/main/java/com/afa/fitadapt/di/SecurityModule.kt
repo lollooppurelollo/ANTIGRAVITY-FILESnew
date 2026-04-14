@@ -4,17 +4,9 @@
 // =============================================================
 package com.afa.fitadapt.di
 
-import android.content.Context
-import com.afa.fitadapt.security.BiometricHelper
-import com.afa.fitadapt.security.CryptoManager
-import com.afa.fitadapt.security.KeystoreManager
-import com.afa.fitadapt.security.PasswordManager
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
 /**
  * Modulo Hilt per i componenti di sicurezza.
@@ -29,6 +21,7 @@ import javax.inject.Singleton
  * quindi Hilt può crearli automaticamente. Questo modulo esiste per
  * documentare chiaramente le dipendenze di sicurezza e il loro scope.
  */
+@Suppress("unused") // Hilt module: consumato implicitamente dal framework DI
 @Module
 @InstallIn(SingletonComponent::class)
 object SecurityModule {

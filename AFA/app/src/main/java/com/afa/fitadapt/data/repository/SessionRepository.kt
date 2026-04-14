@@ -33,14 +33,17 @@ class SessionRepository @Inject constructor(
         sessionDao.getAllSessions()
 
     /** Sessioni di una scheda specifica */
+    @Suppress("unused") // Usata dalla schermata storico sessioni per scheda (Tranche 5)
     fun getSessionsByCard(cardId: Long): Flow<List<SessionEntity>> =
         sessionDao.getSessionsByCard(cardId)
 
     /** Una sessione con i dettagli degli esercizi completati */
+    @Suppress("unused") // Usata dalla schermata dettaglio sessione
     fun getSessionWithExercises(sessionId: Long): Flow<SessionWithExercises?> =
         sessionDao.getSessionWithExercises(sessionId)
 
     /** Sessioni in un intervallo di date */
+    @Suppress("unused") // Usata dal ExportRepository per export per periodo
     fun getSessionsInRange(fromDate: Long, toDate: Long): Flow<List<SessionEntity>> =
         sessionDao.getSessionsInRange(fromDate, toDate)
 
@@ -71,6 +74,7 @@ class SessionRepository @Inject constructor(
     }
 
     /** Aggiorna una sessione esistente */
+    @Suppress("unused") // Usata per correggere note di sessioni esistenti
     suspend fun updateSession(session: SessionEntity) =
         sessionDao.update(session)
 

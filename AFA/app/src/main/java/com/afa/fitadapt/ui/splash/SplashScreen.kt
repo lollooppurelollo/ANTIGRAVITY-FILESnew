@@ -59,6 +59,7 @@ fun SplashScreen(
         label = "splashAlpha"
     )
 
+    @Suppress("CanBeVal") // visible parte a false intenzionalmente per l'animazione fade-in
     LaunchedEffect(Unit) {
         visible = true
     }

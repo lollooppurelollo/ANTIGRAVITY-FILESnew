@@ -31,6 +31,7 @@ class ArticleRepository @Inject constructor(
         articleDao.getAll()
 
     /** Articoli per categoria */
+    @Suppress("unused") // Usata dal ArticleViewModel per filtro per categoria
     fun getByCategory(category: String): Flow<List<ArticleEntity>> =
         articleDao.getByCategory(category)
 
@@ -43,6 +44,7 @@ class ArticleRepository @Inject constructor(
         articleDao.getById(id)
 
     /** Cerca articoli per titolo */
+    @Suppress("unused") // Usata dalla barra di ricerca nella schermata articoli
     fun searchByTitle(query: String): Flow<List<ArticleEntity>> =
         articleDao.searchByTitle(query)
 
@@ -51,24 +53,29 @@ class ArticleRepository @Inject constructor(
         articleDao.getCategories()
 
     /** Aggiungi un nuovo articolo (dalla sezione protetta) */
+    @Suppress("unused") // Chiamata dalla sezione protetta - editor articoli (Tranche 5)
     suspend fun addArticle(article: ArticleEntity): Long =
         articleDao.insert(article)
 
     /** Aggiorna un articolo */
+    @Suppress("unused") // Chiamata dalla sezione protetta - modifica articolo
     suspend fun updateArticle(article: ArticleEntity) =
         articleDao.update(article)
 
     /** Elimina un articolo */
+    @Suppress("unused") // Chiamata dalla sezione protetta - elimina articolo
     suspend fun deleteArticle(article: ArticleEntity) =
         articleDao.delete(article)
 
     /** Imposta un articolo come in evidenza */
+    @Suppress("unused") // Chiamata dalla sezione protetta per articolo in evidenza
     suspend fun setFeatured(articleId: Long) {
         articleDao.clearAllFeatured()
         articleDao.setFeatured(articleId)
     }
 
     /** Verifica se ci sono articoli (per il seeding) */
+    @Suppress("unused") // Chiamata dal DatabaseSeeder al primo avvio
     suspend fun isEmpty(): Boolean =
         articleDao.count() == 0
 }

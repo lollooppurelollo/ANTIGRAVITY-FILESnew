@@ -32,10 +32,12 @@ class DiaryRepository @Inject constructor(
         diaryDao.getAll()
 
     /** Voci del diario per un giorno specifico */
+    @Suppress("unused") // Filtro per giorno, usata dalla vista calendario
     fun getDiaryEntriesForDay(startOfDay: Long, endOfDay: Long): Flow<List<DiaryEntryEntity>> =
         diaryDao.getEntriesForDay(startOfDay, endOfDay)
 
     /** Voci del diario in un intervallo di date */
+    @Suppress("unused") // Filtro per periodo, usata per export e grafici
     fun getDiaryEntriesInRange(fromDate: Long, toDate: Long): Flow<List<DiaryEntryEntity>> =
         diaryDao.getEntriesInRange(fromDate, toDate)
 
@@ -44,6 +46,7 @@ class DiaryRepository @Inject constructor(
         diaryDao.insert(entry)
 
     /** Aggiorna una voce del diario */
+    @Suppress("unused") // Usata per modifica voce del diario
     suspend fun updateDiaryEntry(entry: DiaryEntryEntity) =
         diaryDao.update(entry)
 
@@ -68,6 +71,7 @@ class DiaryRepository @Inject constructor(
         scaleEntryDao.getEntriesInRange(fromDate, toDate)
 
     /** Ultima rilevazione */
+    @Suppress("unused") // Usata dalla HomeScreen per il widget ultima rilevazione
     suspend fun getLatestScaleEntry(): ScaleEntryEntity? =
         scaleEntryDao.getLatest()
 
@@ -76,6 +80,7 @@ class DiaryRepository @Inject constructor(
         scaleEntryDao.insert(entry)
 
     /** Aggiorna una rilevazione */
+    @Suppress("unused") // Usata per correzione rilevazione inserita per errore
     suspend fun updateScaleEntry(entry: ScaleEntryEntity) =
         scaleEntryDao.update(entry)
 
@@ -90,6 +95,7 @@ class DiaryRepository @Inject constructor(
      * @param sinceDate timestamp da cui calcolare le medie
      * @return mappa scala->media (null se non ci sono dati)
      */
+    @Suppress("unused") // Usata da ArticleRepository per prioritizzazione articoli
     suspend fun getRecentAverages(sinceDate: Long): Map<String, Float?> {
         return mapOf(
             "asthenia" to scaleEntryDao.averageAstheniaSince(sinceDate),

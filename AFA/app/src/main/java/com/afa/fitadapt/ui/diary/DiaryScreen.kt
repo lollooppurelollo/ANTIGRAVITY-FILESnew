@@ -4,7 +4,7 @@
 // =============================================================
 package com.afa.fitadapt.ui.diary
 
-import androidx.compose.foundation.background
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -103,6 +103,7 @@ class DiaryViewModel @Inject constructor(
         }
     }
 
+    @Suppress("unused") // API per swipe-to-delete (da collegare alla UI)
     fun deleteDiaryEntry(entry: DiaryEntryEntity) {
         viewModelScope.launch { diaryRepository.deleteDiaryEntry(entry) }
     }

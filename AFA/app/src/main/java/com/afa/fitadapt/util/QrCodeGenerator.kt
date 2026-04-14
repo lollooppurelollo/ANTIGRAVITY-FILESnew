@@ -72,9 +72,9 @@ object QrCodeGenerator {
             )
 
             createBitmapFromMatrix(bitMatrix)
-        } catch (e: WriterException) {
+        } catch (_: WriterException) {
             null
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
@@ -86,6 +86,7 @@ object QrCodeGenerator {
      * @param size dimensione del QR in pixel
      * @return Bitmap con il QR code
      */
+    @Suppress("unused") // Usata per QR code semplici (URI brevi)
     fun generateSimpleQrCode(content: String, size: Int = QR_SIZE): Bitmap? {
         return try {
             val writer = QRCodeWriter()
@@ -104,7 +105,7 @@ object QrCodeGenerator {
             )
 
             createBitmapFromMatrix(bitMatrix)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
@@ -115,11 +116,13 @@ object QrCodeGenerator {
     private fun createBitmapFromMatrix(matrix: BitMatrix): Bitmap {
         val width = matrix.width
         val height = matrix.height
+        @Suppress("UseKtx") // Il loop pixel-per-pixel è necessario per la conversione BitMatrix
         val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
 
         for (x in 0 until width) {
             for (y in 0 until height) {
                 // Moduli neri su sfondo bianco
+                @Suppress("UseKtx") // setPixel usato intenzionalmente nel loop BitMatrix
                 bitmap.setPixel(
                     x, y,
                     if (matrix.get(x, y)) Color.BLACK else Color.WHITE

@@ -49,10 +49,15 @@ sealed class Screen(val route: String) {
     // ── Sezione protetta ──
     object ProtectedGate : Screen("protected_gate")
     object ProtectedDashboard : Screen("protected_dashboard")
+    @Suppress("unused") // Route per la Tranche 5: editor scheda
     object CardEditor : Screen("card_editor/{cardId}") {
+        @Suppress("unused") // Usata dal Navigator quando l'utente crea/modifica una scheda
         fun createRoute(cardId: Long = -1L) = "card_editor/$cardId"
     }
+    @Suppress("unused") // Route per la Tranche 5: selezione esercizi
     object ExercisePicker : Screen("exercise_picker")
+    @Suppress("unused") // Route per la Tranche 5: schede future
     object FutureCards : Screen("future_cards")
+    @Suppress("unused") // Route per la Tranche 5: editor obiettivi
     object GoalEditor : Screen("goal_editor")
 }

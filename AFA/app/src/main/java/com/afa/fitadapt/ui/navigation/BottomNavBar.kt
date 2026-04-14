@@ -8,7 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.ShowChart
+import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -36,7 +36,7 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem("Home", Screen.Home.route, Icons.Outlined.Home),
     BottomNavItem("Scheda", Screen.ActiveCard.route, Icons.Outlined.FitnessCenter),
-    BottomNavItem("Progressi", Screen.Progress.route, Icons.Outlined.ShowChart),
+    BottomNavItem("Progressi", Screen.Progress.route, Icons.AutoMirrored.Outlined.ShowChart),
     BottomNavItem("Altro", Screen.More.route, Icons.Outlined.Menu),
 )
 

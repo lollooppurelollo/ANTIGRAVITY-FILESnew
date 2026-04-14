@@ -15,6 +15,7 @@ import java.util.Date
  * Se in futuro servissero altre conversioni (liste, mappe, ecc.),
  * si aggiungono qui.
  */
+@Suppress("unused") // Metodi @TypeConverter chiamati da Room via reflection
 class Converters {
 
     // Converte un timestamp Long in un oggetto Date
