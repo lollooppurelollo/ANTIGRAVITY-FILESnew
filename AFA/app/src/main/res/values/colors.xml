@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- AFA - Colori base per risorse XML (il tema Compose usa i propri) -->
+<resources>
+    <color name="primary">#1B3A5C</color>
+    <color name="primary_container">#DCEEFB</color>
+    <color name="secondary">#4A90D9</color>
+    <color name="background">#F0F5FA</color>
+    <color name="surface">#FAFCFE</color>
+    <color name="white">#FFFFFF</color>
+    <color name="success">#4CAF7D</color>
+    <color name="warning">#F5A623</color>
+    <color name="error">#D9534F</color>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AFA - Attività Fisica Adattata
+    Tema XML base per l'Activity.
+    Il tema visivo reale è gestito da Jetpack Compose (Material 3).
+-->
+<resources>
+    <style name="Theme.AFA" parent="android:Theme.Material.Light.NoActionBar">
+        <!-- Sfondo della finestra durante il caricamento -->
+        <item name="android:windowBackground">@color/background</item>
+    </style>
+</resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AFA - Attività Fisica Adattata
+    AndroidManifest.xml
+    Manifesto dell'app: permessi, activity, provider
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permesso per mostrare notifiche (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Permesso per usare biometria (impronta/volto) -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+
+    <!-- Permesso per ricevere l'avvio del dispositivo (riavvio notifiche) -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Permesso per vibrazione (feedback tattile) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!--
+        ESPLICITAMENTE rimuoviamo il permesso INTERNET.
+        Questa app è completamente offline — nessun dato esce dal dispositivo.
+    -->
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        tools:node="remove" />
+
+    <application
+        android:name=".AfaApplication"
+        android:allowBackup="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AFA"
+        tools:targetApi="35">
+
+        <!-- Activity principale — unico punto di ingresso (Single Activity pattern) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AFA">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!--
+            Disabilitiamo l'inizializzazione automatica di WorkManager
+            perché usiamo Hilt per iniettare la HiltWorkerFactory.
+            L'inizializzazione avviene in AfaApplication.
+        -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
+    </application>
+
+</manifest>

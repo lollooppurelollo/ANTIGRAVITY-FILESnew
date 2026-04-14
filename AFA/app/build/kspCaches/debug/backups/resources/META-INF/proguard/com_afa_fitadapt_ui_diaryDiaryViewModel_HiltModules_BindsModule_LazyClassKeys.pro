@@ -1,0 +1,7 @@
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.articles.ArticlesViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.articles.ArticlesViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.auth.AuthViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.auth.AuthViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.card.CardViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.card.CardViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.diary.DiaryViewModel

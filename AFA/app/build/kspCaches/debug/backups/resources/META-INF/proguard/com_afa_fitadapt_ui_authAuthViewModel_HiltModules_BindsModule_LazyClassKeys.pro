@@ -1,0 +1,3 @@
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.articles.ArticlesViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.articles.ArticlesViewModel
+-keep,allowobfuscation,allowshrinking class com.afa.fitadapt.ui.auth.AuthViewModel

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    AFA - Attività Fisica Adattata
+    Stringhe dell'app (italiano)
+-->
+<resources>
+    <string name="app_name">AFA</string>
+    <string name="app_full_name">Attività Fisica Adattata</string>
+    <string name="app_description">Il tuo percorso di attività fisica personalizzato</string>
+</resources>

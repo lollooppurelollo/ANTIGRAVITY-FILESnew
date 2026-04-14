@@ -1,0 +1,85 @@
+com.afa.fitadapt.app-material-ripple-release-0 C:\Users\lollo\.gradle\caches\8.13\transforms\00248bed2812caac4370ee5ae35bed43\transformed\material-ripple-release\res
+com.afa.fitadapt.app-startup-runtime-1.1.1-1 C:\Users\lollo\.gradle\caches\8.13\transforms\0dc1be2633fcdd8fd14d20f98d6e1666\transformed\startup-runtime-1.1.1\res
+com.afa.fitadapt.app-navigation-runtime-ktx-2.8.6-2 C:\Users\lollo\.gradle\caches\8.13\transforms\0ede9d5158ad3948c075d37d2d35548c\transformed\navigation-runtime-ktx-2.8.6\res
+com.afa.fitadapt.app-lifecycle-livedata-2.8.7-3 C:\Users\lollo\.gradle\caches\8.13\transforms\113d04ea04d57a07bc7b45399a9b0f76\transformed\lifecycle-livedata-2.8.7\res
+com.afa.fitadapt.app-media-1.7.0-4 C:\Users\lollo\.gradle\caches\8.13\transforms\151bc253bc1a087861490ac9331d0d6c\transformed\media-1.7.0\res
+com.afa.fitadapt.app-lifecycle-runtime-ktx-release-5 C:\Users\lollo\.gradle\caches\8.13\transforms\1902a2a8e3a7a79ccf6387061a0f8565\transformed\lifecycle-runtime-ktx-release\res
+com.afa.fitadapt.app-room-ktx-2.6.1-6 C:\Users\lollo\.gradle\caches\8.13\transforms\19d5f00464605fe6177491fdc086583f\transformed\room-ktx-2.6.1\res
+com.afa.fitadapt.app-emoji2-1.3.0-7 C:\Users\lollo\.gradle\caches\8.13\transforms\25b02d9b02f5f7b08a0ee164c7b59b95\transformed\emoji2-1.3.0\res
+com.afa.fitadapt.app-sqlite-ktx-2.4.0-8 C:\Users\lollo\.gradle\caches\8.13\transforms\299fd380685c4bb216ff2e0233b078f7\transformed\sqlite-ktx-2.4.0\res
+com.afa.fitadapt.app-hilt-navigation-1.2.0-9 C:\Users\lollo\.gradle\caches\8.13\transforms\29ac5b89155c2dc126f662078e8f27e1\transformed\hilt-navigation-1.2.0\res
+com.afa.fitadapt.app-ui-release-10 C:\Users\lollo\.gradle\caches\8.13\transforms\2a55a335a422691fe024c7c37b7aa765\transformed\ui-release\res
+com.afa.fitadapt.app-activity-compose-1.9.3-11 C:\Users\lollo\.gradle\caches\8.13\transforms\2afdf5d36fc044b56681cfca90a33a1e\transformed\activity-compose-1.9.3\res
+com.afa.fitadapt.app-navigation-common-2.8.6-12 C:\Users\lollo\.gradle\caches\8.13\transforms\2dd9599acfb11fcd3492eec785435378\transformed\navigation-common-2.8.6\res
+com.afa.fitadapt.app-savedstate-ktx-1.2.1-13 C:\Users\lollo\.gradle\caches\8.13\transforms\3412950c9e609b490e24aa59d98155f1\transformed\savedstate-ktx-1.2.1\res
+com.afa.fitadapt.app-customview-poolingcontainer-1.0.0-14 C:\Users\lollo\.gradle\caches\8.13\transforms\35aff044fe191a04bc77385b3212977c\transformed\customview-poolingcontainer-1.0.0\res
+com.afa.fitadapt.app-animation-release-15 C:\Users\lollo\.gradle\caches\8.13\transforms\38daea03714e120fbac2e52745f87547\transformed\animation-release\res
+com.afa.fitadapt.app-material3-release-16 C:\Users\lollo\.gradle\caches\8.13\transforms\3daa6a1c9c7c8716c56f700a2f179a88\transformed\material3-release\res
+com.afa.fitadapt.app-runtime-saveable-release-17 C:\Users\lollo\.gradle\caches\8.13\transforms\3dd31de0e80da79eeb05aa9af24bf96b\transformed\runtime-saveable-release\res
+com.afa.fitadapt.app-material-icons-core-release-18 C:\Users\lollo\.gradle\caches\8.13\transforms\4133f7e8fc8a2e8a6080bb46961104e7\transformed\material-icons-core-release\res
+com.afa.fitadapt.app-sqlcipher-android-4.6.1-19 C:\Users\lollo\.gradle\caches\8.13\transforms\4281e0b59e4d2212ff91633df5da10a3\transformed\sqlcipher-android-4.6.1\res
+com.afa.fitadapt.app-material-icons-extended-release-20 C:\Users\lollo\.gradle\caches\8.13\transforms\47a2572ef21697c0af6e0050d6af685f\transformed\material-icons-extended-release\res
+com.afa.fitadapt.app-ui-tooling-release-21 C:\Users\lollo\.gradle\caches\8.13\transforms\47fa9c362ca558a11b8faedbb63e11ef\transformed\ui-tooling-release\res
+com.afa.fitadapt.app-work-runtime-ktx-2.10.0-22 C:\Users\lollo\.gradle\caches\8.13\transforms\4ea23b837c0f2ac8e00796c66c47968a\transformed\work-runtime-ktx-2.10.0\res
+com.afa.fitadapt.app-datastore-preferences-release-23 C:\Users\lollo\.gradle\caches\8.13\transforms\4f28b7d10975d1107e78dc3488d918c5\transformed\datastore-preferences-release\res
+com.afa.fitadapt.app-foundation-release-24 C:\Users\lollo\.gradle\caches\8.13\transforms\575fc09001be7468fd5a844e40d3feca\transformed\foundation-release\res
+com.afa.fitadapt.app-navigation-runtime-2.8.6-25 C:\Users\lollo\.gradle\caches\8.13\transforms\5bd118fb470bc31fcbca420047800465\transformed\navigation-runtime-2.8.6\res
+com.afa.fitadapt.app-fragment-1.5.1-26 C:\Users\lollo\.gradle\caches\8.13\transforms\6212fd44b55b6b64dd35f64f762507de\transformed\fragment-1.5.1\res
+com.afa.fitadapt.app-lifecycle-service-2.8.7-27 C:\Users\lollo\.gradle\caches\8.13\transforms\6404c1a7ed984d8a435d82723c16dc08\transformed\lifecycle-service-2.8.7\res
+com.afa.fitadapt.app-lifecycle-livedata-core-ktx-2.8.7-28 C:\Users\lollo\.gradle\caches\8.13\transforms\64f51135bc8542f5878287bab9acea82\transformed\lifecycle-livedata-core-ktx-2.8.7\res
+com.afa.fitadapt.app-core-1.15.0-29 C:\Users\lollo\.gradle\caches\8.13\transforms\66b209273a1aba4c151125b57066f3a7\transformed\core-1.15.0\res
+com.afa.fitadapt.app-ui-text-release-30 C:\Users\lollo\.gradle\caches\8.13\transforms\6715dae7b8d34e29fe8ef2fce554a03b\transformed\ui-text-release\res
+com.afa.fitadapt.app-profileinstaller-1.3.1-31 C:\Users\lollo\.gradle\caches\8.13\transforms\6736dce7aed15de55e671679f570ce4e\transformed\profileinstaller-1.3.1\res
+com.afa.fitadapt.app-runtime-release-32 C:\Users\lollo\.gradle\caches\8.13\transforms\6ad86c704ea624020b710a3efbf0aeda\transformed\runtime-release\res
+com.afa.fitadapt.app-lifecycle-viewmodel-release-33 C:\Users\lollo\.gradle\caches\8.13\transforms\6bac575602846720e6487d26c489080a\transformed\lifecycle-viewmodel-release\res
+com.afa.fitadapt.app-tracing-ktx-1.2.0-34 C:\Users\lollo\.gradle\caches\8.13\transforms\6bff28b0e4929fe24af2d9fb2240aa25\transformed\tracing-ktx-1.2.0\res
+com.afa.fitadapt.app-biometric-1.1.0-35 C:\Users\lollo\.gradle\caches\8.13\transforms\711d67b5886cb565008a763629ca5316\transformed\biometric-1.1.0\res
+com.afa.fitadapt.app-navigation-compose-2.8.6-36 C:\Users\lollo\.gradle\caches\8.13\transforms\71b26544bb160a34dc78c1443f24dc27\transformed\navigation-compose-2.8.6\res
+com.afa.fitadapt.app-core-runtime-2.2.0-37 C:\Users\lollo\.gradle\caches\8.13\transforms\729d640f25bff45bef26cf81eb116e12\transformed\core-runtime-2.2.0\res
+com.afa.fitadapt.app-sqlite-framework-2.4.0-38 C:\Users\lollo\.gradle\caches\8.13\transforms\7a86cc9a30683c0a29a810cd5b805ac7\transformed\sqlite-framework-2.4.0\res
+com.afa.fitadapt.app-hilt-work-1.2.0-39 C:\Users\lollo\.gradle\caches\8.13\transforms\7c7765accb249cfe793ceaf3207816ad\transformed\hilt-work-1.2.0\res
+com.afa.fitadapt.app-lifecycle-viewmodel-compose-release-40 C:\Users\lollo\.gradle\caches\8.13\transforms\7f28b9065fbee4a4f593a1494f29671e\transformed\lifecycle-viewmodel-compose-release\res
+com.afa.fitadapt.app-ui-util-release-41 C:\Users\lollo\.gradle\caches\8.13\transforms\82391157d40d62187f9f88390d632dee\transformed\ui-util-release\res
+com.afa.fitadapt.app-lifecycle-runtime-release-42 C:\Users\lollo\.gradle\caches\8.13\transforms\82443291962332b8f5a71e9d4b625fcc\transformed\lifecycle-runtime-release\res
+com.afa.fitadapt.app-navigation-common-ktx-2.8.6-43 C:\Users\lollo\.gradle\caches\8.13\transforms\82c9d0e296cf5a008fd7756a14fdf29d\transformed\navigation-common-ktx-2.8.6\res
+com.afa.fitadapt.app-appcompat-1.2.0-44 C:\Users\lollo\.gradle\caches\8.13\transforms\888e36083b25425dfaa887eaf190d7c4\transformed\appcompat-1.2.0\res
+com.afa.fitadapt.app-datastore-core-release-45 C:\Users\lollo\.gradle\caches\8.13\transforms\89b4782675639b1f8aee3276754604eb\transformed\datastore-core-release\res
+com.afa.fitadapt.app-media3-exoplayer-1.5.1-46 C:\Users\lollo\.gradle\caches\8.13\transforms\8c3427d443de99dcd80a99f89f2731ac\transformed\media3-exoplayer-1.5.1\res
+com.afa.fitadapt.app-appcompat-resources-1.2.0-47 C:\Users\lollo\.gradle\caches\8.13\transforms\92e23ec3155130d6f916953a325a8890\transformed\appcompat-resources-1.2.0\res
+com.afa.fitadapt.app-savedstate-1.2.1-48 C:\Users\lollo\.gradle\caches\8.13\transforms\9415bcafa8489d379df4888a54020ecf\transformed\savedstate-1.2.1\res
+com.afa.fitadapt.app-lifecycle-viewmodel-ktx-2.8.7-49 C:\Users\lollo\.gradle\caches\8.13\transforms\9a9d0938d1582a51cb8f038522522679\transformed\lifecycle-viewmodel-ktx-2.8.7\res
+com.afa.fitadapt.app-graphics-path-1.0.1-50 C:\Users\lollo\.gradle\caches\8.13\transforms\9b68984f4c200b22fc34ba6e6eadd5d1\transformed\graphics-path-1.0.1\res
+com.afa.fitadapt.app-lifecycle-runtime-compose-release-51 C:\Users\lollo\.gradle\caches\8.13\transforms\9c1b7fcbf70a892be439d36e9f7df69b\transformed\lifecycle-runtime-compose-release\res
+com.afa.fitadapt.app-lifecycle-process-2.8.7-52 C:\Users\lollo\.gradle\caches\8.13\transforms\9faf7df6d910386e335e3f208226198f\transformed\lifecycle-process-2.8.7\res
+com.afa.fitadapt.app-ui-graphics-release-53 C:\Users\lollo\.gradle\caches\8.13\transforms\a03b4a97480e171d271008acc65a8fd9\transformed\ui-graphics-release\res
+com.afa.fitadapt.app-ui-test-manifest-1.7.7-54 C:\Users\lollo\.gradle\caches\8.13\transforms\a16dcaaab3144af78512cc015c4c2dd0\transformed\ui-test-manifest-1.7.7\res
+com.afa.fitadapt.app-material-release-55 C:\Users\lollo\.gradle\caches\8.13\transforms\a78a570f1a3b5216311037aff96d69f9\transformed\material-release\res
+com.afa.fitadapt.app-activity-1.9.3-56 C:\Users\lollo\.gradle\caches\8.13\transforms\aa71461a82dc72b1311aa7634d185c69\transformed\activity-1.9.3\res
+com.afa.fitadapt.app-activity-ktx-1.9.3-57 C:\Users\lollo\.gradle\caches\8.13\transforms\b0ca9c5c082da1ae374e2a1dfaf88acf\transformed\activity-ktx-1.9.3\res
+com.afa.fitadapt.app-animation-core-release-58 C:\Users\lollo\.gradle\caches\8.13\transforms\b75b797bd933b0c06de91eb196a5b83f\transformed\animation-core-release\res
+com.afa.fitadapt.app-tracing-1.2.0-59 C:\Users\lollo\.gradle\caches\8.13\transforms\b833c7108300793a3918a5241372da01\transformed\tracing-1.2.0\res
+com.afa.fitadapt.app-datastore-release-60 C:\Users\lollo\.gradle\caches\8.13\transforms\bcaba23c2ebcd4fc777cd62f86841521\transformed\datastore-release\res
+com.afa.fitadapt.app-ui-geometry-release-61 C:\Users\lollo\.gradle\caches\8.13\transforms\c6feca64c6f770245a64aae05ff82432\transformed\ui-geometry-release\res
+com.afa.fitadapt.app-core-splashscreen-1.0.1-62 C:\Users\lollo\.gradle\caches\8.13\transforms\c8b7207b096cf3bc936b5597639cde64\transformed\core-splashscreen-1.0.1\res
+com.afa.fitadapt.app-recyclerview-1.3.0-63 C:\Users\lollo\.gradle\caches\8.13\transforms\ccfb359d710c2d7a308c4a750eda155b\transformed\recyclerview-1.3.0\res
+com.afa.fitadapt.app-ui-tooling-data-release-64 C:\Users\lollo\.gradle\caches\8.13\transforms\cd00c2760c77f47496cc6af5c6aa3c26\transformed\ui-tooling-data-release\res
+com.afa.fitadapt.app-ui-tooling-preview-release-65 C:\Users\lollo\.gradle\caches\8.13\transforms\d357b40552a88ecd55c12f1d66e3e512\transformed\ui-tooling-preview-release\res
+com.afa.fitadapt.app-core-ktx-1.15.0-66 C:\Users\lollo\.gradle\caches\8.13\transforms\dbe6a470ae931d7bb107bd081b0e9f0c\transformed\core-ktx-1.15.0\res
+com.afa.fitadapt.app-lifecycle-viewmodel-savedstate-2.8.7-67 C:\Users\lollo\.gradle\caches\8.13\transforms\de49a7928234e220a45ba34900645e3d\transformed\lifecycle-viewmodel-savedstate-2.8.7\res
+com.afa.fitadapt.app-annotation-experimental-1.4.1-68 C:\Users\lollo\.gradle\caches\8.13\transforms\e7fbf45293408604de9f8b5191138f5c\transformed\annotation-experimental-1.4.1\res
+com.afa.fitadapt.app-sqlite-2.4.0-69 C:\Users\lollo\.gradle\caches\8.13\transforms\f35d2b7e617682de9d563a99015dc2dc\transformed\sqlite-2.4.0\res
+com.afa.fitadapt.app-room-runtime-2.6.1-70 C:\Users\lollo\.gradle\caches\8.13\transforms\f4bae0fb4d4d596537d2caf385f0e740\transformed\room-runtime-2.6.1\res
+com.afa.fitadapt.app-ui-unit-release-71 C:\Users\lollo\.gradle\caches\8.13\transforms\f4bf1ce22eb7536b175c7b78da9ff437\transformed\ui-unit-release\res
+com.afa.fitadapt.app-media3-ui-1.5.1-72 C:\Users\lollo\.gradle\caches\8.13\transforms\f56f0ac24c1134c04e855c0192dcfe24\transformed\media3-ui-1.5.1\res
+com.afa.fitadapt.app-lifecycle-livedata-core-2.8.7-73 C:\Users\lollo\.gradle\caches\8.13\transforms\f665badd0d6fa2796e1aeeb3ca2e31f6\transformed\lifecycle-livedata-core-2.8.7\res
+com.afa.fitadapt.app-work-runtime-2.10.0-74 C:\Users\lollo\.gradle\caches\8.13\transforms\fa0a3caedd793d6ad14b2179e7b6d894\transformed\work-runtime-2.10.0\res
+com.afa.fitadapt.app-hilt-navigation-compose-1.2.0-75 C:\Users\lollo\.gradle\caches\8.13\transforms\fa0c12e6c69d39b6b8ef2d90991c95d5\transformed\hilt-navigation-compose-1.2.0\res
+com.afa.fitadapt.app-foundation-layout-release-76 C:\Users\lollo\.gradle\caches\8.13\transforms\fc0cf305e0d2865a479222dcd0b32a1c\transformed\foundation-layout-release\res
+com.afa.fitadapt.app-pngs-77 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\build\generated\res\pngs\debug
+com.afa.fitadapt.app-resValues-78 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\build\generated\res\resValues\debug
+com.afa.fitadapt.app-updated_navigation_xml-79 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\build\generated\updated_navigation_xml\debug
+com.afa.fitadapt.app-packageDebugResources-80 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\build\intermediates\incremental\debug\packageDebugResources\merged.dir
+com.afa.fitadapt.app-packageDebugResources-81 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\build\intermediates\incremental\debug\packageDebugResources\stripped.dir
+com.afa.fitadapt.app-debug-82 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\build\intermediates\merged_res\debug\mergeDebugResources
+com.afa.fitadapt.app-debug-83 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\src\debug\res
+com.afa.fitadapt.app-main-84 C:\Users\lollo\Desktop\ANTIGRAVITY FILES\AFA\app\src\main\res
