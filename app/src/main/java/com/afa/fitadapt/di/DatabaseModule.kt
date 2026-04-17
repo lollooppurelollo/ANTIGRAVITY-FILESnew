@@ -73,7 +73,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context.applicationContext,
             AfaDatabase::class.java,
-            "afa_database.db"       // Nome del file database su disco
+            "afa_v1.db"       // Nome del file database su disco
         )
             .openHelperFactory(supportFactory)   // ← QUESTA RIGA ABILITA LA CIFRATURA
             .fallbackToDestructiveMigration()     // Se lo schema cambia, ricrea il DB

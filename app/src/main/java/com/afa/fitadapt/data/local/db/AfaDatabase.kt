@@ -60,7 +60,7 @@ import com.afa.fitadapt.data.local.entity.TrainingCardEntity
         PatientProfileEntity::class,
         GoalEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
