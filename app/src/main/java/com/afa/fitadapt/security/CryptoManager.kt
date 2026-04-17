@@ -11,8 +11,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import java.security.SecureRandom
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -66,10 +68,13 @@ class CryptoManager @Inject constructor(
      * l'inizializzazione del database (nel modulo Hilt), dove serve
      * un risultato sincrono. Succede una sola volta all'avvio dell'app.
      *
+     * USIAMO Dispatchers.IO per evitare deadlock con il Main Thread
+     * quando si accede a DataStore durante l'iniezione Hilt.
+     *
      * @return la passphrase come CharArray per SQLCipher
      */
     fun getOrCreateDatabasePassphrase(): CharArray {
-        return runBlocking {
+        return runBlocking(Dispatchers.IO) {
             val preferences = context.cryptoDataStore.data.first()
             val exists = preferences[PASSPHRASE_EXISTS_KEY] ?: false
 

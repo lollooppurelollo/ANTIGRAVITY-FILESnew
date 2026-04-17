@@ -13,6 +13,14 @@ import com.afa.fitadapt.ui.navigation.AfaNavGraph
 import com.afa.fitadapt.ui.theme.AfaTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.Composable
+import androidx.compose.material3.Text
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.Modifier
 
 /**
  * Unica Activity dell'app — tutto il resto è gestito da Jetpack Compose.
@@ -46,6 +54,22 @@ class MainActivity : ComponentActivity() {
             AfaTheme {
                 AfaNavGraph(biometricHelper = biometricHelper)
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun AfaPreview() {
+    AfaTheme {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "APP AFA FUNZIONA 🚀",
+                fontSize = 24.sp
+            )
         }
     }
 }

@@ -63,8 +63,8 @@ object DatabaseModule {
         val passphrase = cryptoManager.getOrCreateDatabasePassphrase()
 
         // Passo 2: Converti la passphrase in byte[] come richiesto da SQLCipher
-        // String.toByteArray(Charsets.UTF_8) è il modo idiomatico Kotlin
-        val passphraseBytes = passphrase.toString().toByteArray(Charsets.UTF_8)
+        // Usiamo String(passphrase) per ottenere il contenuto reale dell'array
+        val passphraseBytes = String(passphrase).toByteArray(Charsets.UTF_8)
 
         // Passo 3: Crea il SupportFactory — questo è il ponte tra SQLCipher e Room
         val supportFactory = SupportFactory(passphraseBytes)

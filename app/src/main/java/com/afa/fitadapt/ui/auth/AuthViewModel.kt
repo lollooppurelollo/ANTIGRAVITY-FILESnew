@@ -59,20 +59,29 @@ class AuthViewModel @Inject constructor(
      */
     private fun initializeApp() {
         viewModelScope.launch {
-            // Popola il database con esercizi e articoli se è la prima volta
-            databaseSeeder.seedIfEmpty()
+            try {
+                // Popola il database con esercizi e articoli se è la prima volta
+                databaseSeeder.seedIfEmpty()
 
-            // Inizializza il profilo paziente se non esiste
-            profileRepository.initializeIfNeeded()
+                // Inizializza il profilo paziente se non esiste
+                profileRepository.initializeIfNeeded()
 
-            // Controlla se il setup iniziale è stato completato
-            val isSetupDone = userPreferences.isFirstSetupCompleted()
+                // Controlla se il setup iniziale è stato completato
+                val isSetupDone = userPreferences.isFirstSetupCompleted()
 
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    isFirstLaunch = !isSetupDone
-                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        isFirstLaunch = !isSetupDone
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        authError = "Errore durante l'inizializzazione: ${e.message}"
+                    )
+                }
             }
         }
     }
