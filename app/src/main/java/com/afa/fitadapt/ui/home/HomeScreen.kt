@@ -46,9 +46,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.ui.theme.SageGreenLight
 import com.afa.fitadapt.ui.theme.SoftAmber
@@ -79,7 +79,7 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(NavyBlue, CelestialBlue)
+                        colors = listOf(NavyBlue, FitlyBlue)
                     ),
                     shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
                 )
@@ -90,14 +90,14 @@ fun HomeScreen(
                 Text(
                     text = "Buongiorno! 👋",
                     style = MaterialTheme.typography.headlineLarge,
-                    color = PastelBlue
+                    color = FitlyBlueLight
                 )
                 if (uiState.patientCode.isNotBlank()) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Codice: ${uiState.patientCode}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = PastelBlue.copy(alpha = 0.7f)
+                        color = FitlyBlueLight.copy(alpha = 0.7f)
                     )
                 }
                 Spacer(modifier = Modifier.height(20.dp))
@@ -182,7 +182,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .size(44.dp)
                                 .clip(CircleShape)
-                                .background(PastelBlue),
+                                .background(FitlyBlueLight),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(Icons.Outlined.FitnessCenter, "Scheda", tint = NavyBlue, modifier = Modifier.size(24.dp))
@@ -244,7 +244,7 @@ fun HomeScreen(
                             modifier = Modifier
                                 .size(44.dp)
                                 .clip(CircleShape)
-                                .background(PastelBlue),
+                                .background(FitlyBlueLight),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(Icons.AutoMirrored.Outlined.Article, "Articolo", tint = NavyBlue, modifier = Modifier.size(24.dp))
@@ -278,7 +278,7 @@ fun HomeScreen(
                             Text(goal.title, style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
                             Text("${goal.currentValue.toInt()} / ${goal.targetValue.toInt()}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
-                        Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.titleSmall, color = if (progress >= 1f) SageGreen else CelestialBlue, fontWeight = FontWeight.Bold)
+                        Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.titleSmall, color = if (progress >= 1f) SageGreen else FitlyBlue, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -311,7 +311,7 @@ private fun StatBadge(icon: ImageVector, value: String, label: String, color: an
             Icon(icon, label, tint = color, modifier = Modifier.size(28.dp))
         }
         Spacer(modifier = Modifier.height(4.dp))
-        Text(value, style = MaterialTheme.typography.titleLarge, color = PastelBlue, fontWeight = FontWeight.Bold)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = PastelBlue.copy(alpha = 0.7f))
+        Text(value, style = MaterialTheme.typography.titleLarge, color = FitlyBlueLight, fontWeight = FontWeight.Bold)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = FitlyBlueLight.copy(alpha = 0.7f))
     }
 }

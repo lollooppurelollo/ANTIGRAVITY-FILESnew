@@ -40,9 +40,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.data.local.entity.CardExerciseEntity
 import com.afa.fitadapt.data.local.entity.ExerciseEntity
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.SageGreen
 
 /**
@@ -94,7 +94,7 @@ fun ActiveCardScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        PastelBlue,
+                        FitlyBlueLight,
                         shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
                     )
                     .padding(24.dp)
@@ -174,7 +174,7 @@ private fun ExerciseListItem(
         ) {
             // Numero ordine
             Box(
-                modifier = Modifier.size(36.dp).clip(CircleShape).background(PastelBlue),
+                modifier = Modifier.size(36.dp).clip(CircleShape).background(FitlyBlueLight),
                 contentAlignment = Alignment.Center
             ) {
                 Text("$index", style = MaterialTheme.typography.labelLarge, color = NavyBlue)
@@ -213,7 +213,7 @@ private fun ExerciseListItem(
             Icon(
                 Icons.Outlined.PlayArrow,
                 "Dettaglio",
-                tint = CelestialBlue,
+                tint = FitlyBlue,
                 modifier = Modifier.size(24.dp)
             )
         }

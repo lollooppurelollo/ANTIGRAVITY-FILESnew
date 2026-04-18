@@ -83,7 +83,7 @@ class WorkScheduler @Inject constructor(
     /**
      * Messaggi motivazionali — ogni 2 giorni.
      */
-    private fun scheduleMotivationalMessages() {
+    fun scheduleMotivationalMessages() {
         val motivationalWork = PeriodicWorkRequestBuilder<MotivationalWorker>(
             repeatInterval = 48,
             repeatIntervalTimeUnit = TimeUnit.HOURS,
@@ -101,7 +101,6 @@ class WorkScheduler @Inject constructor(
     /**
      * Cancella tutti i Worker schedulati (utile quando le notifiche vengono disattivate).
      */
-    @Suppress("unused") // Chiamata quando l'utente disattiva tutte le notifiche
     fun cancelAll() {
         val wm = WorkManager.getInstance(context)
         wm.cancelUniqueWork(ReminderWorker.WORK_NAME)
@@ -110,7 +109,6 @@ class WorkScheduler @Inject constructor(
     }
 
     /** Cancella solo il motivational worker */
-    @Suppress("unused") // Chiamata quando l'utente disattiva i messaggi motivazionali
     fun cancelMotivational() {
         WorkManager.getInstance(context).cancelUniqueWork(MotivationalWorker.WORK_NAME)
     }

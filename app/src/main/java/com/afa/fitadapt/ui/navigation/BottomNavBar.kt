@@ -18,7 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavController
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.WarmWhite
 
 /**
@@ -78,7 +78,7 @@ fun BottomNavBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = NavyBlue,
                     selectedTextColor = NavyBlue,
-                    indicatorColor = PastelBlue,
+                    indicatorColor = FitlyBlueLight,
                 )
             )
         }

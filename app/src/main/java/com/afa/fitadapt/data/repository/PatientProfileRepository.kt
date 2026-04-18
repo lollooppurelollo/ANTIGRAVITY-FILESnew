@@ -43,10 +43,6 @@ class PatientProfileRepository @Inject constructor(
     suspend fun setBiometricsEnabled(enabled: Boolean) =
         profileDao.setBiometricsEnabled(enabled)
 
-    /** Segna la sezione protetta come configurata */
-    suspend fun setProtectedSectionConfigured() =
-        profileDao.setProtectedSectionConfigured()
-
     /** Registra un accesso */
     suspend fun recordAccess() =
         profileDao.updateLastAccess(System.currentTimeMillis())

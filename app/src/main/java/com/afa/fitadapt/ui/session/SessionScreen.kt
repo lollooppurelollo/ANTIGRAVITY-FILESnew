@@ -48,7 +48,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
@@ -56,7 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.ui.theme.SoftRose
 
@@ -165,9 +165,9 @@ private fun QuestionPhase(
             modifier = Modifier.fillMaxWidth().height(52.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
-            Icon(Icons.Outlined.Edit, "Parziale", tint = CelestialBlue)
+            Icon(Icons.Outlined.Edit, "Parziale", tint = FitlyBlue)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Sì, ma solo in parte", color = CelestialBlue)
+            Text("Sì, ma solo in parte", color = FitlyBlue)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -359,7 +359,7 @@ private fun OptionalSlider(
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(label, style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
-            Text(displayValue, style = MaterialTheme.typography.titleSmall, color = CelestialBlue, fontWeight = FontWeight.Bold)
+            Text(displayValue, style = MaterialTheme.typography.titleSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
         }
         Slider(
             value = value,
@@ -367,8 +367,8 @@ private fun OptionalSlider(
             valueRange = range,
             steps = steps,
             colors = SliderDefaults.colors(
-                thumbColor = CelestialBlue,
-                activeTrackColor = CelestialBlue
+                thumbColor = FitlyBlue,
+                activeTrackColor = FitlyBlue
             )
         )
     }

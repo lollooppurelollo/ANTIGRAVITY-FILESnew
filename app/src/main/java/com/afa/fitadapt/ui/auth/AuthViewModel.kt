@@ -130,18 +130,25 @@ class AuthViewModel @Inject constructor(
     fun setPatientCode(code: String) {
         if (code.isBlank()) return
         viewModelScope.launch {
-            profileRepository.updatePatientCode(code)
-            _uiState.update { it.copy(setupStep = 2) }
+            try {
+                profileRepository.updatePatientCode(code)
+                _uiState.update { it.copy(setupStep = 2, authError = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(authError = "Errore salvataggio codice: ${e.message}") }
+            }
         }
     }
 
     /** Completa il setup iniziale (Step 2) */
     fun completeSetup() {
         viewModelScope.launch {
-            userPreferences.setFirstSetupCompleted()
-            profileRepository.setAppInitialized()
-            profileRepository.setProtectedSectionConfigured()
-            _uiState.update { it.copy(setupCompleted = true) }
+            try {
+                userPreferences.setFirstSetupCompleted()
+                profileRepository.setAppInitialized()
+                _uiState.update { it.copy(setupCompleted = true, authError = null) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(authError = "Errore completamento setup: ${e.message}") }
+            }
         }
     }
 

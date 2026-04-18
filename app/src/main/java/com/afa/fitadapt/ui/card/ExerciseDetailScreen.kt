@@ -42,12 +42,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.components.VideoPlayer
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 
 /**
  * Dettaglio di un singolo esercizio.
@@ -104,7 +106,7 @@ fun ExerciseDetailScreen(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .background(PastelBlue)
+                    .background(FitlyBlueLight)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             ) {
                 Text(
@@ -118,32 +120,37 @@ fun ExerciseDetailScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Video placeholder
+            // Video player o placeholder
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp),
-                colors = CardDefaults.cardColors(containerColor = PastelBlue),
+                    .height(200.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (exercise.videoUri != null) Color.Black else FitlyBlueLight
+                ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            Icons.Outlined.Videocam,
-                            "Video",
-                            tint = NavyBlue.copy(alpha = 0.4f),
-                            modifier = Modifier.size(48.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            if (exercise.videoUri != null) "Video disponibile"
-                            else "Video non ancora disponibile",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = NavyBlue.copy(alpha = 0.5f)
-                        )
+                if (exercise.videoUri != null) {
+                    VideoPlayer(videoUri = exercise.videoUri)
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                Icons.Outlined.Videocam,
+                                "Video",
+                                tint = NavyBlue.copy(alpha = 0.4f),
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                "Video non disponibile",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = NavyBlue.copy(alpha = 0.5f)
+                            )
+                        }
                     }
                 }
             }
@@ -195,7 +202,7 @@ fun ExerciseDetailScreen(
                 Spacer(modifier = Modifier.height(20.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = PastelBlue.copy(alpha = 0.5f)),
+                    colors = CardDefaults.cardColors(containerColor = FitlyBlueLight.copy(alpha = 0.5f)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(modifier = Modifier.padding(16.dp)) {
@@ -222,7 +229,7 @@ private fun ParameterCard(icon: ImageVector, value: String, label: String) {
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, label, tint = CelestialBlue, modifier = Modifier.size(24.dp))
+            Icon(icon, label, tint = FitlyBlue, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.height(8.dp))
             Text(value, style = MaterialTheme.typography.titleSmall, color = NavyBlue, textAlign = TextAlign.Center)
             Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

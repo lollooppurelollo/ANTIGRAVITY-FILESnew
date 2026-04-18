@@ -47,10 +47,6 @@ interface PatientProfileDao {
     @Query("UPDATE patient_profile SET biometricsEnabled = :enabled WHERE id = 1")
     suspend fun setBiometricsEnabled(enabled: Boolean)
 
-    // Segna la sezione protetta come configurata
-    @Query("UPDATE patient_profile SET protectedSectionConfigured = 1 WHERE id = 1")
-    suspend fun setProtectedSectionConfigured()
-
     // Aggiorna l'ultimo accesso
     @Query("UPDATE patient_profile SET lastAccessAt = :timestamp WHERE id = 1")
     suspend fun updateLastAccess(timestamp: Long)

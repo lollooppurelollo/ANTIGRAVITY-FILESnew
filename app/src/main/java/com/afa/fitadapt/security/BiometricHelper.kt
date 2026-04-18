@@ -43,13 +43,14 @@ class BiometricHelper @Inject constructor(
 
     /**
      * Verifica se il dispositivo supporta almeno un metodo di autenticazione.
-     *
-     * @return true se biometria o credenziali dispositivo sono disponibili
+     * Accetta sia biometria forte che credenziali dispositivo (PIN/Pattern).
      */
     fun canAuthenticate(): Boolean {
         val biometricManager = BiometricManager.from(context)
         val result = biometricManager.canAuthenticate(authenticators)
-        return result == BiometricManager.BIOMETRIC_SUCCESS
+        // Permettiamo l'accesso se il sistema è pronto o se mancano solo le impronte (ma c'è il PIN)
+        return result == BiometricManager.BIOMETRIC_SUCCESS || 
+               result == BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
     }
 
     /**
@@ -100,11 +101,10 @@ class BiometricHelper @Inject constructor(
 
         // Configura il prompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Accesso AFA")
-            .setSubtitle("Autenticati per accedere all'app")
-            .setDescription("Usa la biometria o le credenziali del dispositivo")
+            .setTitle("Accesso a Fitly")
+            .setSubtitle("Autenticati per accedere")
+            .setDescription("Usa l'impronta digitale o il codice di sblocco del tuo telefono")
             .setAllowedAuthenticators(authenticators)
-            // Nota: non serve setNegativeButtonText() quando si usa DEVICE_CREDENTIAL
             .build()
 
         // Crea e mostra il prompt

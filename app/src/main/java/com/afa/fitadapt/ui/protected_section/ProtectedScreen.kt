@@ -30,7 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.repository.PatientProfileRepository
 import com.afa.fitadapt.security.PasswordManager
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
 
 import com.afa.fitadapt.ui.theme.SageGreen
@@ -47,7 +47,8 @@ import javax.inject.Inject
 data class ProtectedUiState(
     val isAuthenticated: Boolean = false,
     val authError: String? = null,
-    val patientCode: String = ""
+    val patientCode: String = "",
+    val isPasswordConfigured: Boolean? = null // null indica che stiamo caricando
 )
 
 @HiltViewModel
@@ -59,9 +60,20 @@ class ProtectedViewModel @Inject constructor(
     val uiState = _uiState.asStateFlow()
 
     init {
+        checkPasswordStatus()
+    }
+
+    fun checkPasswordStatus() {
         viewModelScope.launch {
             val profile = profileRepository.getProfileSync()
-            _uiState.update { it.copy(patientCode = profile?.patientCode ?: "") }
+            val isConfigured = passwordManager.isPasswordConfiguredSync()
+            _uiState.update { 
+                it.copy(
+                    patientCode = profile?.patientCode ?: "",
+                    isPasswordConfigured = isConfigured,
+                    isAuthenticated = false // Reset obbligatorio ogni volta che si inizializza
+                ) 
+            }
         }
     }
 
@@ -74,6 +86,13 @@ class ProtectedViewModel @Inject constructor(
                     authError = if (!valid) "Password non corretta" else null
                 )
             }
+        }
+    }
+
+    fun setInitialPassword(password: String) {
+        viewModelScope.launch {
+            passwordManager.setPassword(password)
+            _uiState.update { it.copy(isPasswordConfigured = true, isAuthenticated = true) }
         }
     }
 
@@ -96,15 +115,31 @@ fun ProtectedGateScreen(
 ) {
     val uiState by protectedViewModel.uiState.collectAsState()
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
+    // Forza il ricaricamento dello stato quando la schermata appare
+    LaunchedEffect(Unit) {
+        protectedViewModel.checkPasswordStatus()
+    }
 
     LaunchedEffect(uiState.isAuthenticated) {
         if (uiState.isAuthenticated) onAuthenticated()
     }
 
+    // Se stiamo ancora caricando lo stato dal DataStore, mostriamo un caricamento
+    if (uiState.isPasswordConfigured == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = FitlyBlue)
+        }
+        return
+    }
+
+    val isConfigured = uiState.isPasswordConfigured == true
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Area protetta", color = NavyBlue) },
+                title = { Text(if (isConfigured) "Area protetta" else "Configura Area Protetta", color = NavyBlue) },
                 navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
@@ -115,11 +150,25 @@ fun ProtectedGateScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(Icons.Outlined.Lock, "Protetta", tint = NavyBlue, modifier = Modifier.size(56.dp))
+            Icon(
+                imageVector = if (isConfigured) Icons.Outlined.Lock else Icons.Outlined.AdminPanelSettings,
+                contentDescription = "Protetta",
+                tint = NavyBlue,
+                modifier = Modifier.size(56.dp)
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Inserisci la password", style = MaterialTheme.typography.headlineSmall, color = NavyBlue)
+            Text(
+                text = if (isConfigured) "Inserisci la password" else "Crea una password",
+                style = MaterialTheme.typography.headlineSmall,
+                color = NavyBlue
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Questa sezione è riservata all'operatore", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
+            Text(
+                text = if (isConfigured) "Questa sezione è riservata all'operatore" else "Imposta una password per proteggere questa sezione in futuro",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
             Spacer(modifier = Modifier.height(24.dp))
 
             OutlinedTextField(
@@ -127,20 +176,43 @@ fun ProtectedGateScreen(
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = if (isConfigured) ImeAction.Done else ImeAction.Next),
                 singleLine = true, isError = uiState.authError != null
             )
+            
+            if (!isConfigured) {
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = confirmPassword, onValueChange = { confirmPassword = it },
+                    label = { Text("Conferma Password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                    singleLine = true
+                )
+            }
+
             uiState.authError?.let {
                 Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
             }
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = { protectedViewModel.verifyPassword(password) },
+                onClick = { 
+                    if (isConfigured) {
+                        protectedViewModel.verifyPassword(password)
+                    } else {
+                        if (password == confirmPassword && password.isNotEmpty()) {
+                            protectedViewModel.setInitialPassword(password)
+                        } else if (password != confirmPassword) {
+                            // Errore password non corrispondenti gestito implicitamente dal bottone disabilitato o potresti aggiungere un errore nello stato
+                        }
+                    }
+                },
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                enabled = password.isNotEmpty(),
+                enabled = password.isNotEmpty() && (isConfigured || (confirmPassword.isNotEmpty() && password == confirmPassword)),
                 shape = RoundedCornerShape(16.dp)
-            ) { Text("Accedi") }
+            ) { Text(if (isConfigured) "Accedi" else "Salva e Accedi") }
         }
     }
 }
@@ -153,11 +225,19 @@ fun ProtectedDashboardScreen(
     protectedViewModel: ProtectedViewModel,
     onBack: () -> Unit,
     onManageCards: () -> Unit,
-    onManageGoals: () -> Unit
+    onManageGoals: () -> Unit,
+    onManageExercises: () -> Unit,
+    onManageArticles: () -> Unit
 ) {
     val uiState by protectedViewModel.uiState.collectAsState()
     var editingCode by remember { mutableStateOf(false) }
     var newCode by remember { mutableStateOf(uiState.patientCode) }
+
+    // Controllo sicurezza: se non autenticato, torna indietro
+    // (L'autenticazione è valida solo finché il ViewModel è in vita e lo stato è true)
+    LaunchedEffect(uiState.isAuthenticated) {
+        if (!uiState.isAuthenticated) onBack()
+    }
 
     Scaffold(
         topBar = {
@@ -197,13 +277,13 @@ fun ProtectedDashboardScreen(
             Text("Gestione", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
             Spacer(modifier = Modifier.height(8.dp))
 
-            DashboardCard(Icons.Outlined.FitnessCenter, "Schede di allenamento", "Crea, modifica e gestisci le schede", CelestialBlue, onManageCards)
+            DashboardCard(Icons.Outlined.FitnessCenter, "Schede di allenamento", "Crea, modifica e gestisci le schede", FitlyBlue, onManageCards)
             Spacer(modifier = Modifier.height(8.dp))
             DashboardCard(Icons.Outlined.Flag, "Obiettivi", "Configura gli obiettivi della paziente", SageGreen, onManageGoals)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", SoftAmber) { /* TODO: Tranche 5 */ }
+            DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", SoftAmber, onManageExercises)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", NavyBlue) { /* TODO: Tranche 5 */ }
+            DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", NavyBlue, onManageArticles)
 
             Spacer(modifier = Modifier.height(32.dp))
         }

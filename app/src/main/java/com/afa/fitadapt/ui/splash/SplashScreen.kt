@@ -33,9 +33,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.afa.fitadapt.ui.auth.AuthViewModel
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import kotlinx.coroutines.delay
 
 /**
@@ -82,7 +82,7 @@ fun SplashScreen(
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(NavyBlue, CelestialBlue)
+                    colors = listOf(NavyBlue, FitlyBlue)
                 )
             ),
         contentAlignment = Alignment.Center
@@ -92,31 +92,31 @@ fun SplashScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo — grande lettera "A" stilizzata
+            // Logo stilizzato Fitly
             Text(
-                text = "A",
-                fontSize = 72.sp,
+                text = "F",
+                fontSize = 80.sp,
                 fontWeight = FontWeight.Bold,
-                color = PastelBlue
+                color = FitlyBlueLight
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // Nome app
             Text(
-                text = "AFA",
+                text = "Fitly",
                 style = MaterialTheme.typography.displayLarge,
-                color = PastelBlue,
+                color = FitlyBlueLight,
                 fontWeight = FontWeight.Bold
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Sottotitolo
+            // Slogan
             Text(
-                text = "Attività Fisica Adattata",
+                text = "Fit your life",
                 style = MaterialTheme.typography.titleMedium,
-                color = PastelBlue.copy(alpha = 0.8f),
+                color = FitlyBlueLight.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center
             )
 
@@ -126,7 +126,7 @@ fun SplashScreen(
             if (uiState.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(32.dp),
-                    color = PastelBlue,
+                    color = FitlyBlueLight,
                     strokeWidth = 3.dp
                 )
             }

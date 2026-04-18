@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +51,7 @@ import com.afa.fitadapt.ui.progress.ProgressViewModel
 import com.afa.fitadapt.ui.protected_section.ProtectedDashboardScreen
 import com.afa.fitadapt.ui.protected_section.ProtectedGateScreen
 import com.afa.fitadapt.ui.protected_section.ProtectedViewModel
+import com.afa.fitadapt.ui.protected_section.management.*
 import com.afa.fitadapt.ui.session.SessionScreen
 import com.afa.fitadapt.ui.session.SessionViewModel
 import com.afa.fitadapt.ui.settings.SettingsScreen
@@ -294,25 +296,138 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
             }
 
             composable(Screen.ProtectedGate.route) {
+                // Usiamo un ViewModel con scope legato a QUESTA rotta specifica,
+                // così quando usciamo dalla sezione protetta, il ViewModel viene distrutto
+                // e la password verrà richiesta di nuovo al prossimo accesso.
                 val protectedViewModel: ProtectedViewModel = hiltViewModel()
                 ProtectedGateScreen(
                     protectedViewModel = protectedViewModel,
                     onBack = { navController.popBackStack() },
                     onAuthenticated = {
-                        navController.navigate(Screen.ProtectedDashboard.route) {
-                            popUpTo(Screen.ProtectedGate.route) { inclusive = true }
-                        }
+                        navController.navigate(Screen.ProtectedDashboard.route)
                     }
                 )
             }
 
             composable(Screen.ProtectedDashboard.route) {
-                val protectedViewModel: ProtectedViewModel = hiltViewModel()
+                // Condividiamo lo stesso ViewModel (grazie allo scope del backstack se volessimo),
+                // ma per semplicità e sicurezza qui richiediamo che l'utente arrivi dal Gate.
+                // Se usiamo hiltViewModel() senza specificare uno scope, ne viene creato uno nuovo
+                // che avrà isAuthenticated = false di default, forzando il ritorno al gate.
+                val backStackEntry = remember(navBackStackEntry) {
+                    navController.getBackStackEntry(Screen.ProtectedGate.route)
+                }
+                val protectedViewModel: ProtectedViewModel = hiltViewModel(backStackEntry)
+                
                 ProtectedDashboardScreen(
                     protectedViewModel = protectedViewModel,
+                    onBack = { 
+                        navController.popBackStack(Screen.ProtectedGate.route, inclusive = true)
+                    },
+                    onManageCards = { navController.navigate(Screen.CardManager.route) },
+                    onManageGoals = { navController.navigate(Screen.GoalManager.route) },
+                    onManageExercises = { navController.navigate(Screen.ExerciseLibraryManager.route) },
+                    onManageArticles = { navController.navigate(Screen.ArticleManager.route) }
+                )
+            }
+
+            // ── Rotte Gestione (Area Protetta) ──
+
+            composable(Screen.CardManager.route) {
+                val viewModel: CardManagerViewModel = hiltViewModel()
+                CardManagerScreen(
+                    viewModel = viewModel,
                     onBack = { navController.popBackStack() },
-                    onManageCards = { /* TODO: CardEditor screen */ },
-                    onManageGoals = { /* TODO: GoalEditor screen */ }
+                    onAddCard = { navController.navigate(Screen.CardEditor.createRoute(-1L)) },
+                    onEditCard = { id -> navController.navigate(Screen.CardEditor.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Screen.CardEditor.route,
+                arguments = listOf(navArgument("cardId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val viewModel: CardEditorViewModel = hiltViewModel()
+                CardEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onPickExercise = { navController.navigate(Screen.ExercisePicker.route) }
+                )
+            }
+
+            composable(Screen.ExercisePicker.route) {
+                val viewModel: ExerciseLibraryViewModel = hiltViewModel()
+                val backStackEntry = remember(navBackStackEntry) {
+                    navController.getBackStackEntry(Screen.CardEditor.route)
+                }
+                val editorViewModel: CardEditorViewModel = hiltViewModel(backStackEntry)
+                
+                ExercisePickerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onExerciseSelected = { exercise ->
+                        editorViewModel.addExercise(exercise)
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.GoalManager.route) {
+                val viewModel: GoalManagerViewModel = hiltViewModel()
+                GoalManagerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddGoal = { navController.navigate(Screen.GoalEditor.route) }
+                )
+            }
+
+            composable(Screen.GoalEditor.route) {
+                val viewModel: GoalEditorViewModel = hiltViewModel()
+                GoalEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ExerciseLibraryManager.route) {
+                val viewModel: ExerciseLibraryViewModel = hiltViewModel()
+                ExerciseLibraryManagerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddExercise = { navController.navigate(Screen.ExerciseEditor.createRoute(-1L)) },
+                    onEditExercise = { id -> navController.navigate(Screen.ExerciseEditor.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Screen.ExerciseEditor.route,
+                arguments = listOf(navArgument("exerciseId") { type = NavType.LongType })
+            ) {
+                val viewModel: ExerciseEditorViewModel = hiltViewModel()
+                ExerciseEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ArticleManager.route) {
+                val viewModel: ArticleManagerViewModel = hiltViewModel()
+                ArticleManagerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddArticle = { navController.navigate(Screen.ArticleEditor.createRoute(-1L)) },
+                    onEditArticle = { id -> navController.navigate(Screen.ArticleEditor.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Screen.ArticleEditor.route,
+                arguments = listOf(navArgument("articleId") { type = NavType.LongType })
+            ) {
+                val viewModel: ArticleEditorViewModel = hiltViewModel()
+                ArticleEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
                 )
             }
         }

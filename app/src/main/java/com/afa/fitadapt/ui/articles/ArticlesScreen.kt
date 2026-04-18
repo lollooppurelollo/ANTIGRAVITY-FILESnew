@@ -26,9 +26,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.ArticleEntity
 import com.afa.fitadapt.data.repository.ArticleRepository
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -120,7 +120,7 @@ fun ArticlesScreen(articlesViewModel: ArticlesViewModel, onBack: () -> Unit, onA
                         elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(14.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Box(modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(PastelBlue).padding(horizontal = 8.dp, vertical = 2.dp)) {
+                            Box(modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(FitlyBlueLight).padding(horizontal = 8.dp, vertical = 2.dp)) {
                                 Text(article.category, style = MaterialTheme.typography.labelSmall, color = NavyBlue)
                             }
                             Spacer(modifier = Modifier.height(8.dp))
@@ -157,13 +157,13 @@ fun ArticleDetailScreen(articlesViewModel: ArticlesViewModel, articleId: Long, o
     ) { padding ->
         if (article != null) {
             Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp)) {
-                Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(PastelBlue).padding(horizontal = 12.dp, vertical = 4.dp)) {
+                Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(FitlyBlueLight).padding(horizontal = 12.dp, vertical = 4.dp)) {
                     Text(article.category, style = MaterialTheme.typography.labelMedium, color = NavyBlue)
                 }
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(article.title, style = MaterialTheme.typography.headlineSmall, color = NavyBlue)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(article.summary, style = MaterialTheme.typography.bodyLarge, color = CelestialBlue)
+                Text(article.summary, style = MaterialTheme.typography.bodyLarge, color = FitlyBlue)
                 Spacer(modifier = Modifier.height(20.dp))
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(20.dp))

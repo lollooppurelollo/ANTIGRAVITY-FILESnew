@@ -32,9 +32,9 @@ import com.afa.fitadapt.data.repository.DiaryRepository
 import com.afa.fitadapt.data.repository.GoalRepository
 import com.afa.fitadapt.data.repository.PatientProfileRepository
 import com.afa.fitadapt.data.repository.TrainingCardRepository
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -159,7 +159,7 @@ fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
                 onClick = { exportViewModel.performExport() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 enabled = !uiState.isExporting,
-                colors = ButtonDefaults.buttonColors(containerColor = CelestialBlue),
+                colors = ButtonDefaults.buttonColors(containerColor = FitlyBlue),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 if (uiState.isExporting) {
@@ -190,7 +190,7 @@ fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
             // Risultato: file
             uiState.filePath?.let { path ->
                 Spacer(modifier = Modifier.height(24.dp))
-                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = PastelBlue)) {
+                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = FitlyBlueLight)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("File salvato ✅", style = MaterialTheme.typography.titleSmall, color = SageGreen)
                         Spacer(modifier = Modifier.height(8.dp))

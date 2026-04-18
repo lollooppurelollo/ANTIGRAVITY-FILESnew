@@ -39,18 +39,18 @@ private val AfaLightColorScheme = lightColorScheme(
 )
 
 /**
- * Tema principale dell'app AFA.
+ * Tema principale dell'app Fitly.
  * Combina colori, tipografia e forme in un unico tema Material 3.
  *
  * Uso:
  * ```
- * AfaTheme {
+ * FitlyTheme {
  *     // Il tuo contenuto Compose qui
  * }
  * ```
  */
 @Composable
-fun AfaTheme(
+fun FitlyTheme(
     content: @Composable () -> Unit
 ) {
     MaterialTheme(

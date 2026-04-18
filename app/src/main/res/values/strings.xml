@@ -4,7 +4,8 @@
     Stringhe dell'app (italiano)
 -->
 <resources>
-    <string name="app_name">AFA</string>
-    <string name="app_full_name">Attività Fisica Adattata</string>
-    <string name="app_description">Il tuo percorso di attività fisica personalizzato</string>
+    <string name="app_name">Fitly</string>
+    <string name="app_full_name">Fitly - Fit your life</string>
+    <string name="app_description">Fit your life: Il tuo percorso di attività fisica personalizzato</string>
+    <string name="app_slogan">Fit your life</string>
 </resources>

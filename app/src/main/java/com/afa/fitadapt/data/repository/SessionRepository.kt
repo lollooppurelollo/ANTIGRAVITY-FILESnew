@@ -8,6 +8,7 @@ import com.afa.fitadapt.data.local.dao.SessionDao
 import com.afa.fitadapt.data.local.entity.SessionEntity
 import com.afa.fitadapt.data.local.entity.SessionExerciseEntity
 import com.afa.fitadapt.data.local.entity.SessionWithExercises
+import com.afa.fitadapt.model.CardStatus
 import com.afa.fitadapt.util.DateUtils
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -23,7 +24,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class SessionRepository @Inject constructor(
-    private val sessionDao: SessionDao
+    private val sessionDao: SessionDao,
+    private val cardRepository: TrainingCardRepository
 ) {
 
     // ── Lettura ──
@@ -70,7 +72,27 @@ class SessionRepository @Inject constructor(
             sessionDao.insertSessionExercises(completionsWithSessionId)
         }
 
+        // --- Logica Sequential Card: controlla se la scheda è finita ---
+        checkAndAdvanceCard(session.cardId)
+
         return sessionId
+    }
+
+    /**
+     * Controlla se una scheda ha raggiunto il limite di sedute e passa alla prossima.
+     */
+    private suspend fun checkAndAdvanceCard(cardId: Long) {
+        val card = cardRepository.getById(cardId) ?: return
+        if (!card.autoAdvance || card.status != CardStatus.ACTIVE.name) return
+
+        val target = card.targetSessions ?: return
+        val completedCount = sessionDao.countCompletedByCard(cardId)
+
+        if (completedCount >= target) {
+            // Scheda terminata! Completa e avanza
+            cardRepository.completeCard(cardId)
+            cardRepository.advanceToNextCard()
+        }
     }
 
     /** Aggiorna una sessione esistente */

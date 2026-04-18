@@ -18,7 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.datastore.UserPreferences
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.notification.WorkScheduler
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,8 @@ data class SettingsUiState(
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val workScheduler: WorkScheduler
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState = _uiState.asStateFlow()
@@ -53,11 +55,39 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { userPreferences.motivationalMessagesEnabled.collect { v -> _uiState.update { it.copy(motivationalEnabled = v) } } }
     }
 
-    fun toggleNotifications(enabled: Boolean) { viewModelScope.launch { userPreferences.setNotificationEnabled(enabled) } }
+    fun toggleNotifications(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferences.setNotificationEnabled(enabled)
+            if (enabled) {
+                workScheduler.scheduleAll()
+            } else {
+                workScheduler.cancelAll()
+            }
+        }
+    }
+
     fun toggleBiometrics(enabled: Boolean) { viewModelScope.launch { userPreferences.setBiometricsEnabled(enabled) } }
-    fun toggleMotivational(enabled: Boolean) { viewModelScope.launch { userPreferences.setMotivationalMessagesEnabled(enabled) } }
-    @Suppress("unused") // Sarà chiamata dal TimePicker nella schermata impostazioni
-    fun setNotificationTime(hour: Int, minute: Int) { viewModelScope.launch { userPreferences.setNotificationTime(hour, minute) } }
+
+    fun toggleMotivational(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferences.setMotivationalMessagesEnabled(enabled)
+            if (enabled) {
+                workScheduler.scheduleMotivationalMessages()
+            } else {
+                workScheduler.cancelMotivational()
+            }
+        }
+    }
+
+    fun setNotificationTime(hour: Int, minute: Int) {
+        viewModelScope.launch {
+            userPreferences.setNotificationTime(hour, minute)
+            // Re-schedula per applicare il nuovo orario (se abilitate)
+            if (_uiState.value.notificationsEnabled) {
+                workScheduler.scheduleAll()
+            }
+        }
+    }
 }
 
 // ── Screen ──
@@ -91,7 +121,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) {
                             Text("Orario promemoria", style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
                             Text(
                                 String.format(Locale.ROOT, "%02d:%02d", uiState.notificationHour, uiState.notificationMinute),
-                                style = MaterialTheme.typography.titleSmall, color = CelestialBlue
+                                style = MaterialTheme.typography.titleSmall, color = FitlyBlue
                             )
                         }
                     }

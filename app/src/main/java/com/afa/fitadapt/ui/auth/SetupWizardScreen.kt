@@ -19,11 +19,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Visibility
@@ -48,16 +50,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.SageGreen
+import com.afa.fitadapt.ui.theme.TextSecondary
 
 /**
  * Wizard di configurazione iniziale (3 step).
@@ -86,9 +90,9 @@ fun SetupWizardScreen(
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Titolo
+        // Titolo rebranding Fitly
         Text(
-            text = "Configurazione iniziale",
+            text = "Benvenuta in Fitly",
             style = MaterialTheme.typography.headlineLarge,
             color = NavyBlue
         )
@@ -96,7 +100,7 @@ fun SetupWizardScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Prepariamo l'app per il tuo percorso",
+            text = "Personalizziamo la tua esperienza",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -144,25 +148,27 @@ private fun StepIndicator(currentStep: Int) {
             val isDone = i < currentStep
             val color = when {
                 isDone -> SageGreen
-                isCurrent -> CelestialBlue
-                else -> PastelBlue
+                isCurrent -> FitlyBlue
+                else -> FitlyBlueLight
             }
 
             Box(
                 modifier = Modifier
-                    .size(if (isCurrent) 36.dp else 28.dp)
+                    .size(if (isCurrent) 32.dp else 24.dp)
                     .clip(CircleShape)
                     .background(color),
                 contentAlignment = Alignment.Center
             ) {
                 if (isDone) {
-                    Icon(Icons.Default.Check, "Completato", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Check, "Completato", tint = Color.White, modifier = Modifier.size(16.dp))
                 } else {
-                    Text("${i + 1}", color = MaterialTheme.colorScheme.onPrimary, style = MaterialTheme.typography.labelMedium)
+                    Text("${i + 1}", color = if (isCurrent) Color.White else NavyBlue, style = MaterialTheme.typography.labelMedium)
                 }
             }
             if (i < 2) {
-                Box(modifier = Modifier.width(40.dp).height(2.dp).background(if (isDone) SageGreen else PastelBlue))
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(modifier = Modifier.width(32.dp).height(2.dp).background(if (isDone) SageGreen else FitlyBlueLight))
+                Spacer(modifier = Modifier.width(8.dp))
             }
         }
     }
@@ -302,14 +308,14 @@ private fun ConfirmStep(
                 modifier = Modifier.size(64.dp).clip(CircleShape).background(SageGreen),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Check, "OK", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(32.dp))
+                Icon(Icons.Default.Check, "OK", tint = Color.White, modifier = Modifier.size(32.dp))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             Text("Tutto pronto!", style = MaterialTheme.typography.titleLarge, color = NavyBlue)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "L'app è configurata. Potrai modificare le impostazioni in qualsiasi momento dalla sezione protetta.",
+                "La configurazione di Fitly è terminata. Inizia subito il tuo percorso!",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -318,13 +324,14 @@ private fun ConfirmStep(
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = onConfirm,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = SageGreen)
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = FitlyBlue),
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Iniziamo!", color = MaterialTheme.colorScheme.onPrimary)
+                Text("Entra in Fitly", color = Color.White)
             }
             Spacer(modifier = Modifier.height(8.dp))
-            TextButton(onClick = onBack) { Text("Indietro") }
+            TextButton(onClick = onBack) { Text("Indietro", color = TextSecondary) }
         }
     }
 }

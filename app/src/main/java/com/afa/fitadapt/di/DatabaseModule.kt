@@ -22,6 +22,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
 import net.sqlcipher.database.SupportFactory
 import javax.inject.Singleton
 
@@ -60,10 +61,14 @@ object DatabaseModule {
         cryptoManager: CryptoManager
     ): AfaDatabase {
         // Passo 1: Ottieni la passphrase (genera se primo avvio, altrimenti decifra)
-        val passphrase = cryptoManager.getOrCreateDatabasePassphrase()
+        // Room richiede l'apertura sincrona dell'HelperFactory nel thread di apertura DB.
+        // Poiché Hilt inietta il database come singleton, questa chiamata avviene
+        // alla prima richiesta del database.
+        val passphrase = runBlocking {
+            cryptoManager.getOrCreateDatabasePassphrase()
+        }
 
         // Passo 2: Converti la passphrase in byte[] come richiesto da SQLCipher
-        // Usiamo String(passphrase) per ottenere il contenuto reale dell'array
         val passphraseBytes = String(passphrase).toByteArray(Charsets.UTF_8)
 
         // Passo 3: Crea il SupportFactory — questo è il ponte tra SQLCipher e Room

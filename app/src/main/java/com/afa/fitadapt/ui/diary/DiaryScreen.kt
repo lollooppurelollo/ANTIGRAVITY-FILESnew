@@ -23,9 +23,9 @@ import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.DiaryEntryEntity
 import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import com.afa.fitadapt.data.repository.DiaryRepository
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -127,7 +127,7 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, onBack: () -> Unit) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { if (uiState.selectedTab == 0) diaryViewModel.toggleAddDiary() else diaryViewModel.toggleAddScale() },
-                containerColor = CelestialBlue
+                containerColor = FitlyBlue
             ) { Icon(Icons.Default.Add, "Aggiungi", tint = MaterialTheme.colorScheme.onPrimary) }
         }
     ) { padding ->
@@ -152,7 +152,7 @@ private fun DiaryTab(uiState: DiaryUiState, vm: DiaryViewModel) {
         // Form per aggiungere
         if (uiState.showAddDiary) {
             item {
-                Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = PastelBlue), shape = RoundedCornerShape(16.dp)) {
+                Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = FitlyBlueLight), shape = RoundedCornerShape(16.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Come ti senti oggi?", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
                         Spacer(modifier = Modifier.height(8.dp))
@@ -193,7 +193,7 @@ private fun DiaryTab(uiState: DiaryUiState, vm: DiaryViewModel) {
                 elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = CelestialBlue, fontWeight = FontWeight.Bold)
+                    Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(entry.text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                 }
@@ -207,7 +207,7 @@ private fun ScalesTab(uiState: DiaryUiState, vm: DiaryViewModel) {
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         if (uiState.showAddScale) {
             item {
-                Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = PastelBlue), shape = RoundedCornerShape(16.dp)) {
+                Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = FitlyBlueLight), shape = RoundedCornerShape(16.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Come stai oggi? (0-10)", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
                         Spacer(modifier = Modifier.height(12.dp))
@@ -247,7 +247,7 @@ private fun ScalesTab(uiState: DiaryUiState, vm: DiaryViewModel) {
                 elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = CelestialBlue, fontWeight = FontWeight.Bold)
+                    Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         entry.asthenia?.let { ScaleBadge("Astenia", it) }
@@ -266,7 +266,7 @@ private fun ScaleSlider(label: String, value: Float, onValueChange: (Float) -> U
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(label, style = MaterialTheme.typography.bodySmall, color = NavyBlue)
-            Text("${value.toInt()}/10", style = MaterialTheme.typography.labelLarge, color = CelestialBlue)
+            Text("${value.toInt()}/10", style = MaterialTheme.typography.labelLarge, color = FitlyBlue)
         }
         Slider(value = value, onValueChange = onValueChange, valueRange = 0f..10f, steps = 9)
     }
@@ -275,7 +275,7 @@ private fun ScaleSlider(label: String, value: Float, onValueChange: (Float) -> U
 @Composable
 private fun ScaleBadge(label: String, value: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("$value", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = when { value <= 3 -> SageGreen; value <= 6 -> CelestialBlue; else -> MaterialTheme.colorScheme.error })
+        Text("$value", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = when { value <= 3 -> SageGreen; value <= 6 -> FitlyBlue; else -> MaterialTheme.colorScheme.error })
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

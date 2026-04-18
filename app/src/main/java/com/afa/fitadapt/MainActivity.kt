@@ -4,13 +4,13 @@
 // =============================================================
 package com.afa.fitadapt
 
+import androidx.fragment.app.FragmentActivity
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.afa.fitadapt.security.BiometricHelper
 import com.afa.fitadapt.ui.navigation.AfaNavGraph
-import com.afa.fitadapt.ui.theme.AfaTheme
+import com.afa.fitadapt.ui.theme.FitlyTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.compose.foundation.layout.Box
@@ -27,14 +27,14 @@ import androidx.compose.ui.Modifier
  *
  * Questa activity:
  * 1. Abilita la visualizzazione edge-to-edge (contenuto sotto status bar)
- * 2. Imposta il tema Material 3 AFA
+ * 2. Imposta il tema Material 3 Fitly
  * 3. Lancia il navigation graph Compose
  *
  * @AndroidEntryPoint permette a Hilt di iniettare dipendenze nei ViewModel
  * usati all'interno delle schermate Compose.
  */
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
 
     /**
      * BiometricHelper viene iniettato da Hilt.
@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            AfaTheme {
+            FitlyTheme {
                 AfaNavGraph(biometricHelper = biometricHelper)
             }
         }
@@ -60,14 +60,14 @@ class MainActivity : ComponentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-fun AfaPreview() {
-    AfaTheme {
+fun FitlyPreview() {
+    FitlyTheme {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "APP AFA FUNZIONA 🚀",
+                text = "Fitly - Fit your life 🚀",
                 fontSize = 24.sp
             )
         }

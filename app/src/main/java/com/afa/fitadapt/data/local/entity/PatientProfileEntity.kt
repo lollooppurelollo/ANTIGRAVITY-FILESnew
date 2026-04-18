@@ -19,7 +19,6 @@ import androidx.room.PrimaryKey
  * @property createdAt timestamp della prima configurazione
  * @property appInitialized se true, il setup iniziale è stato completato
  * @property biometricsEnabled se true, l'accesso biometrico è attivo
- * @property protectedSectionConfigured se true, la password è stata impostata
  * @property lastAccessAt ultimo accesso all'app (timestamp, opzionale)
  */
 @Entity(tableName = "patient_profile")
@@ -34,8 +33,6 @@ data class PatientProfileEntity(
     val appInitialized: Boolean = false,
 
     val biometricsEnabled: Boolean = true,
-
-    val protectedSectionConfigured: Boolean = false,
 
     val lastAccessAt: Long? = null
 )

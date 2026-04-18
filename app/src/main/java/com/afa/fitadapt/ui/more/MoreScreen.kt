@@ -36,7 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
 
 import com.afa.fitadapt.ui.theme.SageGreen
@@ -81,7 +81,7 @@ fun MoreScreen(
             icon = Icons.Outlined.Book,
             title = "Diario",
             subtitle = "Scrivi come ti senti e registra le scale rapide",
-            color = CelestialBlue,
+            color = FitlyBlue,
             onClick = onNavigateToDiary
         )
 

@@ -49,15 +49,29 @@ sealed class Screen(val route: String) {
     // ── Sezione protetta ──
     object ProtectedGate : Screen("protected_gate")
     object ProtectedDashboard : Screen("protected_dashboard")
-    @Suppress("unused") // Route per la Tranche 5: editor scheda
+    
+    // Gestione Schede
+    object CardManager : Screen("card_manager")
     object CardEditor : Screen("card_editor/{cardId}") {
-        @Suppress("unused") // Usata dal Navigator quando l'utente crea/modifica una scheda
         fun createRoute(cardId: Long = -1L) = "card_editor/$cardId"
     }
-    @Suppress("unused") // Route per la Tranche 5: selezione esercizi
-    object ExercisePicker : Screen("exercise_picker")
-    @Suppress("unused") // Route per la Tranche 5: schede future
-    object FutureCards : Screen("future_cards")
-    @Suppress("unused") // Route per la Tranche 5: editor obiettivi
+    
+    // Gestione Obiettivi
+    object GoalManager : Screen("goal_manager")
     object GoalEditor : Screen("goal_editor")
+    
+    // Gestione Esercizi
+    object ExerciseLibraryManager : Screen("exercise_library_manager")
+    object ExerciseEditor : Screen("exercise_editor/{exerciseId}") {
+        fun createRoute(exerciseId: Long = -1L) = "exercise_editor/$exerciseId"
+    }
+    
+    // Gestione Articoli
+    object ArticleManager : Screen("article_manager")
+    object ArticleEditor : Screen("article_editor/{articleId}") {
+        fun createRoute(articleId: Long = -1L) = "article_editor/$articleId"
+    }
+
+    @Suppress("unused") // Usata dal Navigator per selezione esercizi nelle schede
+    object ExercisePicker : Screen("exercise_picker")
 }

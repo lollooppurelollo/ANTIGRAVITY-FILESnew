@@ -44,9 +44,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.afa.fitadapt.ui.theme.CelestialBlue
+import com.afa.fitadapt.ui.theme.FitlyBlue
 import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.PastelBlue
+import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.ui.theme.SageGreenLight
 import com.afa.fitadapt.ui.theme.SoftAmber
@@ -69,7 +69,7 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(PastelBlue, shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+                .background(FitlyBlueLight, shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
                 .padding(24.dp)
                 .padding(top = 8.dp)
         ) {
@@ -96,14 +96,14 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                     "${uiState.adherencePercent.toInt()}%",
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (uiState.adherencePercent >= 70) SageGreen else if (uiState.adherencePercent >= 40) SoftAmber else CelestialBlue
+                    color = if (uiState.adherencePercent >= 70) SageGreen else if (uiState.adherencePercent >= 40) SoftAmber else FitlyBlue
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 LinearProgressIndicator(
                     progress = { (uiState.adherencePercent / 100f).coerceIn(0f, 1f) },
                     modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
-                    color = if (uiState.adherencePercent >= 70) SageGreen else CelestialBlue,
-                    trackColor = PastelBlue,
+                    color = if (uiState.adherencePercent >= 70) SageGreen else FitlyBlue,
+                    trackColor = FitlyBlueLight,
                     strokeCap = StrokeCap.Round,
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -124,8 +124,8 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
         }
         Spacer(modifier = Modifier.height(12.dp))
         Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(modifier = Modifier.weight(1f), icon = Icons.Outlined.Timer, value = "${uiState.totalMinutes}", label = "Minuti totali", color = CelestialBlue, bgColor = PastelBlue)
-            StatCard(modifier = Modifier.weight(1f), icon = Icons.Outlined.FitnessCenter, value = "${uiState.completedSessions}", label = "Sessioni fatte", color = NavyBlue, bgColor = PastelBlue)
+            StatCard(modifier = Modifier.weight(1f), icon = Icons.Outlined.Timer, value = "${uiState.totalMinutes}", label = "Minuti totali", color = FitlyBlue, bgColor = FitlyBlueLight)
+            StatCard(modifier = Modifier.weight(1f), icon = Icons.Outlined.FitnessCenter, value = "${uiState.completedSessions}", label = "Sessioni fatte", color = NavyBlue, bgColor = FitlyBlueLight)
         }
 
         // Obiettivi
@@ -147,14 +147,14 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                             Text("🎯", fontSize = 20.sp)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(goal.title, style = MaterialTheme.typography.titleSmall, color = NavyBlue, modifier = Modifier.weight(1f))
-                            Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.titleSmall, color = if (progress >= 1f) SageGreen else CelestialBlue, fontWeight = FontWeight.Bold)
+                            Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.titleSmall, color = if (progress >= 1f) SageGreen else FitlyBlue, fontWeight = FontWeight.Bold)
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         LinearProgressIndicator(
                             progress = { progress },
                             modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
-                            color = if (progress >= 1f) SageGreen else CelestialBlue,
-                            trackColor = PastelBlue,
+                            color = if (progress >= 1f) SageGreen else FitlyBlue,
+                            trackColor = FitlyBlueLight,
                             strokeCap = StrokeCap.Round,
                         )
                         Spacer(modifier = Modifier.height(4.dp))

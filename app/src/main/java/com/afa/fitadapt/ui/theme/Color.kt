@@ -7,53 +7,51 @@ package com.afa.fitadapt.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ══════════════════════════════════════════════════════════
-// PALETTE PRINCIPALE AFA
-// Palette medicale rassicurante: azzurro pastello, bianco, blu navy
+// PALETTE PRINCIPALE FITLY
+// Palette medicale-fitness moderna: Azzurro pastello vibrante, Navy Blue, Bianchi puliti
 // ══════════════════════════════════════════════════════════
 
-// Blu Navy — colore primario, trasmette serietà e professionalità
+// Blu Navy — testi e icone principali, trasmette professionalità
 val NavyBlue = Color(0xFF1B3A5C)
 val NavyBlueDark = Color(0xFF0F1E33)
 
-// Azzurro Pastello — contenitore primario, calmo e rassicurante
-val PastelBlue = Color(0xFFDCEEFB)
-val PastelBlueLight = Color(0xFFE8F4FD)
+// Fitly Blue (Azzurro Pastello Moderno) — Il cuore dell'identità visiva
+// Un azzurro bilanciato tra il sanitario e il fitness tech
+val FitlyBlue = Color(0xFF7CB9E8)      // Azzurro pastello più deciso
+val FitlyBlueLight = Color(0xFFE3F2FD) // Versione molto chiara per sfondi
+val FitlyBlueDark = Color(0xFF4682B4)  // Versione più scura per accenti
 
-// Celeste — colore secondario, vivace ma delicato
-val CelestialBlue = Color(0xFF4A90D9)
-
-// Bianchi e superfici
+// Bianchi e superfici pulite
 val WarmWhite = Color(0xFFFAFCFE)
-val IceWhite = Color(0xFFF0F5FA)
-val SurfaceVariant = Color(0xFFE4E8ED)
+val IceWhite = Color(0xFFF4F9FF)       // Sfondo leggermente azzurrato
+val SurfaceVariant = Color(0xFFEBF2F7)
 
-// Colori funzionali
-val SageGreen = Color(0xFF4CAF7D)       // Successo, streak, completamento
-val SageGreenLight = Color(0xFFE8F5EE)  // Sfondo verde chiaro
-val SoftAmber = Color(0xFFF5A623)       // Attenzione, obiettivi
-val SoftAmberLight = Color(0xFFFFF4E0)  // Sfondo ambra chiaro
-val SoftRose = Color(0xFFD9534F)        // Errore
-val SoftRoseLight = Color(0xFFFDE8E8)   // Sfondo rosa chiaro
+// Colori funzionali (mantenuti ma armonizzati)
+val SageGreen = Color(0xFF52B788)       // Successo moderno
+val SageGreenLight = Color(0xFFD8F3DC)
+val SoftAmber = Color(0xFFFFB347)       // Ambra pastello
+val SoftAmberLight = Color(0xFFFFF3E0)
+val SoftRose = Color(0xFFE57373)        // Rosso pastello
+val SoftRoseLight = Color(0xFFFFEBEE)
 
 // Testi
-val TextPrimary = Color(0xFF1A1C1E)
-val TextSecondary = Color(0xFF44474E)
-val TextTertiary = Color(0xFF74777F)
-
+val TextPrimary = Color(0xFF2C3E50)
+val TextSecondary = Color(0xFF5D6D7E)
+val TextTertiary = Color(0xFF85929E)
 
 // ══════════════════════════════════════════════════════════
 // SCHEMA COLORI MATERIAL 3 (tema chiaro)
 // ══════════════════════════════════════════════════════════
 
-val md_light_primary = NavyBlue
+val md_light_primary = FitlyBlueDark
 val md_light_onPrimary = Color.White
-val md_light_primaryContainer = PastelBlue
-val md_light_onPrimaryContainer = NavyBlueDark
+val md_light_primaryContainer = FitlyBlueLight
+val md_light_onPrimaryContainer = NavyBlue
 
-val md_light_secondary = CelestialBlue
+val md_light_secondary = FitlyBlue
 val md_light_onSecondary = Color.White
-val md_light_secondaryContainer = PastelBlueLight
-val md_light_onSecondaryContainer = NavyBlue
+val md_light_secondaryContainer = Color.White
+val md_light_onSecondaryContainer = FitlyBlueDark
 
 val md_light_tertiary = SageGreen
 val md_light_onTertiary = Color.White
