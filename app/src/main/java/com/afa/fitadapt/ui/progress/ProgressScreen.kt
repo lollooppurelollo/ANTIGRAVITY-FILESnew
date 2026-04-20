@@ -55,6 +55,7 @@ import com.afa.fitadapt.ui.theme.SoftAmberLight
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import com.afa.fitadapt.data.local.entity.SessionEntity
 import com.afa.fitadapt.ui.theme.SoftRose
 
@@ -177,17 +178,16 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
         }
 
         // Grafici Trend
-        if (uiState.recentSessions.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(24.dp))
-            Text("Trend Parametri", style = MaterialTheme.typography.titleMedium, color = NavyBlue, modifier = Modifier.padding(horizontal = 24.dp))
-            Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(24.dp))
+        Text("Trend Parametri", style = MaterialTheme.typography.titleMedium, color = NavyBlue, modifier = Modifier.padding(horizontal = 24.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-            TrendChartCard(
-                title = "Andamento Parametri",
-                sessions = uiState.recentSessions.reversed(),
-                modifier = Modifier.padding(horizontal = 24.dp)
-            )
-        }
+        TrendChartCard(
+            title = "Andamento Parametri",
+            sessions = uiState.recentSessions.reversed(),
+            scaleEntries = uiState.scaleEntries.sortedBy { it.date },
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
 
         // Obiettivi
         if (uiState.activeGoals.isNotEmpty()) {
@@ -250,15 +250,28 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
 private fun TrendChartCard(
     title: String,
     sessions: List<SessionEntity>,
+    scaleEntries: List<ScaleEntryEntity>,
     modifier: Modifier = Modifier
 ) {
     val completedSessions = sessions.filter { it.completed }
-    var showEffort by remember { mutableStateOf(true) }
-    var showMood by remember { mutableStateOf(true) }
+    
+    // Filtri visibilità
+    var showEffort by remember { mutableStateOf(false) }
+    var showMood by remember { mutableStateOf(false) }
     var showSleep by remember { mutableStateOf(false) }
-    var showDuration by remember { mutableStateOf(false) }
+    var showAsthenia by remember { mutableStateOf(true) }
+    var showPain by remember { mutableStateOf(true) }
+    var showRestDyspnea by remember { mutableStateOf(false) }
+    var showExertionDyspnea by remember { mutableStateOf(false) }
 
-    if (completedSessions.size < 2) {
+    // Unifichiamo i dati per asse X (date)
+    val allDates = (completedSessions.map { it.date } + scaleEntries.map { it.date })
+        .map { com.afa.fitadapt.util.DateUtils.toDayTimestamp(it) }
+        .distinct()
+        .sorted()
+        .takeLast(10) // Ultime 10 date con dati
+
+    if (allDates.size < 2) {
         Card(
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
@@ -282,11 +295,20 @@ private fun TrendChartCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Filtri
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                FilterChip(selected = showEffort, onClick = { showEffort = !showEffort }, label = { Text("Fatica", fontSize = 9.sp) })
-                FilterChip(selected = showMood, onClick = { showMood = !showMood }, label = { Text("Umore", fontSize = 9.sp) })
-                FilterChip(selected = showSleep, onClick = { showSleep = !showSleep }, label = { Text("Sonno", fontSize = 9.sp) })
-                FilterChip(selected = showDuration, onClick = { showDuration = !showDuration }, label = { Text("Durata", fontSize = 9.sp) })
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FilterChip(selected = showAsthenia, onClick = { showAsthenia = !showAsthenia }, label = { Text("Astenia", fontSize = 9.sp) }, modifier = Modifier.height(32.dp))
+                    FilterChip(selected = showPain, onClick = { showPain = !showPain }, label = { Text("Dolore", fontSize = 9.sp) }, modifier = Modifier.height(32.dp))
+                    FilterChip(selected = showRestDyspnea, onClick = { showRestDyspnea = !showRestDyspnea }, label = { Text("Dispnea a riposo", fontSize = 9.sp) }, modifier = Modifier.height(32.dp))
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FilterChip(selected = showExertionDyspnea, onClick = { showExertionDyspnea = !showExertionDyspnea }, label = { Text("Dispnea a sforzi minimi", fontSize = 9.sp) }, modifier = Modifier.height(32.dp))
+                    FilterChip(selected = showEffort, onClick = { showEffort = !showEffort }, label = { Text("Fatica Sessione", fontSize = 9.sp) }, modifier = Modifier.height(32.dp))
+                }
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    FilterChip(selected = showMood, onClick = { showMood = !showMood }, label = { Text("Umore", fontSize = 9.sp) }, modifier = Modifier.height(32.dp))
+                    FilterChip(selected = showSleep, onClick = { showSleep = !showSleep }, label = { Text("Qualità sonno", fontSize = 9.sp) }, modifier = Modifier.height(32.dp))
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -294,61 +316,75 @@ private fun TrendChartCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(180.dp)
-                    .padding(bottom = 24.dp)
+                    .height(200.dp)
+                    .padding(bottom = 24.dp, end = 8.dp)
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     val width = size.width
                     val height = size.height
-                    val spacing = width / (completedSessions.size - 1)
+                    val spacing = width / (allDates.size - 1)
 
-                    // Linea Fatica (SoftRose)
+                    // Helper per disegnare linee
+                    fun drawTrendLine(points: List<Pair<Int, Float>>, color: Color) {
+                        if (points.size < 2) return
+                        val path = Path()
+                        points.forEachIndexed { i, p ->
+                            val x = p.first * spacing
+                            val y = height - (p.second / 10f * height)
+                            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+                        }
+                        drawPath(path, color = color, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
+                    }
+
+                    // Preparazione punti
                     if (showEffort) {
-                        val effortPath = Path()
-                        completedSessions.forEachIndexed { index, session ->
-                            val effort = session.perceivedEffort?.toFloat() ?: 5f
-                            val x = index * spacing
-                            val y = height - (effort / 10f * height)
-                            if (index == 0) effortPath.moveTo(x, y) else effortPath.lineTo(x, y)
+                        val pts = allDates.mapIndexedNotNull { i, d -> 
+                            val s = completedSessions.find { com.afa.fitadapt.util.DateUtils.isSameDay(it.date, d) }
+                            s?.perceivedEffort?.let { i to it.toFloat() }
                         }
-                        drawPath(effortPath, color = SoftRose, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
+                        drawTrendLine(pts, SoftRose)
                     }
-
-                    // Linea Umore (SageGreen)
                     if (showMood) {
-                        val moodPath = Path()
-                        completedSessions.forEachIndexed { index, session ->
-                            val mood = session.mood?.toFloat() ?: 5f
-                            val x = index * spacing
-                            val y = height - (mood / 10f * height)
-                            if (index == 0) moodPath.moveTo(x, y) else moodPath.lineTo(x, y)
+                        val pts = allDates.mapIndexedNotNull { i, d -> 
+                            val s = completedSessions.find { com.afa.fitadapt.util.DateUtils.isSameDay(it.date, d) }
+                            s?.mood?.let { i to it.toFloat() }
                         }
-                        drawPath(moodPath, color = SageGreen, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
+                        drawTrendLine(pts, SageGreen)
                     }
-
-                    // Linea Durata (FitlyBlue) - Normalizzata su 60 min o max
-                    if (showDuration) {
-                        val durationPath = Path()
-                        val maxDur = completedSessions.maxOf { it.actualDurationMin ?: 30 }.toFloat().coerceAtLeast(60f)
-                        completedSessions.forEachIndexed { index, session ->
-                            val dur = session.actualDurationMin?.toFloat() ?: 0f
-                            val x = index * spacing
-                            val y = height - (dur / maxDur * height)
-                            if (index == 0) durationPath.moveTo(x, y) else durationPath.lineTo(x, y)
+                    if (showAsthenia) {
+                        val pts = allDates.mapIndexedNotNull { i, d -> 
+                            val e = scaleEntries.find { com.afa.fitadapt.util.DateUtils.isSameDay(it.date, d) }
+                            e?.asthenia?.let { i to it.toFloat() }
                         }
-                        drawPath(durationPath, color = FitlyBlue, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
+                        drawTrendLine(pts, FitlyBlue)
                     }
-
-                    // Linea Sonno (SoftAmber)
+                    if (showPain) {
+                        val pts = allDates.mapIndexedNotNull { i, d -> 
+                            val e = scaleEntries.find { com.afa.fitadapt.util.DateUtils.isSameDay(it.date, d) }
+                            e?.osteoarticularPain?.let { i to it.toFloat() }
+                        }
+                        drawTrendLine(pts, SoftAmber)
+                    }
+                    if (showRestDyspnea) {
+                        val pts = allDates.mapIndexedNotNull { i, d -> 
+                            val e = scaleEntries.find { com.afa.fitadapt.util.DateUtils.isSameDay(it.date, d) }
+                            e?.restDyspnea?.let { i to it.toFloat() }
+                        }
+                        drawTrendLine(pts, Color.Cyan)
+                    }
+                    if (showExertionDyspnea) {
+                        val pts = allDates.mapIndexedNotNull { i, d -> 
+                            val e = scaleEntries.find { com.afa.fitadapt.util.DateUtils.isSameDay(it.date, d) }
+                            e?.exertionDyspnea?.let { i to it.toFloat() }
+                        }
+                        drawTrendLine(pts, Color.Magenta)
+                    }
                     if (showSleep) {
-                        val sleepPath = Path()
-                        completedSessions.forEachIndexed { index, session ->
-                            val sleep = session.sleepQuality?.toFloat() ?: 5f
-                            val x = index * spacing
-                            val y = height - (sleep / 10f * height)
-                            if (index == 0) sleepPath.moveTo(x, y) else sleepPath.lineTo(x, y)
+                        val pts = allDates.mapIndexedNotNull { i, d -> 
+                            val s = completedSessions.find { com.afa.fitadapt.util.DateUtils.isSameDay(it.date, d) }
+                            s?.sleepQuality?.let { i to it.toFloat() }
                         }
-                        drawPath(sleepPath, color = SoftAmber, style = Stroke(width = 3.dp.toPx(), cap = StrokeCap.Round))
+                        drawTrendLine(pts, Color.Gray)
                     }
                 }
             }
@@ -359,37 +395,31 @@ private fun TrendChartCard(
                 modifier = Modifier.fillMaxWidth().padding(top = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val labelIndices = if (completedSessions.size <= 5) {
-                    completedSessions.indices
-                } else {
-                    listOf(
-                        0,
-                        completedSessions.size / 4,
-                        completedSessions.size / 2,
-                        (completedSessions.size * 3) / 4,
-                        completedSessions.size - 1
+                allDates.forEach { date ->
+                    Text(
+                        text = sdf.format(Date(date)),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
-                }
-                
-                completedSessions.forEachIndexed { index, session ->
-                    if (index in labelIndices) {
-                        Text(
-                            text = sdf.format(Date(session.date)),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                        )
-                    } else if (completedSessions.size > 5) {
-                         Spacer(modifier = Modifier.width(1.dp)) // Maintain some spacing for the row
-                    }
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                if (showEffort) LegendItem("Fatica", SoftRose)
-                if (showMood) LegendItem("Umore", SageGreen)
-                if (showSleep) LegendItem("Sonno", SoftAmber)
-                if (showDuration) LegendItem("Durata", FitlyBlue)
+            Spacer(modifier = Modifier.height(16.dp))
+            // Legenda dinamica
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (showAsthenia) LegendItem("Astenia", FitlyBlue)
+                    if (showPain) LegendItem("Dolore", SoftAmber)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (showRestDyspnea) LegendItem("Dispnea a riposo", Color.Cyan)
+                    if (showExertionDyspnea) LegendItem("Dispnea a sforzi minimi", Color.Magenta)
+                }
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    if (showEffort) LegendItem("Fatica Sessione", SoftRose)
+                    if (showMood) LegendItem("Umore", SageGreen)
+                    if (showSleep) LegendItem("Qualità sonno", Color.Gray)
+                }
             }
         }
     }

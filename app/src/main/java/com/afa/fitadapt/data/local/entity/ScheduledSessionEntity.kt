@@ -12,6 +12,7 @@ data class ScheduledSessionEntity(
     val title: String,
     val notificationEnabled: Boolean = false,
     val recurrenceType: String = "NONE", // NONE, WEEKLY, EVERY_X_DAYS
-    val recurrenceValue: Int = 0, // Giorno della settimana (1-7) o numero di giorni
+    val recurrenceValue: Int = 0, // Inutilizzato per WEEKLY (usiamo recurrenceDays)
+    val recurrenceDays: String? = null, // Giorni della settimana per WEEKLY (es. "1,3,5")
     val cardId: Long? = null
 )

@@ -35,7 +35,10 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -580,6 +583,21 @@ fun AddScheduledSessionDialog(
     var recurrenceValue by remember { mutableStateOf(1) } // Default 1 for Every X Days
     var showDatePicker by remember { mutableStateOf(false) }
 
+    // State for weekly days
+    var selectedDays by remember {
+        mutableStateOf(
+            if (initialDate > 0) {
+                val cal = Calendar.getInstance()
+                cal.timeInMillis = initialDate
+                // Calendar.DAY_OF_WEEK: 1=Sun, 2=Mon, ..., 7=Sat
+                // We want 1=Mon, ..., 7=Sun
+                val dow = cal.get(Calendar.DAY_OF_WEEK)
+                val mapped = if (dow == Calendar.SUNDAY) 7 else dow - 1
+                setOf(mapped)
+            } else emptySet<Int>()
+        )
+    }
+
     val dateStr = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(Date(selectedDateMillis))
 
     AlertDialog(
@@ -615,10 +633,49 @@ fun AddScheduledSessionDialog(
                 )
 
                 Text("Ripetizione", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    RecurrenceChip(selected = recurrenceType == "NONE", label = "Singolo", onClick = { recurrenceType = "NONE" })
-                    RecurrenceChip(selected = recurrenceType == "WEEKLY", label = "Settimanale", onClick = { recurrenceType = "WEEKLY" })
-                    RecurrenceChip(selected = recurrenceType == "EVERY_X_DAYS", label = "Ogni X gg", onClick = { recurrenceType = "EVERY_X_DAYS" })
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Box(modifier = Modifier.weight(1f)) {
+                        RecurrenceChip(selected = recurrenceType == "NONE", label = "Singola", onClick = { recurrenceType = "NONE" })
+                    }
+                    Box(modifier = Modifier.weight(1.5f)) {
+                        RecurrenceChip(selected = recurrenceType == "WEEKLY", label = "Settimanale", onClick = { recurrenceType = "WEEKLY" })
+                    }
+                    Box(modifier = Modifier.weight(1.4f)) {
+                        RecurrenceChip(selected = recurrenceType == "EVERY_X_DAYS", label = "Ogni X gg", onClick = { recurrenceType = "EVERY_X_DAYS" })
+                    }
+                }
+
+                if (recurrenceType == "WEEKLY") {
+                    val dayLabels = listOf("L", "M", "M", "G", "V", "S", "D")
+                    Text("Giorni della settimana", style = MaterialTheme.typography.labelSmall)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        dayLabels.forEachIndexed { index, label ->
+                            val dayNumber = index + 1 // 1=Mon, 7=Sun
+                            val isSelected = selectedDays.contains(dayNumber)
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isSelected) FitlyBlue else MaterialTheme.colorScheme.surfaceVariant)
+                                    .clickable {
+                                        selectedDays = if (isSelected) selectedDays - dayNumber else selectedDays + dayNumber
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = label,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = if (isSelected) Color.White else NavyBlue
+                                )
+                            }
+                        }
+                    }
                 }
 
                 if (recurrenceType == "EVERY_X_DAYS") {
@@ -651,11 +708,10 @@ fun AddScheduledSessionDialog(
                             title = title,
                             notificationEnabled = notificationEnabled,
                             recurrenceType = recurrenceType,
-                            recurrenceValue = if (recurrenceType == "WEEKLY") {
-                                val cal = Calendar.getInstance()
-                                cal.timeInMillis = selectedDateMillis
-                                cal.get(Calendar.DAY_OF_WEEK)
-                            } else recurrenceValue,
+                            recurrenceValue = recurrenceValue,
+                            recurrenceDays = if (recurrenceType == "WEEKLY") {
+                                selectedDays.sorted().joinToString(",")
+                            } else null,
                             cardId = activeCard?.id
                         )
                     )
@@ -772,15 +828,25 @@ fun WeeklyCalendar(
 
 @Composable
 fun RecurrenceChip(selected: Boolean, label: String, onClick: () -> Unit) {
-    FilterChip(
-        selected = selected,
+    Surface(
         onClick = onClick,
-        label = { Text(label, fontSize = 10.sp) },
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = FitlyBlue,
-            selectedLabelColor = Color.White
-        )
-    )
+        shape = RoundedCornerShape(16.dp),
+        color = if (selected) FitlyBlue else MaterialTheme.colorScheme.surfaceVariant,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(32.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = label,
+                fontSize = 10.sp,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                color = if (selected) Color.White else NavyBlue,
+                maxLines = 1,
+                overflow = TextOverflow.Visible
+            )
+        }
+    }
 }
 
 @Composable

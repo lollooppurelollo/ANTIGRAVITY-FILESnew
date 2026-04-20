@@ -62,7 +62,9 @@ sealed class Screen(val route: String) {
     
     // Gestione Obiettivi
     object GoalManager : Screen("goal_manager")
-    object GoalEditor : Screen("goal_editor")
+    object GoalEditor : Screen("goal_editor/{goalId}") {
+        fun createRoute(goalId: Long = -1L) = "goal_editor/$goalId"
+    }
     
     // Gestione Esercizi
     object ExerciseLibraryManager : Screen("exercise_library_manager")

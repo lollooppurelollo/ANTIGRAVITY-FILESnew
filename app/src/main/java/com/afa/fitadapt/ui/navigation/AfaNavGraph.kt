@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -67,6 +68,7 @@ private val bottomNavRoutes = setOf(
     Screen.Home.route,
     Screen.ActiveCard.route,
     Screen.Progress.route,
+    Screen.Diary.route,
     Screen.More.route
 )
 
@@ -279,8 +281,7 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
             composable(Screen.Diary.route) {
                 val diaryViewModel: DiaryViewModel = hiltViewModel()
                 DiaryScreen(
-                    diaryViewModel = diaryViewModel,
-                    onBack = { navController.popBackStack() }
+                    diaryViewModel = diaryViewModel
                 )
             }
 
@@ -406,12 +407,24 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
                 GoalManagerScreen(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() },
-                    onAddGoal = { navController.navigate(Screen.GoalEditor.route) }
+                    onAddGoal = { navController.navigate(Screen.GoalEditor.createRoute(-1L)) },
+                    onEditGoal = { id -> navController.navigate(Screen.GoalEditor.createRoute(id)) }
                 )
             }
 
-            composable(Screen.GoalEditor.route) {
+            composable(
+                route = Screen.GoalEditor.route,
+                arguments = listOf(navArgument("goalId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val goalId = backStackEntry.arguments?.getLong("goalId") ?: -1L
                 val viewModel: GoalEditorViewModel = hiltViewModel()
+                
+                LaunchedEffect(goalId) {
+                    if (goalId != -1L) {
+                        viewModel.loadGoal(goalId)
+                    }
+                }
+
                 GoalEditorScreen(
                     viewModel = viewModel,
                     onBack = { navController.popBackStack() }

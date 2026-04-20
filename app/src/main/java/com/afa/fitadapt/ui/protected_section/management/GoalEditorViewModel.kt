@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class GoalEditorUiState(
+    val goalId: Long? = null,
     val title: String = "",
     val targetType: String = "sessions_per_week",
     val bronzeValue: String = "",
@@ -32,6 +33,21 @@ class GoalEditorViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(GoalEditorUiState())
     val uiState = _uiState.asStateFlow()
 
+    fun loadGoal(goalId: Long) {
+        viewModelScope.launch {
+            goalRepository.getById(goalId)?.let { goal ->
+                _uiState.update { it.copy(
+                    goalId = goal.id,
+                    title = goal.title,
+                    targetType = goal.targetType,
+                    bronzeValue = goal.targetValue.toInt().toString(),
+                    silverValue = goal.silverValue?.toInt()?.toString() ?: "",
+                    goldValue = goal.goldValue?.toInt()?.toString() ?: ""
+                ) }
+            }
+        }
+    }
+
     fun updateTitle(title: String) = _uiState.update { it.copy(title = title) }
     fun updateTargetType(type: String) = _uiState.update { it.copy(targetType = type) }
     fun updateBronzeValue(value: String) = _uiState.update { it.copy(bronzeValue = value) }
@@ -41,6 +57,7 @@ class GoalEditorViewModel @Inject constructor(
     fun save() {
         val state = _uiState.value
         val goal = GoalEntity(
+            id = state.goalId ?: 0,
             title = state.title,
             targetType = state.targetType,
             targetValue = state.bronzeValue.toFloatOrNull() ?: 0f,
@@ -48,7 +65,11 @@ class GoalEditorViewModel @Inject constructor(
             goldValue = state.goldValue.toFloatOrNull()
         )
         viewModelScope.launch {
-            goalRepository.createGoal(goal)
+            if (state.goalId == null) {
+                goalRepository.createGoal(goal)
+            } else {
+                goalRepository.updateGoal(goal)
+            }
             _uiState.update { it.copy(isSaved = true) }
         }
     }

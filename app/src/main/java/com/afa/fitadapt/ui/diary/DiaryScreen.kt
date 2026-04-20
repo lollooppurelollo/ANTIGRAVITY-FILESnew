@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -48,7 +47,16 @@ data class DiaryUiState(
     val scalePain: Float = 0f,
     val scaleRestDyspnea: Float = 0f,
     val scaleExertionDyspnea: Float = 0f,
-    val selectedTab: Int = 0
+    val selectedTab: Int = 0,
+    val editingDiaryEntry: DiaryEntryEntity? = null,
+    val editingScaleEntry: ScaleEntryEntity? = null,
+    val selectedDate: Long = System.currentTimeMillis()
+)
+
+data class DayGroup(
+    val date: Long,
+    val scale: ScaleEntryEntity?,
+    val diaryEntries: List<DiaryEntryEntity>
 )
 
 @HiltViewModel
@@ -72,35 +80,100 @@ class DiaryViewModel @Inject constructor(
         }
     }
 
-    fun selectTab(index: Int) { _uiState.update { it.copy(selectedTab = index) } }
-    fun toggleAddDiary() { _uiState.update { it.copy(showAddDiary = !it.showAddDiary, newDiaryText = "") } }
+    fun toggleAddDiary() {
+        _uiState.update { it.copy(
+            showAddDiary = !it.showAddDiary,
+            newDiaryText = "",
+            editingDiaryEntry = null,
+            editingScaleEntry = null,
+            selectedDate = System.currentTimeMillis()
+        ) }
+    }
+
     fun toggleAddScale() { _uiState.update { it.copy(showAddScale = !it.showAddScale) } }
+    
     fun updateDiaryText(text: String) { _uiState.update { it.copy(newDiaryText = text) } }
     fun updateScaleAsthenia(v: Float) { _uiState.update { it.copy(scaleAsthenia = v) } }
     fun updateScalePain(v: Float) { _uiState.update { it.copy(scalePain = v) } }
     fun updateScaleRestDyspnea(v: Float) { _uiState.update { it.copy(scaleRestDyspnea = v) } }
     fun updateScaleExertionDyspnea(v: Float) { _uiState.update { it.copy(scaleExertionDyspnea = v) } }
+    fun updateSelectedDate(date: Long) { _uiState.update { it.copy(selectedDate = date) } }
 
-    fun saveDiaryEntry() {
-        val text = _uiState.value.newDiaryText.trim()
-        if (text.isBlank()) return
-        viewModelScope.launch {
-            diaryRepository.addDiaryEntry(DiaryEntryEntity(date = System.currentTimeMillis(), text = text))
-            _uiState.update { it.copy(showAddDiary = false, newDiaryText = "") }
-        }
+    fun startEditingDiary(entry: DiaryEntryEntity) {
+        val scale = _uiState.value.scaleEntries.find { DateUtils.isSameDay(it.date, entry.date) }
+        _uiState.update { it.copy(
+            editingDiaryEntry = entry,
+            editingScaleEntry = scale,
+            newDiaryText = entry.text,
+            scaleAsthenia = scale?.asthenia?.toFloat() ?: 0f,
+            scalePain = scale?.osteoarticularPain?.toFloat() ?: 0f,
+            scaleRestDyspnea = scale?.restDyspnea?.toFloat() ?: 0f,
+            scaleExertionDyspnea = scale?.exertionDyspnea?.toFloat() ?: 0f,
+            selectedDate = entry.date,
+            showAddDiary = true,
+            showAddScale = true
+        ) }
     }
 
-    fun saveScaleEntry() {
+    fun startEditingScale(scale: ScaleEntryEntity) {
+        _uiState.update { it.copy(
+            editingScaleEntry = scale,
+            editingDiaryEntry = null,
+            newDiaryText = "",
+            scaleAsthenia = scale.asthenia?.toFloat() ?: 0f,
+            scalePain = scale.osteoarticularPain?.toFloat() ?: 0f,
+            scaleRestDyspnea = scale.restDyspnea?.toFloat() ?: 0f,
+            scaleExertionDyspnea = scale.exertionDyspnea?.toFloat() ?: 0f,
+            selectedDate = scale.date,
+            showAddDiary = true,
+            showAddScale = true
+        ) }
+    }
+
+    fun saveCombinedEntry() {
         val s = _uiState.value
+        val targetDate = s.selectedDate
+        
         viewModelScope.launch {
-            diaryRepository.addScaleEntry(ScaleEntryEntity(
-                date = System.currentTimeMillis(),
+            // 1. Handle Scale Entry (One per day)
+            // If we are editing a specific scale entry, use its ID.
+            // Otherwise, look if there's already a scale for the target date.
+            val existingScale = s.editingScaleEntry ?: s.scaleEntries.find { DateUtils.isSameDay(it.date, targetDate) }
+            
+            val scaleEntry = ScaleEntryEntity(
+                id = existingScale?.id ?: 0,
+                date = targetDate,
                 asthenia = s.scaleAsthenia.toInt().takeIf { it > 0 },
                 osteoarticularPain = s.scalePain.toInt().takeIf { it > 0 },
                 restDyspnea = s.scaleRestDyspnea.toInt().takeIf { it > 0 },
                 exertionDyspnea = s.scaleExertionDyspnea.toInt().takeIf { it > 0 }
-            ))
-            _uiState.update { it.copy(showAddScale = false, scaleAsthenia = 0f, scalePain = 0f, scaleRestDyspnea = 0f, scaleExertionDyspnea = 0f) }
+            )
+            
+            if (scaleEntry.id != 0L) {
+                diaryRepository.updateScaleEntry(scaleEntry)
+            } else if (scaleEntry.asthenia != null || scaleEntry.osteoarticularPain != null || 
+                       scaleEntry.restDyspnea != null || scaleEntry.exertionDyspnea != null) {
+                diaryRepository.addScaleEntry(scaleEntry)
+            }
+
+            // 2. Handle Diary Entry
+            if (s.newDiaryText.isNotBlank()) {
+                if (s.editingDiaryEntry != null) {
+                    diaryRepository.updateDiaryEntry(s.editingDiaryEntry.copy(text = s.newDiaryText.trim(), date = targetDate))
+                } else {
+                    diaryRepository.addDiaryEntry(DiaryEntryEntity(date = targetDate, text = s.newDiaryText.trim()))
+                }
+            }
+            
+            _uiState.update { it.copy(
+                showAddDiary = false, 
+                showAddScale = false,
+                newDiaryText = "",
+                scaleAsthenia = 0f, scalePain = 0f, scaleRestDyspnea = 0f, scaleExertionDyspnea = 0f,
+                editingDiaryEntry = null,
+                editingScaleEntry = null,
+                selectedDate = System.currentTimeMillis()
+            ) }
         }
     }
 
@@ -114,8 +187,9 @@ class DiaryViewModel @Inject constructor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DiaryScreen(diaryViewModel: DiaryViewModel, onBack: () -> Unit) {
+fun DiaryScreen(diaryViewModel: DiaryViewModel) {
     val uiState by diaryViewModel.uiState.collectAsState()
+    var showDatePicker by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -126,13 +200,32 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, onBack: () -> Unit) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { diaryViewModel.toggleAddDiary(); diaryViewModel.toggleAddScale() },
+                onClick = { 
+                    diaryViewModel.toggleAddDiary()
+                    diaryViewModel.toggleAddScale() 
+                },
                 containerColor = FitlyBlue
             ) { Icon(Icons.Default.Add, "Aggiungi", tint = MaterialTheme.colorScheme.onPrimary) }
         }
     ) { padding ->
+        val groupedEntries = remember(uiState.diaryEntries, uiState.scaleEntries) {
+            val allDates = (uiState.scaleEntries.map { DateUtils.toDayTimestamp(it.date) } + 
+                           uiState.diaryEntries.map { DateUtils.toDayTimestamp(it.date) })
+                .distinct()
+                .sortedDescending()
+            
+            allDates.map { date ->
+                DayGroup(
+                    date = date,
+                    scale = uiState.scaleEntries.find { DateUtils.isSameDay(it.date, date) },
+                    diaryEntries = uiState.diaryEntries.filter { DateUtils.isSameDay(it.date, date) }
+                        .sortedByDescending { it.createdAt }
+                )
+            }
+        }
+
         LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
-            // Sezione Scale Rapide (Sempre visibile se in modalità inserimento)
+            // Sezione Scale Rapide (Sempre visibile se in modalità inserimento/modifica)
             if (uiState.showAddDiary || uiState.showAddScale) {
                 item {
                     Card(
@@ -141,7 +234,30 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, onBack: () -> Unit) {
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Rilevazione di oggi", style = MaterialTheme.typography.titleMedium, color = NavyBlue, fontWeight = FontWeight.Bold)
+                            val titleText = remember(uiState.editingDiaryEntry, uiState.editingScaleEntry) {
+                                val editDiary = uiState.editingDiaryEntry
+                                val editScale = uiState.editingScaleEntry
+                                when {
+                                    editDiary != null -> "Modifica diario del ${DateUtils.toDisplayString(editDiary.date)}"
+                                    editScale != null -> "Modifica scale del ${DateUtils.toDisplayString(editScale.date)}"
+                                    else -> "Nuova rilevazione"
+                                }
+                            }
+                            
+                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                                Text(titleText, style = MaterialTheme.typography.titleMedium, color = NavyBlue, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                                
+                                // Date selection for new entry
+                                if (uiState.editingDiaryEntry == null && uiState.editingScaleEntry == null) {
+                                    TextButton(
+                                        onClick = { showDatePicker = true },
+                                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                                    ) {
+                                        Text(DateUtils.toDisplayString(uiState.selectedDate), color = FitlyBlue, style = MaterialTheme.typography.bodySmall)
+                                    }
+                                }
+                            }
+                            
                             Spacer(modifier = Modifier.height(12.dp))
                             
                             Text("Scale rapide (0-10)", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
@@ -165,14 +281,11 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, onBack: () -> Unit) {
                             Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                                 TextButton(onClick = { 
                                     diaryViewModel.toggleAddDiary()
-                                    if (!uiState.showAddDiary) diaryViewModel.toggleAddScale() // sync
                                 }) { Text("Annulla") }
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Button(
                                     onClick = { 
-                                        diaryViewModel.saveScaleEntry()
-                                        if (uiState.newDiaryText.isNotBlank()) diaryViewModel.saveDiaryEntry()
-                                        else diaryViewModel.toggleAddDiary() // Chiude il form
+                                        diaryViewModel.saveCombinedEntry()
                                     },
                                     colors = ButtonDefaults.buttonColors(containerColor = SageGreen)
                                 ) { Text("Salva tutto") }
@@ -185,62 +298,97 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, onBack: () -> Unit) {
                 }
             }
 
-            // Combinazione dei due flussi (semplicistica per ora, ordinata per data)
-            // In un'app reale faremmo un merge nel ViewModel, qui mostriamo le scale sopra e il diario sotto o alternati.
-            // Per brevità mostriamo prima le scale recenti e poi il diario.
-            
-            items(uiState.scaleEntries) { entry ->
-                ScaleEntryCard(entry)
+            items(groupedEntries) { group ->
+                DayGroupCard(
+                    group = group, 
+                    onEditDiary = { diaryViewModel.startEditingDiary(it) },
+                    onEditScale = { diaryViewModel.startEditingScale(it) }
+                )
             }
-            
-            item { Spacer(modifier = Modifier.height(16.dp)) }
+        }
+    }
 
-            items(uiState.diaryEntries) { entry ->
-                DiaryEntryCard(entry)
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = uiState.selectedDate)
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        diaryViewModel.updateSelectedDate(it)
+                    }
+                    showDatePicker = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Annulla") }
             }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 }
 
 @Composable
-fun ScaleEntryCard(entry: ScaleEntryEntity) {
+fun DayGroupCard(
+    group: DayGroup, 
+    onEditDiary: (DiaryEntryEntity) -> Unit,
+    onEditScale: (ScaleEntryEntity) -> Unit
+) {
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("📊", fontSize = 16.sp)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(if (group.scale != null && group.diaryEntries.isNotEmpty()) "📊📝" else if (group.scale != null) "📊" else "📝", fontSize = 16.sp)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(DateUtils.toDisplayString(group.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+                }
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                entry.asthenia?.let { ScaleBadge("Astenia", it) }
-                entry.osteoarticularPain?.let { ScaleBadge("Dolore", it) }
-                entry.restDyspnea?.let { ScaleBadge("Dispnea R", it) }
-                entry.exertionDyspnea?.let { ScaleBadge("Dispnea S", it) }
+            
+            if (group.scale != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    onClick = { onEditScale(group.scale) },
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        group.scale.asthenia?.let { ScaleBadge("Astenia", it) }
+                        group.scale.osteoarticularPain?.let { ScaleBadge("Dolore", it) }
+                        group.scale.restDyspnea?.let { ScaleBadge("Dispnea R", it) }
+                        group.scale.exertionDyspnea?.let { ScaleBadge("Dispnea S", it) }
+                    }
+                }
             }
-        }
-    }
-}
-
-@Composable
-fun DiaryEntryCard(entry: DiaryEntryEntity) {
-    Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("📝", fontSize = 16.sp)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+            
+            group.diaryEntries.forEachIndexed { index, diary ->
+                if (index > 0 || group.scale != null) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = MaterialTheme.colorScheme.outlineVariant)
+                } else {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+                
+                Surface(
+                    onClick = { onEditDiary(diary) },
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        diary.text, 
+                        style = MaterialTheme.typography.bodyMedium, 
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(entry.text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

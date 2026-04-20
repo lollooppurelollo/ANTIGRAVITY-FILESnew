@@ -82,7 +82,7 @@ object DatabaseModule {
             "afa_v1.db"       // Nome del file database su disco
         )
             .openHelperFactory(supportFactory)   // ← QUESTA RIGA ABILITA LA CIFRATURA
-            .addMigrations(AfaDatabase.MIGRATION_4_5) // Aggiungi la migrazione
+            .addMigrations(AfaDatabase.MIGRATION_4_5, AfaDatabase.MIGRATION_5_6) // Aggiungi la migrazione
             .fallbackToDestructiveMigration(dropAllTables = true)     // Se lo schema cambia e non c'è migrazione, ricrea il DB
             .build()
     }

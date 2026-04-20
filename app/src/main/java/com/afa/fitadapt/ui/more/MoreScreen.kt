@@ -76,17 +76,6 @@ fun MoreScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Diario
-        MenuCard(
-            icon = Icons.Outlined.Book,
-            title = "Diario",
-            subtitle = "Scrivi come ti senti e registra le scale rapide",
-            color = FitlyBlue,
-            onClick = onNavigateToDiary
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
         // Consigli e articoli
         MenuCard(
             icon = Icons.AutoMirrored.Outlined.MenuBook,

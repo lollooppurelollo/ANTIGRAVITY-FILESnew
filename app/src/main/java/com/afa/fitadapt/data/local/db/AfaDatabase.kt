@@ -47,7 +47,7 @@ import com.afa.fitadapt.data.local.entity.*
         GoalEntity::class,
         ScheduledSessionEntity::class
     ],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -75,6 +75,12 @@ abstract class AfaDatabase : RoomDatabase() {
                 // Aggiunta campi silverValue e goldValue alla tabella goals
                 db.execSQL("ALTER TABLE goals ADD COLUMN silverValue REAL DEFAULT NULL")
                 db.execSQL("ALTER TABLE goals ADD COLUMN goldValue REAL DEFAULT NULL")
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE scheduled_sessions ADD COLUMN recurrenceDays TEXT")
             }
         }
     }

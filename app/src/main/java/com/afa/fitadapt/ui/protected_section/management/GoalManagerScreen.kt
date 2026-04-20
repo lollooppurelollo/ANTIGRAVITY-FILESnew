@@ -5,6 +5,7 @@
 package com.afa.fitadapt.ui.protected_section.management
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -31,7 +32,8 @@ import com.afa.fitadapt.ui.theme.NavyBlue
 fun GoalManagerScreen(
     viewModel: GoalManagerViewModel,
     onBack: () -> Unit,
-    onAddGoal: () -> Unit
+    onAddGoal: () -> Unit,
+    onEditGoal: (Long) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showDeleteDialog by remember { mutableStateOf<GoalEntity?>(null) }
@@ -69,13 +71,15 @@ fun GoalManagerScreen(
                         GoalListItem(
                             goal = goal,
                             onDelete = { showDeleteDialog = goal },
-                            onToggleActive = { viewModel.toggleGoalActive(goal) }
+                            onToggleActive = { viewModel.toggleGoalActive(goal) },
+                            onClick = { onEditGoal(goal.id) }
                         )
                     }
                 }
             }
         }
     }
+// ... rest of the file ...
 
     if (showDeleteDialog != null) {
         AlertDialog(
@@ -96,7 +100,7 @@ fun GoalManagerScreen(
 }
 
 @Composable
-fun GoalListItem(goal: GoalEntity, onDelete: () -> Unit, onToggleActive: () -> Unit) {
+fun GoalListItem(goal: GoalEntity, onDelete: () -> Unit, onToggleActive: () -> Unit, onClick: () -> Unit) {
     val medalColor = when {
         goal.title.contains("Gold", ignoreCase = true) -> Color(0xFFFFD700)
         goal.title.contains("Silver", ignoreCase = true) -> Color(0xFFC0C0C0)
@@ -105,7 +109,7 @@ fun GoalListItem(goal: GoalEntity, onDelete: () -> Unit, onToggleActive: () -> U
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp)

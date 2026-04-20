@@ -7,7 +7,9 @@ package com.afa.fitadapt.ui.progress
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.GoalEntity
+import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import com.afa.fitadapt.data.local.entity.SessionEntity
+import com.afa.fitadapt.data.repository.DiaryRepository
 import com.afa.fitadapt.data.repository.ProgressRepository
 import com.afa.fitadapt.data.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,13 +30,15 @@ data class ProgressUiState(
     val currentStreak: Int = 0,
     val longestStreak: Int = 0,
     val activeGoals: List<GoalEntity> = emptyList(),
-    val recentSessions: List<SessionEntity> = emptyList()
+    val recentSessions: List<SessionEntity> = emptyList(),
+    val scaleEntries: List<ScaleEntryEntity> = emptyList()
 )
 
 @HiltViewModel
 class ProgressViewModel @Inject constructor(
     private val progressRepository: ProgressRepository,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val diaryRepository: DiaryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProgressUiState())
@@ -86,7 +90,12 @@ class ProgressViewModel @Inject constructor(
         }
         viewModelScope.launch {
             sessionRepository.getAllSessions().collect { sessions ->
-                _uiState.update { it.copy(recentSessions = sessions, isLoading = false) }
+                _uiState.update { it.copy(recentSessions = sessions) }
+            }
+        }
+        viewModelScope.launch {
+            diaryRepository.getAllScaleEntries().collect { scales ->
+                _uiState.update { it.copy(scaleEntries = scales, isLoading = false) }
             }
         }
     }
