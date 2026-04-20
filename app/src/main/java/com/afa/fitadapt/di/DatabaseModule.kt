@@ -13,6 +13,7 @@ import com.afa.fitadapt.data.local.dao.ExportLogDao
 import com.afa.fitadapt.data.local.dao.GoalDao
 import com.afa.fitadapt.data.local.dao.PatientProfileDao
 import com.afa.fitadapt.data.local.dao.ScaleEntryDao
+import com.afa.fitadapt.data.local.dao.ScheduledSessionDao
 import com.afa.fitadapt.data.local.dao.SessionDao
 import com.afa.fitadapt.data.local.dao.TrainingCardDao
 import com.afa.fitadapt.data.local.db.AfaDatabase
@@ -81,7 +82,8 @@ object DatabaseModule {
             "afa_v1.db"       // Nome del file database su disco
         )
             .openHelperFactory(supportFactory)   // ← QUESTA RIGA ABILITA LA CIFRATURA
-            .fallbackToDestructiveMigration()     // Se lo schema cambia, ricrea il DB
+            .addMigrations(AfaDatabase.MIGRATION_4_5) // Aggiungi la migrazione
+            .fallbackToDestructiveMigration(dropAllTables = true)     // Se lo schema cambia e non c'è migrazione, ricrea il DB
             .build()
     }
 
@@ -116,4 +118,7 @@ object DatabaseModule {
 
     @Provides
     fun provideGoalDao(db: AfaDatabase): GoalDao = db.goalDao()
+
+    @Provides
+    fun provideScheduledSessionDao(db: AfaDatabase): ScheduledSessionDao = db.scheduledSessionDao()
 }

@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -65,7 +66,7 @@ fun GoalEditorScreen(
                     onValueChange = {},
                     readOnly = true, label = { Text("Tipo di traguardo") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showTypeMenu) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 )
                 ExposedDropdownMenu(expanded = showTypeMenu, onDismissRequest = { showTypeMenu = false }) {
                     types.forEach { (key, label) ->
@@ -82,19 +83,35 @@ fun GoalEditorScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = uiState.targetValue, onValueChange = viewModel::updateTargetValue,
-                label = { Text("Valore target") }, modifier = Modifier.fillMaxWidth(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                singleLine = true
-            )
+            Text("Soglie traguardi", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+            
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = uiState.bronzeValue, onValueChange = viewModel::updateBronzeValue,
+                    label = { Text("Bronze") }, modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = uiState.silverValue, onValueChange = viewModel::updateSilverValue,
+                    label = { Text("Silver") }, modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+                OutlinedTextField(
+                    value = uiState.goldValue, onValueChange = viewModel::updateGoldValue,
+                    label = { Text("Gold") }, modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
             
             Button(
                 onClick = viewModel::save,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                enabled = uiState.title.isNotBlank() && uiState.targetValue.isNotBlank(),
+                enabled = uiState.title.isNotBlank() && uiState.bronzeValue.isNotBlank(),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
             ) {
                 Icon(Icons.Default.Save, null)

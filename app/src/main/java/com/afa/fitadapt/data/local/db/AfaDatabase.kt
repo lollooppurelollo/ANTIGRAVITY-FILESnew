@@ -44,10 +44,11 @@ import com.afa.fitadapt.data.local.entity.*
         ArticleEntity::class,
         ExportLogEntity::class,
         PatientProfileEntity::class,
-        GoalEntity::class
+        GoalEntity::class,
+        ScheduledSessionEntity::class
     ],
-    version = 3,
-    exportSchema = true // Abilitato per debugging e generazione file schema
+    version = 5,
+    exportSchema = false
 )
 @TypeConverters(Converters::class)
 abstract class AfaDatabase : RoomDatabase() {
@@ -62,21 +63,19 @@ abstract class AfaDatabase : RoomDatabase() {
     abstract fun exportLogDao(): ExportLogDao
     abstract fun patientProfileDao(): PatientProfileDao
     abstract fun goalDao(): GoalDao
+    abstract fun scheduledSessionDao(): ScheduledSessionDao
 
     companion object {
         /**
          * Scaffold per le migrazioni future.
          * Quando si cambia lo schema, aggiungere qui una nuova migrazione.
          */
-        val MIGRATION_1_2 = object : Migration(1, 2) {
+        val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // In questo caso il cambio era nel modo in cui leggiamo la chiave,
-                // non nello schema SQL, quindi il corpo può restare vuoto
-                // o contenere logica di trasformazione dati se necessaria.
+                // Aggiunta campi silverValue e goldValue alla tabella goals
+                db.execSQL("ALTER TABLE goals ADD COLUMN silverValue REAL DEFAULT NULL")
+                db.execSQL("ALTER TABLE goals ADD COLUMN goldValue REAL DEFAULT NULL")
             }
         }
-        
-        // Esempio per il futuro:
-        // val MIGRATION_2_3 = object : Migration(2, 3) { ... }
     }
 }

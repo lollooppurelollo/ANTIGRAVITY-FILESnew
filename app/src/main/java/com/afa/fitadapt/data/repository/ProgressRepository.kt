@@ -43,9 +43,17 @@ class ProgressRepository @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 
-    /** Flow con il conteggio sessioni completate */
+    /** Flow con il conteggio sessioni completate (totale) */
     fun completedSessionsCount(): Flow<Int> =
         sessionRepository.countCompletedSessions()
+
+    /** Flow con il conteggio sessioni completate interamente */
+    fun fullSessionsCount(): Flow<Int> =
+        sessionRepository.countFullSessions()
+
+    /** Flow con il conteggio sessioni completate parzialmente */
+    fun partialSessionsCount(): Flow<Int> =
+        sessionRepository.countPartialSessions()
 
     /** Flow con il conteggio sessioni totali */
     fun totalSessionsCount(): Flow<Int> =

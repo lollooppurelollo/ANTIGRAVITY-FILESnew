@@ -118,4 +118,14 @@ object DateUtils {
         val diffMs = to - from
         return (diffMs / (24 * 60 * 60 * 1000)).toInt()
     }
+
+    fun isToday(timestamp: Long): Boolean {
+        val today = toDayTimestamp(System.currentTimeMillis())
+        val target = toDayTimestamp(timestamp)
+        return today == target
+    }
+
+    fun isSameDay(t1: Long, t2: Long): Boolean {
+        return toDayTimestamp(t1) == toDayTimestamp(t2)
+    }
 }

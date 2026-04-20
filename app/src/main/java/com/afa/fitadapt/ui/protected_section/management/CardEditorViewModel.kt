@@ -20,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -151,6 +152,13 @@ class CardEditorViewModel @Inject constructor(
     fun saveCard() {
         viewModelScope.launch {
             val state = _uiState.value
+            val allCards = cardRepository.getAllCards().first()
+            val nextOrderIndex = if (cardId == -1L) {
+                (allCards.maxOfOrNull { it.orderIndex } ?: -1) + 1
+            } else {
+                allCards.find { it.id == cardId }?.orderIndex ?: 0
+            }
+
             val card = TrainingCardEntity(
                 id = if (cardId != -1L) cardId else 0,
                 title = state.title,
@@ -158,7 +166,7 @@ class CardEditorViewModel @Inject constructor(
                 targetSessions = state.targetSessions.toIntOrNull(),
                 status = state.status,
                 autoAdvance = state.autoAdvance,
-                orderIndex = if (cardId != -1L) 0 else 0 // TODO: gestire ordine globale
+                orderIndex = nextOrderIndex
             )
             
             val exercises = state.exercises.map { it.cardExercise }

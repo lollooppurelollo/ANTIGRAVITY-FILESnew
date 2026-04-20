@@ -37,11 +37,13 @@ class NotificationHelper @Inject constructor(
         const val CHANNEL_REMINDER = "afa_reminder"
         const val CHANNEL_MISSED = "afa_missed_session"
         const val CHANNEL_MOTIVATIONAL = "afa_motivational"
+        const val CHANNEL_SCHEDULED = "afa_scheduled"
 
         // ID notifiche
         const val NOTIFICATION_REMINDER = 1001
         const val NOTIFICATION_MISSED = 1002
         const val NOTIFICATION_MOTIVATIONAL = 1003
+        const val NOTIFICATION_SCHEDULED = 1004
     }
 
     init {
@@ -79,8 +81,16 @@ class NotificationHelper @Inject constructor(
             description = "Messaggi di incoraggiamento periodici"
         }
 
+        val scheduledChannel = NotificationChannel(
+            CHANNEL_SCHEDULED,
+            "Allenamenti programmati",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Notifiche per gli allenamenti che hai programmato"
+        }
+
         manager.createNotificationChannels(
-            listOf(reminderChannel, missedChannel, motivationalChannel)
+            listOf(reminderChannel, missedChannel, motivationalChannel, scheduledChannel)
         )
     }
 
@@ -119,6 +129,18 @@ class NotificationHelper @Inject constructor(
             notificationId = NOTIFICATION_MOTIVATIONAL,
             title = "💪 Il tuo coach AFA",
             body = message
+        )
+    }
+
+    /**
+     * Mostra una notifica per una sessione programmata.
+     */
+    fun showScheduledSessionNotification(sessionTitle: String) {
+        showNotification(
+            channelId = CHANNEL_SCHEDULED,
+            notificationId = (NOTIFICATION_SCHEDULED + System.currentTimeMillis() % 1000).toInt(),
+            title = "È ora di: $sessionTitle 🏋️",
+            body = "La tua sessione programmata inizia ora. Sei pronto?"
         )
     }
 

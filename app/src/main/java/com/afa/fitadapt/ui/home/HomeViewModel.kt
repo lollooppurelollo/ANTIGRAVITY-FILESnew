@@ -8,17 +8,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.ArticleEntity
 import com.afa.fitadapt.data.local.entity.GoalEntity
+import com.afa.fitadapt.data.local.entity.ScheduledSessionEntity
 import com.afa.fitadapt.data.local.entity.TrainingCardEntity
-import com.afa.fitadapt.data.repository.ArticleRepository
-import com.afa.fitadapt.data.repository.GoalRepository
-import com.afa.fitadapt.data.repository.PatientProfileRepository
-import com.afa.fitadapt.data.repository.SessionRepository
-import com.afa.fitadapt.data.repository.TrainingCardRepository
+import com.afa.fitadapt.data.repository.*
+import com.afa.fitadapt.notification.WorkScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 data class HomeUiState(
@@ -29,12 +28,13 @@ data class HomeUiState(
     val currentStreak: Int = 0,
     val totalCompleted: Int = 0,
     val featuredArticle: ArticleEntity? = null,
-    val activeGoals: List<GoalEntity> = emptyList()
+    val activeGoals: List<GoalEntity> = emptyList(),
+    val scheduledSessions: List<ScheduledSessionEntity> = emptyList()
 )
 
 /**
  * ViewModel per la schermata Home.
- * Carica i dati di riepilogo: scheda attiva, streak, articolo in evidenza.
+ * Carica i dati di riepilogo: scheda attiva, streak, articolo in evidenza e calendario.
  */
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -42,7 +42,9 @@ class HomeViewModel @Inject constructor(
     private val cardRepository: TrainingCardRepository,
     private val sessionRepository: SessionRepository,
     private val articleRepository: ArticleRepository,
-    private val goalRepository: GoalRepository
+    private val goalRepository: GoalRepository,
+    private val calendarRepository: CalendarRepository,
+    private val workScheduler: WorkScheduler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -91,8 +93,43 @@ class HomeViewModel @Inject constructor(
         // Obiettivi attivi
         viewModelScope.launch {
             goalRepository.getActiveGoals().collect { goals ->
-                _uiState.update { it.copy(activeGoals = goals, isLoading = false) }
+                _uiState.update { it.copy(activeGoals = goals) }
             }
+        }
+        // Calendario
+        viewModelScope.launch {
+            calendarRepository.getAllScheduled().collect { scheduled ->
+                _uiState.update { it.copy(scheduledSessions = scheduled, isLoading = false) }
+            }
+        }
+    }
+
+    fun addScheduledSession(session: ScheduledSessionEntity) {
+        viewModelScope.launch {
+            val id = calendarRepository.addScheduledSession(session)
+            if (session.notificationEnabled) {
+                // Parsing HH:mm to apply it to session.date
+                val parts = session.startTime.split(":")
+                val hour = parts.getOrNull(0)?.toIntOrNull() ?: 10
+                val minute = parts.getOrNull(1)?.toIntOrNull() ?: 0
+                
+                val cal = Calendar.getInstance().apply {
+                    timeInMillis = session.date
+                    set(Calendar.HOUR_OF_DAY, hour)
+                    set(Calendar.MINUTE, minute)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }
+                
+                workScheduler.scheduleScheduledSession(id, session.title, cal.timeInMillis)
+            }
+        }
+    }
+    
+    fun deleteScheduledSession(session: ScheduledSessionEntity) {
+        viewModelScope.launch {
+            calendarRepository.deleteScheduledSession(session)
+            workScheduler.cancelScheduledSession(session.id)
         }
     }
 }

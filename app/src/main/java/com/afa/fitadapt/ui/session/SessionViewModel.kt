@@ -71,6 +71,9 @@ class SessionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SessionUiState())
     val uiState = _uiState.asStateFlow()
 
+    /** Flow con tutte le sessioni registrate */
+    val allSessions = sessionRepository.getAllSessions()
+
     init {
         loadActiveCard()
     }
@@ -204,7 +207,17 @@ class SessionViewModel @Inject constructor(
         }
     }
 
-    /** Resetta lo stato per una nuova registrazione */
+    /** Carica una sessione specifica per il dettaglio */
+    fun getSessionDetail(sessionId: Long) = sessionRepository.getSessionWithExercises(sessionId)
+
+    /** Elimina una sessione */
+    fun deleteSession(session: SessionEntity, onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            sessionRepository.deleteSession(session)
+            onDeleted()
+        }
+    }
+
     @Suppress("unused") // Chiamata da AfaNavGraph quando l'utente torna alla SessionScreen
     fun reset() {
         _uiState.update {

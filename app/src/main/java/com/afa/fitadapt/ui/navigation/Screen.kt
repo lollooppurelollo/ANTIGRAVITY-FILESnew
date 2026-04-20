@@ -33,6 +33,10 @@ sealed class Screen(val route: String) {
 
     // ── Sessione ──
     object Session : Screen("session")
+    object SessionHistory : Screen("session_history")
+    object SessionDetail : Screen("session_detail/{sessionId}") {
+        fun createRoute(sessionId: Long) = "session_detail/$sessionId"
+    }
 
     // ── Diario ──
     object Diary : Screen("diary")

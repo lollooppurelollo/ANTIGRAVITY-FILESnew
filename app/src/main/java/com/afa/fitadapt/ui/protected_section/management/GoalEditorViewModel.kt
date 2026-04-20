@@ -18,7 +18,9 @@ import javax.inject.Inject
 data class GoalEditorUiState(
     val title: String = "",
     val targetType: String = "sessions_per_week",
-    val targetValue: String = "",
+    val bronzeValue: String = "",
+    val silverValue: String = "",
+    val goldValue: String = "",
     val isSaved: Boolean = false
 )
 
@@ -32,14 +34,18 @@ class GoalEditorViewModel @Inject constructor(
 
     fun updateTitle(title: String) = _uiState.update { it.copy(title = title) }
     fun updateTargetType(type: String) = _uiState.update { it.copy(targetType = type) }
-    fun updateTargetValue(value: String) = _uiState.update { it.copy(targetValue = value) }
+    fun updateBronzeValue(value: String) = _uiState.update { it.copy(bronzeValue = value) }
+    fun updateSilverValue(value: String) = _uiState.update { it.copy(silverValue = value) }
+    fun updateGoldValue(value: String) = _uiState.update { it.copy(goldValue = value) }
 
     fun save() {
         val state = _uiState.value
         val goal = GoalEntity(
             title = state.title,
             targetType = state.targetType,
-            targetValue = state.targetValue.toFloatOrNull() ?: 0f
+            targetValue = state.bronzeValue.toFloatOrNull() ?: 0f,
+            silverValue = state.silverValue.toFloatOrNull(),
+            goldValue = state.goldValue.toFloatOrNull()
         )
         viewModelScope.launch {
             goalRepository.createGoal(goal)

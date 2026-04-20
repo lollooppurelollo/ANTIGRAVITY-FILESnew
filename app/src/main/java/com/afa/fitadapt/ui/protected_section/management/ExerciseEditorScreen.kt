@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -66,7 +67,7 @@ fun ExerciseEditorScreen(
                     value = uiState.category, onValueChange = {},
                     readOnly = true, label = { Text("Categoria") },
                     trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
-                    modifier = Modifier.fillMaxWidth().menuAnchor()
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 )
                 ExposedDropdownMenu(expanded = showCategoryMenu, onDismissRequest = { showCategoryMenu = false }) {
                     ExerciseCategory.entries.forEach { cat ->

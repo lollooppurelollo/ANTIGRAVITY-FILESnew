@@ -7,6 +7,7 @@ package com.afa.fitadapt.ui.progress
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.GoalEntity
+import com.afa.fitadapt.data.local.entity.SessionEntity
 import com.afa.fitadapt.data.repository.ProgressRepository
 import com.afa.fitadapt.data.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,11 +21,14 @@ data class ProgressUiState(
     val isLoading: Boolean = true,
     val totalSessions: Int = 0,
     val completedSessions: Int = 0,
+    val fullSessions: Int = 0,
+    val partialSessions: Int = 0,
     val adherencePercent: Float = 0f,
     val totalMinutes: Int = 0,
     val currentStreak: Int = 0,
     val longestStreak: Int = 0,
-    val activeGoals: List<GoalEntity> = emptyList()
+    val activeGoals: List<GoalEntity> = emptyList(),
+    val recentSessions: List<SessionEntity> = emptyList()
 )
 
 @HiltViewModel
@@ -41,7 +45,20 @@ class ProgressViewModel @Inject constructor(
     fun loadProgress() {
         viewModelScope.launch {
             progressRepository.completedSessionsCount().collect { completed ->
-                _uiState.update { it.copy(completedSessions = completed) }
+                _uiState.update { 
+                    val adh = if (it.totalSessions > 0) (completed.toFloat() / it.totalSessions) * 100f else 0f
+                    it.copy(completedSessions = completed, adherencePercent = adh) 
+                }
+            }
+        }
+        viewModelScope.launch {
+            progressRepository.fullSessionsCount().collect { full ->
+                _uiState.update { it.copy(fullSessions = full) }
+            }
+        }
+        viewModelScope.launch {
+            progressRepository.partialSessionsCount().collect { partial ->
+                _uiState.update { it.copy(partialSessions = partial) }
             }
         }
         viewModelScope.launch {
@@ -64,7 +81,12 @@ class ProgressViewModel @Inject constructor(
         }
         viewModelScope.launch {
             progressRepository.getActiveGoals().collect { goals ->
-                _uiState.update { it.copy(activeGoals = goals, isLoading = false) }
+                _uiState.update { it.copy(activeGoals = goals) }
+            }
+        }
+        viewModelScope.launch {
+            sessionRepository.getAllSessions().collect { sessions ->
+                _uiState.update { it.copy(recentSessions = sessions, isLoading = false) }
             }
         }
     }

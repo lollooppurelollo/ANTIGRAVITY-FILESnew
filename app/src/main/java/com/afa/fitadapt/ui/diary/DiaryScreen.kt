@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.DiaryEntryEntity
@@ -120,143 +121,126 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel, onBack: () -> Unit) {
         topBar = {
             TopAppBar(
                 title = { Text("Diario", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { if (uiState.selectedTab == 0) diaryViewModel.toggleAddDiary() else diaryViewModel.toggleAddScale() },
+                onClick = { diaryViewModel.toggleAddDiary(); diaryViewModel.toggleAddScale() },
                 containerColor = FitlyBlue
             ) { Icon(Icons.Default.Add, "Aggiungi", tint = MaterialTheme.colorScheme.onPrimary) }
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-            // Tab bar
-            TabRow(selectedTabIndex = uiState.selectedTab, containerColor = MaterialTheme.colorScheme.background) {
-                Tab(selected = uiState.selectedTab == 0, onClick = { diaryViewModel.selectTab(0) }, text = { Text("Diario libero") })
-                Tab(selected = uiState.selectedTab == 1, onClick = { diaryViewModel.selectTab(1) }, text = { Text("Scale rapide") })
-            }
-
-            when (uiState.selectedTab) {
-                0 -> DiaryTab(uiState, diaryViewModel)
-                1 -> ScalesTab(uiState, diaryViewModel)
-            }
-        }
-    }
-}
-
-@Composable
-private fun DiaryTab(uiState: DiaryUiState, vm: DiaryViewModel) {
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        // Form per aggiungere
-        if (uiState.showAddDiary) {
-            item {
-                Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = FitlyBlueLight), shape = RoundedCornerShape(16.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Come ti senti oggi?", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(
-                            value = uiState.newDiaryText, onValueChange = { vm.updateDiaryText(it) },
-                            modifier = Modifier.fillMaxWidth().height(120.dp), maxLines = 5,
-                            placeholder = { Text("Scrivi liberamente...") }
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                            TextButton(onClick = { vm.toggleAddDiary() }) { Text("Annulla") }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = { vm.saveDiaryEntry() }, enabled = uiState.newDiaryText.isNotBlank()) { Text("Salva") }
+        LazyColumn(modifier = Modifier.padding(padding).fillMaxSize().padding(16.dp)) {
+            // Sezione Scale Rapide (Sempre visibile se in modalità inserimento)
+            if (uiState.showAddDiary || uiState.showAddScale) {
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = FitlyBlueLight),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text("Rilevazione di oggi", style = MaterialTheme.typography.titleMedium, color = NavyBlue, fontWeight = FontWeight.Bold)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            
+                            Text("Scale rapide (0-10)", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                            ScaleSlider("Astenia", uiState.scaleAsthenia) { diaryViewModel.updateScaleAsthenia(it) }
+                            ScaleSlider("Dolore", uiState.scalePain) { diaryViewModel.updateScalePain(it) }
+                            ScaleSlider("Dispnea Riposo", uiState.scaleRestDyspnea) { diaryViewModel.updateScaleRestDyspnea(it) }
+                            ScaleSlider("Dispnea Sforzo", uiState.scaleExertionDyspnea) { diaryViewModel.updateScaleExertionDyspnea(it) }
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text("Diario libero", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = uiState.newDiaryText, 
+                                onValueChange = { diaryViewModel.updateDiaryText(it) },
+                                modifier = Modifier.fillMaxWidth().height(120.dp), 
+                                maxLines = 5,
+                                placeholder = { Text("Come ti senti? Note libere...") }
+                            )
+                            
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+                                TextButton(onClick = { 
+                                    diaryViewModel.toggleAddDiary()
+                                    if (!uiState.showAddDiary) diaryViewModel.toggleAddScale() // sync
+                                }) { Text("Annulla") }
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Button(
+                                    onClick = { 
+                                        diaryViewModel.saveScaleEntry()
+                                        if (uiState.newDiaryText.isNotBlank()) diaryViewModel.saveDiaryEntry()
+                                        else diaryViewModel.toggleAddDiary() // Chiude il form
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = SageGreen)
+                                ) { Text("Salva tutto") }
+                            }
                         }
                     }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-
-        if (uiState.diaryEntries.isEmpty()) {
-            item {
-                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("📝", style = MaterialTheme.typography.displayMedium)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Nessuna voce nel diario", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Premi + per iniziare a scrivere", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
-                    }
-                }
-            }
-        }
-
-        items(uiState.diaryEntries) { entry ->
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(entry.text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun ScalesTab(uiState: DiaryUiState, vm: DiaryViewModel) {
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        if (uiState.showAddScale) {
-            item {
-                Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = FitlyBlueLight), shape = RoundedCornerShape(16.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Come stai oggi? (0-10)", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        ScaleSlider("Astenia/Stanchezza", uiState.scaleAsthenia) { vm.updateScaleAsthenia(it) }
-                        ScaleSlider("Dolore osteoarticolare", uiState.scalePain) { vm.updateScalePain(it) }
-                        ScaleSlider("Dispnea a riposo", uiState.scaleRestDyspnea) { vm.updateScaleRestDyspnea(it) }
-                        ScaleSlider("Dispnea a sforzi lievi", uiState.scaleExertionDyspnea) { vm.updateScaleExertionDyspnea(it) }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                            TextButton(onClick = { vm.toggleAddScale() }) { Text("Annulla") }
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Button(onClick = { vm.saveScaleEntry() }, colors = ButtonDefaults.buttonColors(containerColor = SageGreen)) { Text("Salva") }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-
-        if (uiState.scaleEntries.isEmpty()) {
-            item {
-                Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("📊", style = MaterialTheme.typography.displayMedium)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Nessuna rilevazione", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        Text("Premi + per registrare i tuoi sintomi", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
-                    }
-                }
-            }
-        }
-
-        items(uiState.scaleEntries) { entry ->
-            Card(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text("Storico", style = MaterialTheme.typography.titleMedium, color = NavyBlue, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        entry.asthenia?.let { ScaleBadge("Astenia", it) }
-                        entry.osteoarticularPain?.let { ScaleBadge("Dolore", it) }
-                        entry.restDyspnea?.let { ScaleBadge("Dispnea R", it) }
-                        entry.exertionDyspnea?.let { ScaleBadge("Dispnea S", it) }
-                    }
                 }
             }
+
+            // Combinazione dei due flussi (semplicistica per ora, ordinata per data)
+            // In un'app reale faremmo un merge nel ViewModel, qui mostriamo le scale sopra e il diario sotto o alternati.
+            // Per brevità mostriamo prima le scale recenti e poi il diario.
+            
+            items(uiState.scaleEntries) { entry ->
+                ScaleEntryCard(entry)
+            }
+            
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+
+            items(uiState.diaryEntries) { entry ->
+                DiaryEntryCard(entry)
+            }
+        }
+    }
+}
+
+@Composable
+fun ScaleEntryCard(entry: ScaleEntryEntity) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("📊", fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                entry.asthenia?.let { ScaleBadge("Astenia", it) }
+                entry.osteoarticularPain?.let { ScaleBadge("Dolore", it) }
+                entry.restDyspnea?.let { ScaleBadge("Dispnea R", it) }
+                entry.exertionDyspnea?.let { ScaleBadge("Dispnea S", it) }
+            }
+        }
+    }
+}
+
+@Composable
+fun DiaryEntryCard(entry: DiaryEntryEntity) {
+    Card(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("📝", fontSize = 16.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(DateUtils.toDisplayString(entry.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(entry.text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

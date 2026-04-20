@@ -54,6 +54,8 @@ import com.afa.fitadapt.ui.protected_section.ProtectedViewModel
 import com.afa.fitadapt.ui.protected_section.management.*
 import com.afa.fitadapt.ui.session.SessionScreen
 import com.afa.fitadapt.ui.session.SessionViewModel
+import com.afa.fitadapt.ui.session.SessionHistoryScreen
+import com.afa.fitadapt.ui.session.SessionDetailScreen
 import com.afa.fitadapt.ui.settings.SettingsScreen
 import com.afa.fitadapt.ui.settings.SettingsViewModel
 import com.afa.fitadapt.ui.splash.SplashScreen
@@ -158,6 +160,9 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
                     onNavigateToSession = {
                         navController.navigate(Screen.Session.route)
                     },
+                    onNavigateToHistory = {
+                        navController.navigate(Screen.SessionHistory.route)
+                    },
                     onNavigateToCard = {
                         navController.navigate(Screen.ActiveCard.route)
                     },
@@ -218,6 +223,30 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
                             popUpTo(Screen.Home.route) { inclusive = true }
                         }
                     }
+                )
+            }
+
+            composable(Screen.SessionHistory.route) {
+                val sessionViewModel: SessionViewModel = hiltViewModel()
+                SessionHistoryScreen(
+                    viewModel = sessionViewModel,
+                    onBack = { navController.popBackStack() },
+                    onSessionClick = { sessionId ->
+                        navController.navigate(Screen.SessionDetail.createRoute(sessionId))
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.SessionDetail.route,
+                arguments = listOf(navArgument("sessionId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: return@composable
+                val sessionViewModel: SessionViewModel = hiltViewModel()
+                SessionDetailScreen(
+                    viewModel = sessionViewModel,
+                    sessionId = sessionId,
+                    onBack = { navController.popBackStack() }
                 )
             }
 

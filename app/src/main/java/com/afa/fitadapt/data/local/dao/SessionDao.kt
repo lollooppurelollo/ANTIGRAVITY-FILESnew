@@ -49,6 +49,10 @@ interface SessionDao {
     @Update
     suspend fun update(session: SessionEntity)
 
+    // Elimina una sessione
+    @androidx.room.Delete
+    suspend fun delete(session: SessionEntity)
+
     // ── ESERCIZI DELLA SESSIONE ──
 
     // Inserisci il dettaglio degli esercizi completati in una sessione
@@ -62,9 +66,17 @@ interface SessionDao {
 
     // ── STATISTICHE PER PROGRESSI ──
 
-    // Conta le sessioni completate (totale)
+    // Conta le sessioni completate (totale: sia piene che parziali)
     @Query("SELECT COUNT(*) FROM sessions WHERE completed = 1")
     fun countCompletedSessions(): Flow<Int>
+
+    // Conta le sessioni completate interamente
+    @Query("SELECT COUNT(*) FROM sessions WHERE completed = 1 AND partial = 0")
+    fun countFullSessions(): Flow<Int>
+
+    // Conta le sessioni completate parzialmente
+    @Query("SELECT COUNT(*) FROM sessions WHERE completed = 1 AND partial = 1")
+    fun countPartialSessions(): Flow<Int>
 
     // Conta le sessioni totali (completate e non)
     @Query("SELECT COUNT(*) FROM sessions")

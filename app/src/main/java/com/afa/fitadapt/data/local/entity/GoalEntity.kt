@@ -42,6 +42,10 @@ data class GoalEntity(
 
     val targetValue: Float,
 
+    val silverValue: Float? = null,
+
+    val goldValue: Float? = null,
+
     val currentValue: Float = 0f,
 
     val isActive: Boolean = true,

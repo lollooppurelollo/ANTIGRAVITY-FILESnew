@@ -96,15 +96,26 @@ class SessionRepository @Inject constructor(
     }
 
     /** Aggiorna una sessione esistente */
-    @Suppress("unused") // Usata per correggere note di sessioni esistenti
     suspend fun updateSession(session: SessionEntity) =
         sessionDao.update(session)
+
+    /** Elimina una sessione */
+    suspend fun deleteSession(session: SessionEntity) =
+        sessionDao.delete(session)
 
     // ── Statistiche ──
 
     /** Numero totale di sessioni completate (Flow) */
     fun countCompletedSessions(): Flow<Int> =
         sessionDao.countCompletedSessions()
+
+    /** Numero totale di sessioni completate interamente (Flow) */
+    fun countFullSessions(): Flow<Int> =
+        sessionDao.countFullSessions()
+
+    /** Numero totale di sessioni completate parzialmente (Flow) */
+    fun countPartialSessions(): Flow<Int> =
+        sessionDao.countPartialSessions()
 
     /** Numero totale di sessioni (Flow) */
     fun countTotalSessions(): Flow<Int> =

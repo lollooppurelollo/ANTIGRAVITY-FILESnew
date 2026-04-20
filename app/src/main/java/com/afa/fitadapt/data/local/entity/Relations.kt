@@ -23,16 +23,45 @@ data class CardWithExercises(
 )
 
 /**
- * Rappresenta una sessione con il dettaglio degli esercizi completati.
- * Usata per le sessioni parziali dove serve sapere cosa è stato fatto.
+ * Rappresenta una sessione con il dettaglio degli esercizi completati e i nomi degli esercizi.
  */
 data class SessionWithExercises(
     @Embedded
     val session: SessionEntity,
 
     @Relation(
+        entity = SessionExerciseEntity::class,
         parentColumn = "id",
         entityColumn = "sessionId"
     )
-    val exerciseCompletions: List<SessionExerciseEntity>
+    val exerciseCompletions: List<SessionExerciseWithDetails>
+)
+
+/**
+ * Dettaglio di un esercizio in una sessione, includendo i dati della scheda e dell'esercizio base.
+ */
+data class SessionExerciseWithDetails(
+    @Embedded
+    val sessionExercise: SessionExerciseEntity,
+
+    @Relation(
+        entity = CardExerciseEntity::class,
+        parentColumn = "cardExerciseId",
+        entityColumn = "id"
+    )
+    val cardExercise: CardExerciseWithExercise
+)
+
+/**
+ * Associazione tra un esercizio in scheda e l'anagrafica dell'esercizio.
+ */
+data class CardExerciseWithExercise(
+    @Embedded
+    val cardExercise: CardExerciseEntity,
+
+    @Relation(
+        parentColumn = "exerciseId",
+        entityColumn = "id"
+    )
+    val exercise: ExerciseEntity
 )

@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.automirrored.outlined.ShowChart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -37,6 +38,7 @@ val bottomNavItems = listOf(
     BottomNavItem("Home", Screen.Home.route, Icons.Outlined.Home),
     BottomNavItem("Scheda", Screen.ActiveCard.route, Icons.Outlined.FitnessCenter),
     BottomNavItem("Progressi", Screen.Progress.route, Icons.AutoMirrored.Outlined.ShowChart),
+    BottomNavItem("Diario", Screen.Diary.route, Icons.Outlined.Book),
     BottomNavItem("Altro", Screen.More.route, Icons.Outlined.Menu),
 )
 
@@ -74,7 +76,13 @@ fun BottomNavBar(
                         contentDescription = item.label
                     )
                 },
-                label = { Text(item.label) },
+                label = { 
+                    Text(
+                        text = item.label,
+                        maxLines = 1,
+                        softWrap = false
+                    ) 
+                },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = NavyBlue,
                     selectedTextColor = NavyBlue,

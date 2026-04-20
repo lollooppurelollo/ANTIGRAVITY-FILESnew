@@ -117,7 +117,12 @@ fun GoalListItem(goal: GoalEntity, onDelete: () -> Unit, onToggleActive: () -> U
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(goal.title, style = MaterialTheme.typography.titleSmall, color = NavyBlue, fontWeight = FontWeight.Bold)
-                Text("${goal.targetType}: ${goal.targetValue.toInt()}", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                val thresholds = listOfNotNull(
+                    "B: ${goal.targetValue.toInt()}",
+                    goal.silverValue?.let { "S: ${it.toInt()}" },
+                    goal.goldValue?.let { "G: ${it.toInt()}" }
+                ).joinToString(" | ")
+                Text("${goal.targetType} ($thresholds)", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
             }
             Switch(checked = goal.isActive, onCheckedChange = { onToggleActive() })
             IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Elimina", tint = Color.Red.copy(alpha = 0.6f)) }
