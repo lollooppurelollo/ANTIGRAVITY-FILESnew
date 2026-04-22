@@ -7,67 +7,72 @@ package com.afa.fitadapt.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ══════════════════════════════════════════════════════════
-// PALETTE PRINCIPALE FITLY
-// Palette medicale-fitness moderna: Azzurro pastello vibrante, Navy Blue, Bianchi puliti
+// PALETTE PRINCIPALE FITLY (Premium Health Edition)
+// Background: #F8FAFC (Off-white), Primary: #2563EB (Modern Blue), Secondary: #6EE7B7 (Sage)
 // ══════════════════════════════════════════════════════════
 
-// Blu Navy — testi e icone principali, trasmette professionalità
-val NavyBlue = Color(0xFF1B3A5C)
-val NavyBlueDark = Color(0xFF0F1E33)
+// Sfondi e Superfici Premium
+val PremiumBackground = Color(0xFFF8FAFC) // Off-white neutrale
+val PremiumCard = Color(0xFFFFFFFF)       // Pure White
+val PremiumSurface = Color(0xFFF1F5F9)     // Light Slate surface
 
-// Fitly Blue (Azzurro Pastello Moderno) — Il cuore dell'identità visiva
-// Un azzurro bilanciato tra il sanitario e il fitness tech
-val FitlyBlue = Color(0xFF7CB9E8)      // Azzurro pastello più deciso
-val FitlyBlueLight = Color(0xFFE3F2FD) // Versione molto chiara per sfondi
-val FitlyBlueDark = Color(0xFF4682B4)  // Versione più scura per accenti
+// Colori Identitari
+val PremiumBlue = Color(0xFF2563EB)       // Deep Modern Blue (Primary)
+val PremiumBlueLight = Color(0xFFDBEAFE)  // Soft Blue tint
+val PremiumSage = Color(0xFF10B981)       // Vibrant Sage Green (Secondary)
+val PremiumSageLight = Color(0xFFD1FAE5)  // Soft Sage tint
 
-// Bianchi e superfici pulite
-val WarmWhite = Color(0xFFFAFCFE)
-val IceWhite = Color(0xFFF4F9FF)       // Sfondo leggermente azzurrato
-val SurfaceVariant = Color(0xFFEBF2F7)
+// Testi (Slate Palette)
+val Slate900 = Color(0xFF0F172A)          // Dark Slate (Primary Text)
+val Slate700 = Color(0xFF334155)          // Medium Slate
+val Slate500 = Color(0xFF64748B)          // Gray-Slate (Secondary Text)
+val Slate400 = Color(0xFF94A3B8)          // Light Slate
 
-// Colori funzionali (mantenuti ma armonizzati)
-val SageGreen = Color(0xFF52B788)       // Successo moderno
-val SageGreenLight = Color(0xFFD8F3DC)
-val SoftAmber = Color(0xFFFFB347)       // Ambra pastello
-val SoftAmberLight = Color(0xFFFFF3E0)
-val SoftRose = Color(0xFFE57373)        // Rosso pastello
-val SoftRoseLight = Color(0xFFFFEBEE)
+// Colori di accento (Mantenuti per compatibilità funzionale)
+val SoftAmber = Color(0xFFF59E0B)       // Modern Amber
+val SoftAmberLight = Color(0xFFFEF3C7)
+val SoftRose = Color(0xFFEF4444)        // Modern Red
+val SoftRoseLight = Color(0xFFFEE2E2)
 
-// Testi
-val TextPrimary = Color(0xFF2C3E50)
-val TextSecondary = Color(0xFF5D6D7E)
-val TextTertiary = Color(0xFF85929E)
+// Vecchi nomi mantenuti per non rompere riferimenti immediati ma mappati sui nuovi
+val NavyBlue = Slate900
+val FitlyBlue = PremiumBlue
+val FitlyBlueLight = PremiumBlueLight
+val SageGreen = PremiumSage
+val SageGreenLight = PremiumSageLight
+val WarmWhite = PremiumCard
+val IceWhite = PremiumBackground
+val TextSecondary = Slate500
 
 // ══════════════════════════════════════════════════════════
 // SCHEMA COLORI MATERIAL 3 (tema chiaro)
 // ══════════════════════════════════════════════════════════
 
-val md_light_primary = FitlyBlueDark
+val md_light_primary = PremiumBlue
 val md_light_onPrimary = Color.White
-val md_light_primaryContainer = FitlyBlueLight
-val md_light_onPrimaryContainer = NavyBlue
+val md_light_primaryContainer = PremiumBlueLight
+val md_light_onPrimaryContainer = PremiumBlue
 
-val md_light_secondary = FitlyBlue
+val md_light_secondary = PremiumSage
 val md_light_onSecondary = Color.White
-val md_light_secondaryContainer = Color.White
-val md_light_onSecondaryContainer = FitlyBlueDark
+val md_light_secondaryContainer = PremiumSageLight
+val md_light_onSecondaryContainer = PremiumSage
 
-val md_light_tertiary = SageGreen
+val md_light_tertiary = SoftAmber
 val md_light_onTertiary = Color.White
-val md_light_tertiaryContainer = SageGreenLight
-val md_light_onTertiaryContainer = Color(0xFF0A3D1F)
+val md_light_tertiaryContainer = SoftAmberLight
+val md_light_onTertiaryContainer = SoftAmber
 
 val md_light_error = SoftRose
 val md_light_onError = Color.White
 val md_light_errorContainer = SoftRoseLight
-val md_light_onErrorContainer = Color(0xFF410002)
+val md_light_onErrorContainer = SoftRose
 
-val md_light_background = IceWhite
-val md_light_onBackground = TextPrimary
-val md_light_surface = WarmWhite
-val md_light_onSurface = TextPrimary
-val md_light_surfaceVariant = SurfaceVariant
-val md_light_onSurfaceVariant = TextSecondary
-val md_light_outline = TextTertiary
-val md_light_outlineVariant = Color(0xFFC4C7CF)
+val md_light_background = PremiumBackground
+val md_light_onBackground = Slate900
+val md_light_surface = PremiumCard
+val md_light_onSurface = Slate900
+val md_light_surfaceVariant = PremiumSurface
+val md_light_onSurfaceVariant = Slate500
+val md_light_outline = Slate400
+val md_light_outlineVariant = Color(0xFFE2E8F0)

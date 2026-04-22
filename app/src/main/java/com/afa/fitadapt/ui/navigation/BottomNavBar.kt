@@ -17,10 +17,22 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.WarmWhite
+import com.afa.fitadapt.ui.theme.PremiumBlue
+import com.afa.fitadapt.ui.theme.PremiumBlueLight
+import com.afa.fitadapt.ui.theme.Slate900
+import com.afa.fitadapt.ui.theme.PremiumCard
+import com.afa.fitadapt.ui.theme.Slate500
 
 /**
  * Elemento della bottom navigation bar.
@@ -32,7 +44,7 @@ data class BottomNavItem(
 )
 
 /**
- * I 4 tab della bottom navigation.
+ * I 5 tab della bottom navigation.
  */
 val bottomNavItems = listOf(
     BottomNavItem("Home", Screen.Home.route, Icons.Outlined.Home),
@@ -44,51 +56,63 @@ val bottomNavItems = listOf(
 
 /**
  * Bottom Navigation Bar dell'app.
- * Mostra 4 tab: Home, Scheda, Progressi, Altro.
- * Visibile solo nelle schermate principali.
+ * Mostra 5 tab: Home, Scheda, Progressi, Diario, Altro.
  */
 @Composable
 fun BottomNavBar(
     navController: NavController,
     currentRoute: String?
 ) {
-    NavigationBar(
-        containerColor = WarmWhite,
+    Surface(
+        modifier = Modifier
+            .padding(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 8.dp) // Aumentato top padding per evitare "taglio"
+            .clip(RoundedCornerShape(28.dp)),
+        tonalElevation = 8.dp,
+        shadowElevation = 8.dp,
+        color = PremiumCard.copy(alpha = 0.98f)
     ) {
-        bottomNavItems.forEach { item ->
-            val isSelected = currentRoute == item.route
+        NavigationBar(
+            containerColor = Color.Transparent,
+            tonalElevation = 0.dp,
+            modifier = Modifier.height(84.dp) // Aumentata altezza per ospitare meglio etichette
+        ) {
+            bottomNavItems.forEach { item ->
+                val isSelected = currentRoute == item.route
 
-            NavigationBarItem(
-                selected = isSelected,
-                onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            // Evita duplicati nello stack
-                            popUpTo(Screen.Home.route) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+                NavigationBarItem(
+                    selected = isSelected,
+                    onClick = {
+                        if (currentRoute != item.route) {
+                            navController.navigate(item.route) {
+                                popUpTo(Screen.Home.route) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.label
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = item.icon,
+                            contentDescription = item.label,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = { 
+                        Text(
+                            text = item.label,
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1
+                        ) 
+                    },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        unselectedIconColor = Slate500,
+                        unselectedTextColor = Slate500,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer,
                     )
-                },
-                label = { 
-                    Text(
-                        text = item.label,
-                        maxLines = 1,
-                        softWrap = false
-                    ) 
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = NavyBlue,
-                    selectedTextColor = NavyBlue,
-                    indicatorColor = FitlyBlueLight,
                 )
-            )
+            }
         }
     }
 }

@@ -38,12 +38,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import com.afa.fitadapt.data.local.entity.CardExerciseEntity
 import com.afa.fitadapt.data.local.entity.ExerciseEntity
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.SageGreen
 
 /**
  * Schermata della scheda attiva.
@@ -59,22 +58,33 @@ fun ActiveCardScreen(
     if (uiState.noActiveCard) {
         // Nessuna scheda attiva
         Box(
-            modifier = Modifier.fillMaxSize().padding(32.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("📋", style = MaterialTheme.typography.displayLarge)
-                Spacer(modifier = Modifier.height(16.dp))
+                Box(
+                    modifier = Modifier
+                        .size(80.dp)
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("📋", style = MaterialTheme.typography.displaySmall)
+                }
+                Spacer(modifier = Modifier.height(24.dp))
                 Text(
                     "Nessuna scheda attiva",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = NavyBlue
+                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onBackground
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     "Chiedi al tuo operatore di attivare una scheda dalla sezione protetta.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             }
         }
@@ -88,50 +98,64 @@ fun ActiveCardScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // Header della scheda
+        // Header della scheda - Floating Gradient Card
         item {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(16.dp)
                     .background(
-                        FitlyBlueLight,
-                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        Brush.linearGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                            )
+                        ),
+                        shape = RoundedCornerShape(32.dp)
                     )
                     .padding(24.dp)
-                    .padding(top = 8.dp)
             ) {
                 Column {
                     Text(
                         text = cardWithExercises.card.title,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = NavyBlue
+                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         cardWithExercises.card.targetSessions?.let { target ->
                             InfoChip(
                                 icon = Icons.Outlined.FitnessCenter,
-                                text = "${uiState.completedSessionsCount}/$target sessioni"
+                                text = "${uiState.completedSessionsCount}/$target sessioni",
+                                isLight = true
                             )
                         }
                         cardWithExercises.card.durationWeeks?.let { weeks ->
                             InfoChip(
                                 icon = Icons.Outlined.Timer,
-                                text = "$weeks settimane"
+                                text = "$weeks settimane",
+                                isLight = true
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        "${cardWithExercises.cardExercises.size} esercizi",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = NavyBlue.copy(alpha = 0.6f)
+                        "${cardWithExercises.cardExercises.size} esercizi in programma",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.8f)
                     )
                 }
             }
         }
 
-        item { Spacer(modifier = Modifier.height(16.dp)) }
+        item { 
+            Text(
+                "Esercizi",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+            )
+        }
 
         // Lista esercizi
         itemsIndexed(
@@ -162,35 +186,43 @@ private fun ExerciseListItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp)
+            .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(1.dp),
-        shape = RoundedCornerShape(14.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(2.dp),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Numero ordine
             Box(
-                modifier = Modifier.size(36.dp).clip(CircleShape).background(FitlyBlueLight),
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Text("$index", style = MaterialTheme.typography.labelLarge, color = NavyBlue)
+                Text(
+                    text = "$index",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
             // Info esercizio
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     exercise.name,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = NavyBlue,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
+
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // Parametri (custom > default)
                 val duration = cardExercise.customDurationSec ?: exercise.defaultDurationSec
@@ -204,7 +236,7 @@ private fun ExerciseListItem(
                 }
                 Text(
                     params.joinToString(" · "),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -213,7 +245,7 @@ private fun ExerciseListItem(
             Icon(
                 Icons.Outlined.PlayArrow,
                 "Dettaglio",
-                tint = FitlyBlue,
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -221,10 +253,27 @@ private fun ExerciseListItem(
 }
 
 @Composable
-private fun InfoChip(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(icon, null, tint = NavyBlue.copy(alpha = 0.7f), modifier = Modifier.size(16.dp))
-        Spacer(modifier = Modifier.width(4.dp))
-        Text(text, style = MaterialTheme.typography.labelMedium, color = NavyBlue.copy(alpha = 0.7f))
+private fun InfoChip(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    text: String,
+    isLight: Boolean = false
+) {
+    val contentColor = if (isLight) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+    val bgColor = if (isLight) Color.White.copy(alpha = 0.15f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(bgColor)
+            .padding(horizontal = 10.dp, vertical = 6.dp)
+    ) {
+        Icon(icon, null, tint = contentColor, modifier = Modifier.size(16.dp))
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium),
+            color = contentColor
+        )
     }
 }

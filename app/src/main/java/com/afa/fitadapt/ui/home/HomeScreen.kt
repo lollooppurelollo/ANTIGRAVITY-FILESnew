@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.FitnessCenter
@@ -51,13 +52,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.SageGreen
-import com.afa.fitadapt.ui.theme.SageGreenLight
-import com.afa.fitadapt.ui.theme.SoftAmber
-import com.afa.fitadapt.ui.theme.SoftAmberLight
+import androidx.compose.material.icons.filled.Check
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.ui.graphics.Color
@@ -113,51 +108,52 @@ fun HomeScreen(
             .verticalScroll(rememberScrollState())
     ) {
         // ... (Header and CTA stay same) ...
-        // ── Header con gradiente ──
+        // ── Header con gradiente Premium ──
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(16.dp)
                 .background(
-                    Brush.verticalGradient(
-                        colors = listOf(NavyBlue, FitlyBlue)
+                    Brush.linearGradient(
+                        colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
                     ),
-                    shape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
+                    shape = RoundedCornerShape(32.dp)
                 )
                 .padding(24.dp)
-                .padding(top = 16.dp)
         ) {
             Column {
                 Text(
                     text = "Buongiorno! 👋",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = FitlyBlueLight
+                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                    color = Color.White
                 )
                 if (uiState.patientCode.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Codice: ${uiState.patientCode}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = FitlyBlueLight.copy(alpha = 0.7f)
+                        style = MaterialTheme.typography.labelMedium,
+                        color = Color.White.copy(alpha = 0.8f)
                     )
                 }
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // Streak e statistiche rapide
+                // Giorni consecutivi e statistiche rapide
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    StatBadge(
+                    ModernStatCard(
+                        modifier = Modifier.weight(1f),
                         icon = Icons.Outlined.LocalFireDepartment,
                         value = "${uiState.currentStreak}",
-                        label = "Streak",
-                        color = SoftAmber
+                        label = "Giorni consecutivi",
+                        color = Color.White
                     )
-                    StatBadge(
+                    ModernStatCard(
+                        modifier = Modifier.weight(1f),
                         icon = Icons.Outlined.FitnessCenter,
                         value = "${uiState.totalCompleted}",
                         label = "Sessioni",
-                        color = SageGreen,
+                        color = Color.White,
                         onClick = onNavigateToHistory
                     )
                 }
@@ -174,16 +170,20 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            SectionTitle(if (isMonthlyView) "Calendario Mensile" else "Calendario Settimanale", modifier = Modifier.padding(horizontal = 0.dp))
+            Text(
+                if (isMonthlyView) "Calendario Mensile" else "Calendario Settimanale",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
             Row {
                 IconButton(onClick = { showAddDialog = true }) {
-                    Icon(Icons.Default.Add, contentDescription = "Aggiungi programmato", tint = FitlyBlue)
+                    Icon(Icons.Default.Add, contentDescription = "Aggiungi programmato", tint = MaterialTheme.colorScheme.primary)
                 }
                 IconButton(onClick = { isMonthlyView = !isMonthlyView }) {
                     Icon(
                         if (isMonthlyView) Icons.Outlined.ViewWeek else Icons.Outlined.CalendarMonth,
                         contentDescription = "Cambia vista",
-                        tint = FitlyBlue
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -199,7 +199,7 @@ fun HomeScreen(
             onDeleteSession = { homeViewModel.deleteScheduledSession(it) }
         )
     } else {
-        WeeklyCalendar(
+        ModernWeeklyCalendar(
             scheduled = uiState.scheduledSessions,
             onDeleteSession = { homeViewModel.deleteScheduledSession(it) }
         )
@@ -214,92 +214,98 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = SageGreen),
-                shape = RoundedCornerShape(16.dp)
+                    .height(64.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                shape = RoundedCornerShape(20.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
             ) {
                 Icon(Icons.Default.Add, "Registra", modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Registra allenamento di oggi", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text("Registra allenamento", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
             }
         } else if (uiState.completedToday) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp),
-                colors = CardDefaults.cardColors(containerColor = SageGreenLight),
-                shape = RoundedCornerShape(16.dp)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)),
+                shape = RoundedCornerShape(20.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
             ) {
                 Row(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("✅", fontSize = 24.sp)
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(MaterialTheme.colorScheme.secondary, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.onSecondary, modifier = Modifier.size(24.dp))
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
                     Column {
-                        Text("Allenamento registrato!", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
-                        Text("Ottimo lavoro, continua così!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Allenamento registrato", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                        Text("Ottimo lavoro per oggi!", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         // ── Scheda Attiva ──
         uiState.activeCard?.let { card ->
-            SectionTitle("La tua scheda attiva")
+            SectionTitle("Piano attivo")
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .clickable { onNavigateToCard() },
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(2.dp),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(24.dp)
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(24.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(FitlyBlueLight),
+                                .size(48.dp)
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Outlined.FitnessCenter, "Scheda", tint = NavyBlue, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Outlined.FitnessCenter, "Scheda", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
                         }
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column {
-                            Text(card.title, style = MaterialTheme.typography.titleMedium, color = NavyBlue)
-                            card.durationWeeks?.let {
-                                Text("Durata: $it settimane", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text(card.title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
+                            val info = listOfNotNull(
+                                card.durationWeeks?.let { "$it settimane" },
+                                card.targetSessions?.let { "$it sessioni obiettivo" }
+                            ).joinToString(" • ")
+                            if (info.isNotEmpty()) {
+                                Text(info, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
-                    card.targetSessions?.let { target ->
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            "Obiettivo: $target sessioni",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
                 }
             }
-        } ?: run {
+        }
+?: run {
             // Nessuna scheda attiva
             SectionTitle("La tua scheda")
             Card(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
-                colors = CardDefaults.cardColors(containerColor = SoftAmberLight),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
                     Text("📋", fontSize = 24.sp)
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text("Nessuna scheda attiva", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                        Text("Nessuna scheda attiva", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onTertiaryContainer)
                         Text("Chiedi al tuo operatore di configurare una scheda", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
@@ -316,24 +322,24 @@ fun HomeScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 24.dp)
                     .clickable { onNavigateToArticle(article.id) },
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(2.dp),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(24.dp)
             ) {
-                Column(modifier = Modifier.padding(20.dp)) {
+                Column(modifier = Modifier.padding(24.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(
                             modifier = Modifier
-                                .size(44.dp)
+                                .size(48.dp)
                                 .clip(CircleShape)
-                                .background(FitlyBlueLight),
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.AutoMirrored.Outlined.Article, "Articolo", tint = NavyBlue, modifier = Modifier.size(24.dp))
+                            Icon(Icons.AutoMirrored.Outlined.Article, "Articolo", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
                         }
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(article.title, style = MaterialTheme.typography.titleSmall, color = NavyBlue, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(article.title, style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(article.summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
                         }
@@ -357,10 +363,10 @@ fun HomeScreen(
                         Text("🎯", fontSize = 20.sp)
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(goal.title, style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
-                            Text("${goal.currentValue.toInt()} / ${goal.targetValue.toInt()}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.titleSmall, color = if (progress >= 1f) SageGreen else FitlyBlue, fontWeight = FontWeight.Bold)
+                            Text(goal.title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text("${goal.currentValue.toInt()} / ${goal.targetValue.toInt()}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.titleSmall, color = if (progress >= 1f) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -400,9 +406,9 @@ fun MonthlyCalendar(
     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
             elevation = CardDefaults.cardElevation(2.dp),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(24.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 // Header Mese
@@ -416,15 +422,15 @@ fun MonthlyCalendar(
                         newMonth.add(Calendar.MONTH, -1)
                         currentMonth = newMonth
                     }) {
-                        Icon(Icons.Default.ChevronLeft, "Mese precedente")
+                        Icon(Icons.Default.ChevronLeft, "Mese precedente", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    Text("$monthName $year", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                    Text("$monthName $year", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
                     IconButton(onClick = {
                         val newMonth = currentMonth.clone() as Calendar
                         newMonth.add(Calendar.MONTH, 1)
                         currentMonth = newMonth
                     }) {
-                        Icon(Icons.Default.ChevronRight, "Mese successivo")
+                        Icon(Icons.Default.ChevronRight, "Mese successivo", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
 
@@ -438,7 +444,7 @@ fun MonthlyCalendar(
                             modifier = Modifier.weight(1f),
                             textAlign = TextAlign.Center,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                         )
                     }
                 }
@@ -472,8 +478,8 @@ fun MonthlyCalendar(
                                         .padding(2.dp)
                                         .clip(CircleShape)
                                         .background(
-                                            if (isToday) FitlyBlue 
-                                            else if (hasSession) FitlyBlueLight.copy(alpha = 0.5f) 
+                                            if (isToday) MaterialTheme.colorScheme.primary 
+                                            else if (hasSession) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                                             else Color.Transparent
                                         )
                                         .clickable { 
@@ -489,7 +495,7 @@ fun MonthlyCalendar(
                                     Text(
                                         text = dayNum.toString(),
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = if (isToday) Color.White else NavyBlue,
+                                        color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
                                         fontWeight = if (isToday || hasSession) FontWeight.Bold else FontWeight.Normal
                                     )
                                     if (hasSession && !isToday) {
@@ -498,7 +504,7 @@ fun MonthlyCalendar(
                                                 .align(Alignment.BottomCenter)
                                                 .padding(bottom = 4.dp)
                                                 .size(4.dp)
-                                                .background(FitlyBlue, CircleShape)
+                                                .background(MaterialTheme.colorScheme.primary, CircleShape)
                                         )
                                     }
                                 }
@@ -537,14 +543,15 @@ fun DaySessionsList(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
-        shape = RoundedCornerShape(12.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text("Allenamenti programmati", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                Text("Allenamenti programmati", style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold), color = MaterialTheme.colorScheme.onSurface)
                 IconButton(onClick = onAddMore) {
-                    Icon(Icons.Default.Add, "Aggiungi", tint = FitlyBlue, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Add, "Aggiungi", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                 }
             }
             sessions.forEach { session ->
@@ -552,14 +559,14 @@ fun DaySessionsList(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Outlined.FitnessCenter, null, tint = FitlyBlue, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Outlined.FitnessCenter, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text(session.title, style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
+                        Text(session.title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                         Text(session.startTime, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     IconButton(onClick = { onDelete(session) }) {
-                        Icon(Icons.Default.Delete, "Elimina", tint = Color.Red.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
+                        Icon(Icons.Default.Delete, "Elimina", tint = MaterialTheme.colorScheme.error.copy(alpha = 0.6f), modifier = Modifier.size(20.dp))
                     }
                 }
             }
@@ -602,14 +609,15 @@ fun AddScheduledSessionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Programma Allenamento") },
+        title = { Text("Programma Allenamento", color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
                     label = { Text("Titolo") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
                 )
 
                 OutlinedTextField(
@@ -618,9 +626,10 @@ fun AddScheduledSessionDialog(
                     label = { Text("Data di inizio") },
                     readOnly = true,
                     modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Outlined.CalendarMonth, "Seleziona data")
+                            Icon(Icons.Outlined.CalendarMonth, "Seleziona data", tint = MaterialTheme.colorScheme.primary)
                         }
                     }
                 )
@@ -629,10 +638,11 @@ fun AddScheduledSessionDialog(
                     value = startTime,
                     onValueChange = { startTime = it },
                     label = { Text("Orario (HH:mm)") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
                 )
 
-                Text("Ripetizione", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                Text("Ripetizione", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
@@ -650,7 +660,7 @@ fun AddScheduledSessionDialog(
 
                 if (recurrenceType == "WEEKLY") {
                     val dayLabels = listOf("L", "M", "M", "G", "V", "S", "D")
-                    Text("Giorni della settimana", style = MaterialTheme.typography.labelSmall)
+                    Text("Giorni della settimana", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
@@ -662,7 +672,7 @@ fun AddScheduledSessionDialog(
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(CircleShape)
-                                    .background(if (isSelected) FitlyBlue else MaterialTheme.colorScheme.surfaceVariant)
+                                    .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f))
                                     .clickable {
                                         selectedDays = if (isSelected) selectedDays - dayNumber else selectedDays + dayNumber
                                     },
@@ -671,7 +681,7 @@ fun AddScheduledSessionDialog(
                                 Text(
                                     text = label,
                                     style = MaterialTheme.typography.labelMedium,
-                                    color = if (isSelected) Color.White else NavyBlue
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -684,7 +694,8 @@ fun AddScheduledSessionDialog(
                         onValueChange = { recurrenceValue = it.toIntOrNull() ?: 1 },
                         label = { Text("Ogni quanti giorni?") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
 
@@ -693,8 +704,11 @@ fun AddScheduledSessionDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Notifica promemoria", style = MaterialTheme.typography.bodyMedium)
-                    Switch(checked = notificationEnabled, onCheckedChange = { notificationEnabled = it })
+                    Text("Notifica promemoria", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Switch(
+                        checked = notificationEnabled,
+                        onCheckedChange = { notificationEnabled = it }
+                    )
                 }
             }
         },
@@ -716,7 +730,8 @@ fun AddScheduledSessionDialog(
                         )
                     )
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = FitlyBlue)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Salva")
             }
@@ -755,7 +770,7 @@ fun AddScheduledSessionDialog(
 }
 
 @Composable
-fun WeeklyCalendar(
+fun ModernWeeklyCalendar(
     scheduled: List<ScheduledSessionEntity>,
     onDeleteSession: (ScheduledSessionEntity) -> Unit
 ) {
@@ -782,8 +797,8 @@ fun WeeklyCalendar(
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(if (isToday) FitlyBlue else if (hasSession) FitlyBlueLight else MaterialTheme.colorScheme.surface)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(if (isToday) MaterialTheme.colorScheme.primary else if (hasSession) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface)
                         .clickable {
                             if (hasSession) {
                                 selectedDaySessions = daySessions
@@ -794,18 +809,19 @@ fun WeeklyCalendar(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        day.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.ITALY) ?: "",
+                        day.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.ITALY)?.take(1) ?: "",
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (isToday) Color.White else NavyBlue
+                        color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         day.get(Calendar.DAY_OF_MONTH).toString(),
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = if (isToday) Color.White else NavyBlue
+                        color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                     )
                     if (hasSession) {
-                        Box(modifier = Modifier.padding(top = 4.dp).size(4.dp).background(if (isToday) Color.White else FitlyBlue, CircleShape))
+                        Box(modifier = Modifier.padding(top = 6.dp).size(6.dp).background(if (isToday) Color.White else MaterialTheme.colorScheme.primary, CircleShape))
                     }
                 }
             }
@@ -827,23 +843,47 @@ fun WeeklyCalendar(
 }
 
 @Composable
+private fun ModernStatCard(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    value: String,
+    label: String,
+    color: Color,
+    onClick: (() -> Unit)? = null
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(24.dp))
+            .background(color.copy(alpha = 0.15f))
+            .clickable(enabled = onClick != null) { onClick?.invoke() }
+            .padding(16.dp)
+    ) {
+        Column {
+            Icon(icon, null, tint = color, modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(value, style = MaterialTheme.typography.headlineSmall, color = color, fontWeight = FontWeight.Bold)
+            Text(label, style = MaterialTheme.typography.labelSmall, color = color.copy(alpha = 0.8f))
+        }
+    }
+}
+
+@Composable
 fun RecurrenceChip(selected: Boolean, label: String, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
-        shape = RoundedCornerShape(16.dp),
-        color = if (selected) FitlyBlue else MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(12.dp),
+        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
         modifier = Modifier
             .fillMaxWidth()
-            .height(32.dp)
+            .height(36.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(
                 text = label,
-                fontSize = 10.sp,
-                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                color = if (selected) Color.White else NavyBlue,
-                maxLines = 1,
-                overflow = TextOverflow.Visible
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                maxLines = 1
             )
         }
     }
@@ -853,8 +893,8 @@ fun RecurrenceChip(selected: Boolean, label: String, onClick: () -> Unit) {
 private fun SectionTitle(title: String, modifier: Modifier = Modifier) {
     Text(
         text = title,
-        style = MaterialTheme.typography.titleMedium,
-        color = NavyBlue,
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+        color = MaterialTheme.colorScheme.onSurface,
         modifier = modifier.padding(horizontal = 24.dp, vertical = 8.dp)
     )
 }
@@ -881,7 +921,7 @@ private fun StatBadge(
             Icon(icon, label, tint = color, modifier = Modifier.size(28.dp))
         }
         Spacer(modifier = Modifier.height(4.dp))
-        Text(value, style = MaterialTheme.typography.titleLarge, color = FitlyBlueLight, fontWeight = FontWeight.Bold)
-        Text(label, style = MaterialTheme.typography.labelSmall, color = FitlyBlueLight.copy(alpha = 0.7f))
+        Text(value, style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
     }
 }

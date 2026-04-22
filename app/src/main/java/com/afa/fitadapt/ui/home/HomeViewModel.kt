@@ -17,6 +17,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -94,12 +96,35 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             goalRepository.getActiveGoals().collect { goals ->
                 _uiState.update { it.copy(activeGoals = goals) }
+                updateGoalsProgress(goals)
             }
         }
         // Calendario
         viewModelScope.launch {
             calendarRepository.getAllScheduled().collect { scheduled ->
                 _uiState.update { it.copy(scheduledSessions = scheduled, isLoading = false) }
+            }
+        }
+    }
+
+    private fun updateGoalsProgress(goals: List<GoalEntity>) {
+        viewModelScope.launch {
+            val totalSessions = sessionRepository.countTotalSessions().firstOrNull() ?: 0
+            val fullSessions = sessionRepository.countFullSessions().firstOrNull() ?: 0
+            val totalMin = sessionRepository.totalMinutes().firstOrNull() ?: 0
+            val streak = sessionRepository.calculateCurrentStreak()
+
+            goals.forEach { goal ->
+                val newValue = when (goal.targetType) {
+                    "total_sessions" -> fullSessions.toFloat()
+                    "total_minutes_week" -> totalMin.toFloat()
+                    "streak_days" -> streak.toFloat()
+                    "sessions_per_week" -> fullSessions.toFloat()
+                    else -> goal.currentValue
+                }
+                if (newValue != goal.currentValue) {
+                    goalRepository.updateProgress(goal.id, newValue)
+                }
             }
         }
     }

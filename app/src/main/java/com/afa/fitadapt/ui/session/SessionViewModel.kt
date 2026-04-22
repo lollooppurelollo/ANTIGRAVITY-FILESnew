@@ -107,6 +107,8 @@ class SessionViewModel @Inject constructor(
 
     // ── Risposta principale ──
 
+    var onSessionTargetReached: (() -> Unit)? = null
+
     fun answerCompleted() {
         _uiState.update {
             it.copy(completed = true, partial = false, phase = SessionPhase.DETAILS)
@@ -200,6 +202,15 @@ class SessionViewModel @Inject constructor(
             }
 
             sessionRepository.registerSession(session, exerciseCompletions)
+
+            // Controlla se abbiamo raggiunto il target della scheda
+            val activeCard = cardRepository.getById(cardId)
+            if (activeCard != null && activeCard.targetSessions != null) {
+                val sessionsCount = sessionRepository.countCompletedByCard(activeCard.id)
+                if (sessionsCount >= activeCard.targetSessions) {
+                    onSessionTargetReached?.invoke()
+                }
+            }
 
             _uiState.update {
                 it.copy(isSubmitting = false, phase = SessionPhase.SUBMITTED)

@@ -6,6 +6,7 @@ package com.afa.fitadapt.ui.session
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -48,17 +50,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.SageGreen
-import com.afa.fitadapt.ui.theme.SoftRose
+import androidx.compose.ui.graphics.Brush
 
 /**
  * Schermata di registrazione sessione di allenamento.
@@ -83,11 +81,11 @@ fun SessionScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
-            title = { Text("Registra sessione", color = NavyBlue) },
+            title = { Text("Registra sessione", color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold) },
             navigationIcon = {
                 if (uiState.phase != SessionPhase.SUBMITTED) {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             },
@@ -127,61 +125,67 @@ private fun QuestionPhase(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("🏃‍♀️", fontSize = 64.sp)
-        Spacer(modifier = Modifier.height(24.dp))
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.05f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("🏃‍♀️", fontSize = 64.sp)
+        }
+        Spacer(modifier = Modifier.height(32.dp))
         Text(
             "Hai fatto l'allenamento\noggi?",
-            style = MaterialTheme.typography.headlineMedium,
-            color = NavyBlue,
+            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
         Text(
-            "Registra la tua sessione per tenere traccia dei progressi",
+            "Registra la tua sessione per monitorare i tuoi progressi di salute",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
         // Sì — completo
         Button(
             onClick = onYes,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = SageGreen),
-            shape = RoundedCornerShape(16.dp)
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            shape = RoundedCornerShape(24.dp),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
         ) {
             Icon(Icons.Default.Check, "Sì", modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Sì, tutto completo!", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.width(12.dp))
+            Text("Sì, completato!", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Parziale
         OutlinedButton(
             onClick = onPartial,
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = RoundedCornerShape(16.dp)
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
         ) {
-            Icon(Icons.Outlined.Edit, "Parziale", tint = FitlyBlue)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Sì, ma solo in parte", color = FitlyBlue)
+            Icon(Icons.Outlined.Edit, "Parziale", tint = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.width(12.dp))
+            Text("Sì, ma solo in parte", style = MaterialTheme.typography.titleSmall)
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // No
-        OutlinedButton(
+        TextButton(
             onClick = onNo,
-            modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = SoftRose)
+            modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
-            Icon(Icons.Outlined.Close, "No", tint = SoftRose)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("No, oggi no", color = SoftRose)
+            Text("No, oggi no", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleSmall)
         }
     }
 }
@@ -198,17 +202,24 @@ private fun DetailsPhase(
             .verticalScroll(rememberScrollState())
             .padding(24.dp)
     ) {
-        Text(
-            if (uiState.partial) "Sessione parziale" else "Ottimo lavoro! 🎉",
-            style = MaterialTheme.typography.headlineSmall,
-            color = NavyBlue
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Text(
-            "Aggiungi qualche dettaglio opzionale",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
+            shape = RoundedCornerShape(24.dp)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                Text(
+                    if (uiState.partial) "Sessione parziale" else "Ottimo lavoro! 🎉",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    "Aggiungi qualche dettaglio sulla tua attività",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -244,7 +255,7 @@ private fun DetailsPhase(
 
         // Qualità sonno
         OptionalSlider(
-            label = "Qualità del sonno (notte scorsa)",
+            label = "Qualità del sonno",
             value = uiState.sleepQuality?.toFloat() ?: 5f,
             range = 0f..10f,
             steps = 9,
@@ -254,58 +265,78 @@ private fun DetailsPhase(
 
         // Checklist esercizi (solo per sessioni parziali)
         if (uiState.partial && uiState.cardExercises.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Esercizi completati", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                "Esercizi completati",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(12.dp))
 
             uiState.cardExercises.forEach { ce ->
                 val exercise = uiState.exerciseDetails[ce.exerciseId]
                 val checked = uiState.exerciseChecklist[ce.id] ?: true
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (checked) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f) else Color.Transparent)
+                        .clickable { viewModel.toggleExercise(ce.id) }
+                        .padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Checkbox(checked = checked, onCheckedChange = { viewModel.toggleExercise(ce.id) })
+                    Checkbox(
+                        checked = checked,
+                        onCheckedChange = { viewModel.toggleExercise(ce.id) }
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         exercise?.name ?: "Esercizio #${ce.exerciseId}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = if (checked) NavyBlue else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (checked) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
         }
 
         // Note
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         OutlinedTextField(
             value = uiState.notes,
             onValueChange = { viewModel.updateNotes(it) },
             label = { Text("Note (opzionale)") },
-            modifier = Modifier.fillMaxWidth().height(100.dp),
-            maxLines = 4
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(16.dp),
+            maxLines = 4,
+            colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // Bottone invio
         Button(
             onClick = onSubmit,
-            modifier = Modifier.fillMaxWidth().height(56.dp),
+            modifier = Modifier.fillMaxWidth().height(64.dp),
             enabled = !uiState.isSubmitting,
-            colors = ButtonDefaults.buttonColors(containerColor = SageGreen),
-            shape = RoundedCornerShape(16.dp)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            shape = RoundedCornerShape(24.dp)
         ) {
             if (uiState.isSubmitting) {
                 Text("Salvataggio...")
             } else {
                 Icon(Icons.Default.Check, "Salva")
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Salva sessione", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.width(12.dp))
+                Text("Salva sessione", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(48.dp))
     }
 }
 
@@ -320,29 +351,34 @@ private fun SubmittedPhase(onDone: () -> Unit) {
     ) {
         Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(100.dp)
                 .clip(CircleShape)
-                .background(SageGreen),
+                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Check, "OK", tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(40.dp))
+            Icon(Icons.Default.Check, "OK", tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(56.dp))
         }
-        Spacer(modifier = Modifier.height(24.dp))
-        Text("Sessione registrata!", style = MaterialTheme.typography.headlineSmall, color = NavyBlue)
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(32.dp))
         Text(
-            "Ogni passo conta. Continua così! 💪",
+            "Sessione registrata!",
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            "Ottimo lavoro. Ogni passo conta per il tuo benessere! 💪",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(48.dp))
         Button(
             onClick = onDone,
-            colors = ButtonDefaults.buttonColors(containerColor = NavyBlue),
-            shape = RoundedCornerShape(16.dp)
+            modifier = Modifier.fillMaxWidth().height(64.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            shape = RoundedCornerShape(24.dp)
         ) {
-            Text("Torna alla Home")
+            Text("Torna alla Home", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
         }
     }
 }
@@ -356,19 +392,21 @@ private fun OptionalSlider(
     displayValue: String,
     onValueChange: (Float) -> Unit
 ) {
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+    Column(modifier = Modifier.padding(vertical = 12.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(label, style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
-            Text(displayValue, style = MaterialTheme.typography.titleSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+            Text(label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
+            Text(displayValue, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
         }
+        Spacer(modifier = Modifier.height(8.dp))
         Slider(
             value = value,
             onValueChange = onValueChange,
             valueRange = range,
             steps = steps,
             colors = SliderDefaults.colors(
-                thumbColor = FitlyBlue,
-                activeTrackColor = FitlyBlue
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)
             )
         )
     }

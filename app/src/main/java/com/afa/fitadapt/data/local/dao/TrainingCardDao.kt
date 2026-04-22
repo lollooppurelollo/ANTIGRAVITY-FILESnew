@@ -34,6 +34,10 @@ interface TrainingCardDao {
     @Query("SELECT * FROM training_cards WHERE status = 'ACTIVE' LIMIT 1")
     fun getActiveCard(): Flow<TrainingCardEntity?>
 
+    // Ottieni la scheda attiva senza Flow (sincrona)
+    @Query("SELECT * FROM training_cards WHERE status = 'ACTIVE' LIMIT 1")
+    suspend fun getActiveCardSync(): TrainingCardEntity?
+
     // Ottieni le schede in attesa (future), ordinate per indice
     @Query("SELECT * FROM training_cards WHERE status = 'PENDING' ORDER BY orderIndex")
     fun getPendingCards(): Flow<List<TrainingCardEntity>>

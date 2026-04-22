@@ -15,8 +15,6 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,14 +33,22 @@ fun ArticleEditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.id == 0L) "Nuovo articolo" else "Modifica articolo", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
+                title = { Text(if (uiState.id == 0L) "Nuovo articolo" else "Modifica articolo") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro") } },
                 actions = {
                     IconButton(onClick = viewModel::save, enabled = uiState.title.isNotBlank() && uiState.body.isNotBlank()) {
-                        Icon(Icons.Default.Save, "Salva", tint = if (uiState.title.isNotBlank()) FitlyBlue else NavyBlue.copy(alpha = 0.5f))
+                        Icon(
+                            Icons.Default.Save,
+                            "Salva",
+                            tint = if (uiState.title.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     ) { padding ->

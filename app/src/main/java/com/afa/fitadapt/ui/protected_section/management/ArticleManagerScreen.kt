@@ -23,8 +23,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.data.local.entity.ArticleEntity
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,13 +38,21 @@ fun ArticleManagerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Gestione articoli", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text("Gestione articoli") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro") } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddArticle, containerColor = FitlyBlue, contentColor = Color.White) {
+            FloatingActionButton(
+                onClick = onAddArticle,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
                 Icon(Icons.Default.Add, "Aggiungi articolo")
             }
         }
@@ -97,14 +103,14 @@ fun ArticleListItem(article: ArticleEntity, onEdit: () -> Unit, onDelete: () -> 
     ) {
         Row(modifier = Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(article.title, style = MaterialTheme.typography.titleMedium, color = NavyBlue, fontWeight = FontWeight.Bold)
-                Text(article.category, style = MaterialTheme.typography.bodySmall, color = FitlyBlue)
+                Text(article.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+                Text(article.category, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
             }
             IconButton(onClick = onSetFeatured) {
-                Icon(if (article.isFeatured) Icons.Default.Star else Icons.Default.StarBorder, "In evidenza", tint = if (article.isFeatured) Color(0xFFFFB300) else Color.Gray)
+                Icon(if (article.isFeatured) Icons.Default.Star else Icons.Default.StarBorder, "In evidenza", tint = if (article.isFeatured) Color(0xFFFFB300) else MaterialTheme.colorScheme.outline)
             }
-            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Modifica", tint = NavyBlue) }
-            IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Elimina", tint = Color.Red.copy(alpha = 0.7f)) }
+            IconButton(onClick = onEdit) { Icon(Icons.Default.Edit, "Modifica") }
+            IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Elimina", tint = MaterialTheme.colorScheme.error.copy(alpha = 0.7f)) }
         }
     }
 }

@@ -26,9 +26,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.ArticleEntity
 import com.afa.fitadapt.data.repository.ArticleRepository
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -86,15 +83,26 @@ fun ArticlesScreen(articlesViewModel: ArticlesViewModel, onBack: () -> Unit, onA
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Consigli", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
+                title = { Text("Consigli", color = MaterialTheme.colorScheme.onBackground) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            "Indietro",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             // Filtro categorie
-            LazyRow(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyRow(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 item {
                     FilterChip(
                         selected = uiState.selectedCategory == null,
@@ -112,21 +120,49 @@ fun ArticlesScreen(articlesViewModel: ArticlesViewModel, onBack: () -> Unit, onA
             }
 
             // Lista articoli
-            LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
                 items(filtered) { article ->
                     Card(
-                        modifier = Modifier.fillMaxWidth().clickable { onArticleClick(article.id) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onArticleClick(article.id) },
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(1.dp), shape = RoundedCornerShape(14.dp)
+                        elevation = CardDefaults.cardElevation(1.dp),
+                        shape = RoundedCornerShape(14.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Box(modifier = Modifier.clip(RoundedCornerShape(6.dp)).background(FitlyBlueLight).padding(horizontal = 8.dp, vertical = 2.dp)) {
-                                Text(article.category, style = MaterialTheme.typography.labelSmall, color = NavyBlue)
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .padding(horizontal = 8.dp, vertical = 2.dp)
+                            ) {
+                                Text(
+                                    article.category,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                )
                             }
                             Spacer(modifier = Modifier.height(8.dp))
-                            Text(article.title, style = MaterialTheme.typography.titleSmall, color = NavyBlue, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(
+                                article.title,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
                             Spacer(modifier = Modifier.height(4.dp))
-                            Text(article.summary, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                            Text(
+                                article.summary,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     }
                 }
@@ -149,25 +185,61 @@ fun ArticleDetailScreen(articlesViewModel: ArticlesViewModel, articleId: Long, o
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Articolo", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
+                title = { Text("Articolo", color = MaterialTheme.colorScheme.onBackground) },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            "Indietro",
+                            tint = MaterialTheme.colorScheme.onBackground
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         }
     ) { padding ->
         if (article != null) {
-            Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp)) {
-                Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(FitlyBlueLight).padding(horizontal = 12.dp, vertical = 4.dp)) {
-                    Text(article.category, style = MaterialTheme.typography.labelMedium, color = NavyBlue)
+            Column(
+                modifier = Modifier
+                    .padding(padding)
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(24.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 12.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        article.category,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(article.title, style = MaterialTheme.typography.headlineSmall, color = NavyBlue)
+                Text(
+                    article.title,
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(article.summary, style = MaterialTheme.typography.bodyLarge, color = FitlyBlue)
+                Text(
+                    article.summary,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
                 Spacer(modifier = Modifier.height(20.dp))
                 HorizontalDivider()
                 Spacer(modifier = Modifier.height(20.dp))
-                Text(article.body, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurface, lineHeight = MaterialTheme.typography.bodyLarge.lineHeight)
+                Text(
+                    article.body,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    lineHeight = MaterialTheme.typography.bodyLarge.lineHeight
+                )
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }

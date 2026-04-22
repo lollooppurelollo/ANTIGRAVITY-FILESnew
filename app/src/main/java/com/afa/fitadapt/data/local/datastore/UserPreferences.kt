@@ -59,15 +59,21 @@ class UserPreferences @Inject constructor(
         // ── Stato app ──
         val FIRST_SETUP_COMPLETED = booleanPreferencesKey("first_setup_completed")
         val BIOMETRICS_ENABLED = booleanPreferencesKey("biometrics_enabled")
+        val APP_THEME = intPreferencesKey("app_theme")
 
         // ── Valori predefiniti ──
         const val DEFAULT_NOTIFICATION_HOUR = 9
         const val DEFAULT_NOTIFICATION_MINUTE = 0
+        const val DEFAULT_THEME_ORDINAL = 6 // Light Blue (indice 6 nell'enum che creerò)
     }
 
     // ══════════════════════════════════════════════════════════
     // LETTURA (Flow — si aggiornano automaticamente)
     // ══════════════════════════════════════════════════════════
+
+    /** Tema dell'app selezionato */
+    val appTheme: Flow<Int> = context.userSettingsDataStore.data
+        .map { it[APP_THEME] ?: DEFAULT_THEME_ORDINAL }
 
     /** Se le notifiche di reminder allenamento sono attive */
     val notificationEnabled: Flow<Boolean> = context.userSettingsDataStore.data
@@ -149,5 +155,10 @@ class UserPreferences @Inject constructor(
     /** Attiva o disattiva l'autenticazione biometrica */
     suspend fun setBiometricsEnabled(enabled: Boolean) {
         context.userSettingsDataStore.edit { it[BIOMETRICS_ENABLED] = enabled }
+    }
+
+    /** Imposta il tema dell'app */
+    suspend fun setAppTheme(themeOrdinal: Int) {
+        context.userSettingsDataStore.edit { it[APP_THEME] = themeOrdinal }
     }
 }

@@ -15,8 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,9 +38,13 @@ fun GoalEditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Nuovo obiettivo", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text(if (uiState.goalId == null) "Nuovo obiettivo" else "Modifica obiettivo") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro") } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     ) { padding ->
@@ -83,7 +85,7 @@ fun GoalEditorScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text("Soglie traguardi", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+            Text("Soglie traguardi", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
             
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(

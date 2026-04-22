@@ -35,9 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import com.afa.fitadapt.security.BiometricHelper
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
 
 /**
  * Schermata di blocco biometrico.
@@ -81,12 +78,16 @@ fun BiometricLockScreen(
 
     // ── UI ──
     Box(modifier = Modifier.fillMaxSize()) {
+        val primary = MaterialTheme.colorScheme.primary
+        val secondary = MaterialTheme.colorScheme.secondary
+        val onPrimary = MaterialTheme.colorScheme.onPrimary
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(NavyBlue, FitlyBlue)
+                        colors = listOf(primary, secondary)
                     )
                 )
                 .padding(32.dp),
@@ -98,7 +99,7 @@ fun BiometricLockScreen(
                 imageVector = Icons.Outlined.Fingerprint,
                 contentDescription = "Autenticazione biometrica",
                 modifier = Modifier.size(80.dp),
-                tint = FitlyBlueLight
+                tint = onPrimary
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -106,7 +107,7 @@ fun BiometricLockScreen(
             Text(
                 text = "Benvenuta",
                 style = MaterialTheme.typography.displaySmall,
-                color = FitlyBlueLight
+                color = onPrimary
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -114,7 +115,7 @@ fun BiometricLockScreen(
             Text(
                 text = "Fit your life",
                 style = MaterialTheme.typography.titleMedium,
-                color = FitlyBlueLight.copy(alpha = 0.7f)
+                color = onPrimary.copy(alpha = 0.7f)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -122,7 +123,7 @@ fun BiometricLockScreen(
             Text(
                 text = "Autenticati per accedere\nal tuo percorso",
                 style = MaterialTheme.typography.bodyLarge,
-                color = FitlyBlueLight.copy(alpha = 0.8f),
+                color = onPrimary.copy(alpha = 0.8f),
                 textAlign = TextAlign.Center
             )
 
@@ -140,8 +141,8 @@ fun BiometricLockScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = FitlyBlueLight,
-                    contentColor = NavyBlue
+                    containerColor = onPrimary,
+                    contentColor = primary
                 )
             ) {
                 Icon(Icons.Outlined.Fingerprint, "Riprova", modifier = Modifier.size(20.dp))

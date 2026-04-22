@@ -114,11 +114,6 @@ class TrainingCardRepository @Inject constructor(
     /** Attiva una scheda (e rende la precedente completata se presente) */
     suspend fun activateCard(cardId: Long) {
         // Prima: completa la scheda attualmente attiva (se c'è)
-        val currentActive = trainingCardDao.getActiveCard()
-        // Non posso usare .first() su Flow qui, quindi uso getById approach
-        // Qui lavoro con le suspend functions
-        trainingCardDao.getAll() // forza il load
-        // Uso un approccio diretto con query
         completeCurrentActiveCard()
 
         // Poi: attiva la nuova scheda con data inizio = oggi
@@ -132,14 +127,9 @@ class TrainingCardRepository @Inject constructor(
 
     /** Completa la scheda attualmente attiva */
     private suspend fun completeCurrentActiveCard() {
-        // Trova la scheda attiva e completala
-        val allCards = trainingCardDao.getAll()
-        // Approccio semplificato: aggiorna tutte le ACTIVE a COMPLETED
-        // Ci dovrebbe essere al massimo una scheda ACTIVE
-        val count = trainingCardDao.countByStatus(CardStatus.ACTIVE.name)
-        if (count > 0) {
-            // Uso una query diretta per trovare e aggiornare
-            // Per semplicità, questo viene gestito nel ViewModel
+        val currentActive = trainingCardDao.getActiveCardSync()
+        if (currentActive != null) {
+            completeCard(currentActive.id)
         }
     }
 

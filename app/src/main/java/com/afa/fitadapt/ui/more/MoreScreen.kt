@@ -36,11 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-
-import com.afa.fitadapt.ui.theme.SageGreen
-import com.afa.fitadapt.ui.theme.SoftAmber
 
 /**
  * Schermata "Altro" — menu esteso con collegamento a tutte le sezioni secondarie.
@@ -65,7 +60,7 @@ fun MoreScreen(
         Text(
             text = "Altro",
             style = MaterialTheme.typography.headlineLarge,
-            color = NavyBlue
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(4.dp))
         Text(
@@ -81,7 +76,7 @@ fun MoreScreen(
             icon = Icons.AutoMirrored.Outlined.MenuBook,
             title = "Consigli",
             subtitle = "Articoli su attività fisica, alimentazione, sonno e altro",
-            color = SageGreen,
+            color = MaterialTheme.colorScheme.secondary,
             onClick = onNavigateToArticles
         )
 
@@ -92,7 +87,7 @@ fun MoreScreen(
             icon = Icons.Outlined.QrCode,
             title = "Export dati",
             subtitle = "Esporta i tuoi dati in formato JSON o QR code",
-            color = SoftAmber,
+            color = MaterialTheme.colorScheme.tertiary,
             onClick = onNavigateToExport
         )
 
@@ -103,7 +98,7 @@ fun MoreScreen(
             icon = Icons.Outlined.Settings,
             title = "Impostazioni",
             subtitle = "Notifiche, biometria, preferenze",
-            color = NavyBlue,
+            color = MaterialTheme.colorScheme.primary,
             onClick = onNavigateToSettings
         )
 
@@ -121,7 +116,7 @@ fun MoreScreen(
             icon = Icons.Outlined.Lock,
             title = "Area protetta",
             subtitle = "Gestisci schede, esercizi, obiettivi (richiede password)",
-            color = NavyBlue,
+            color = MaterialTheme.colorScheme.primary,
             onClick = onNavigateToProtected
         )
 
@@ -166,7 +161,7 @@ private fun MenuCard(
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }

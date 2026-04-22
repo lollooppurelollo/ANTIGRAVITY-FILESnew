@@ -23,10 +23,6 @@ import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.DiaryEntryEntity
 import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import com.afa.fitadapt.data.repository.DiaryRepository
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -194,7 +190,7 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Diario", color = NavyBlue) },
+                title = { Text("Diario", color = MaterialTheme.colorScheme.primary) },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
             )
         },
@@ -204,7 +200,7 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                     diaryViewModel.toggleAddDiary()
                     diaryViewModel.toggleAddScale() 
                 },
-                containerColor = FitlyBlue
+                containerColor = MaterialTheme.colorScheme.primary
             ) { Icon(Icons.Default.Add, "Aggiungi", tint = MaterialTheme.colorScheme.onPrimary) }
         }
     ) { padding ->
@@ -230,7 +226,7 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = FitlyBlueLight),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
                         shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -245,7 +241,7 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                             }
                             
                             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                Text(titleText, style = MaterialTheme.typography.titleMedium, color = NavyBlue, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                                Text(titleText, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                                 
                                 // Date selection for new entry
                                 if (uiState.editingDiaryEntry == null && uiState.editingScaleEntry == null) {
@@ -253,21 +249,21 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                                         onClick = { showDatePicker = true },
                                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                                     ) {
-                                        Text(DateUtils.toDisplayString(uiState.selectedDate), color = FitlyBlue, style = MaterialTheme.typography.bodySmall)
+                                        Text(DateUtils.toDisplayString(uiState.selectedDate), color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.bodySmall)
                                     }
                                 }
                             }
                             
                             Spacer(modifier = Modifier.height(12.dp))
                             
-                            Text("Scale rapide (0-10)", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                            Text("Scale rapide (0-10)", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
                             ScaleSlider("Astenia", uiState.scaleAsthenia) { diaryViewModel.updateScaleAsthenia(it) }
                             ScaleSlider("Dolore", uiState.scalePain) { diaryViewModel.updateScalePain(it) }
                             ScaleSlider("Dispnea Riposo", uiState.scaleRestDyspnea) { diaryViewModel.updateScaleRestDyspnea(it) }
                             ScaleSlider("Dispnea Sforzo", uiState.scaleExertionDyspnea) { diaryViewModel.updateScaleExertionDyspnea(it) }
                             
                             Spacer(modifier = Modifier.height(16.dp))
-                            Text("Diario libero", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                            Text("Diario libero", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
                             Spacer(modifier = Modifier.height(8.dp))
                             OutlinedTextField(
                                 value = uiState.newDiaryText, 
@@ -287,13 +283,13 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                                     onClick = { 
                                         diaryViewModel.saveCombinedEntry()
                                     },
-                                    colors = ButtonDefaults.buttonColors(containerColor = SageGreen)
+                                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                                 ) { Text("Salva tutto") }
                             }
                         }
                     }
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text("Storico", style = MaterialTheme.typography.titleMedium, color = NavyBlue, fontWeight = FontWeight.Bold)
+                    Text("Storico", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -349,7 +345,7 @@ fun DayGroupCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(if (group.scale != null && group.diaryEntries.isNotEmpty()) "📊📝" else if (group.scale != null) "📊" else "📝", fontSize = 16.sp)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(DateUtils.toDisplayString(group.date), style = MaterialTheme.typography.labelSmall, color = FitlyBlue, fontWeight = FontWeight.Bold)
+                    Text(DateUtils.toDisplayString(group.date), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
                 }
             }
             
@@ -397,8 +393,8 @@ fun DayGroupCard(
 private fun ScaleSlider(label: String, value: Float, onValueChange: (Float) -> Unit) {
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(label, style = MaterialTheme.typography.bodySmall, color = NavyBlue)
-            Text("${value.toInt()}/10", style = MaterialTheme.typography.labelLarge, color = FitlyBlue)
+            Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface)
+            Text("${value.toInt()}/10", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         }
         Slider(value = value, onValueChange = onValueChange, valueRange = 0f..10f, steps = 9)
     }
@@ -407,7 +403,7 @@ private fun ScaleSlider(label: String, value: Float, onValueChange: (Float) -> U
 @Composable
 private fun ScaleBadge(label: String, value: Int) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("$value", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = when { value <= 3 -> SageGreen; value <= 6 -> FitlyBlue; else -> MaterialTheme.colorScheme.error })
+        Text("$value", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = when { value <= 3 -> MaterialTheme.colorScheme.secondary; value <= 6 -> MaterialTheme.colorScheme.primary; else -> MaterialTheme.colorScheme.error })
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

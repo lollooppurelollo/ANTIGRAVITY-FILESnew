@@ -32,10 +32,6 @@ import com.afa.fitadapt.data.repository.DiaryRepository
 import com.afa.fitadapt.data.repository.GoalRepository
 import com.afa.fitadapt.data.repository.PatientProfileRepository
 import com.afa.fitadapt.data.repository.TrainingCardRepository
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -140,16 +136,16 @@ fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Export dati", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text("Export dati", color = MaterialTheme.colorScheme.onSurface) },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = MaterialTheme.colorScheme.onSurface) } },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(Icons.Outlined.QrCode, "Export", tint = NavyBlue, modifier = Modifier.size(56.dp))
+            Icon(Icons.Outlined.QrCode, "Export", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(56.dp))
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Esporta i tuoi dati", style = MaterialTheme.typography.headlineSmall, color = NavyBlue)
+            Text("Esporta i tuoi dati", style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
             Text("I dati esportati contengono solo il codice paziente.\nNessun dato personale viene incluso.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
 
@@ -159,7 +155,7 @@ fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
                 onClick = { exportViewModel.performExport() },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 enabled = !uiState.isExporting,
-                colors = ButtonDefaults.buttonColors(containerColor = FitlyBlue),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 shape = RoundedCornerShape(16.dp)
             ) {
                 if (uiState.isExporting) {
@@ -178,7 +174,7 @@ fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
                     Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("QR Code generato ✅", style = MaterialTheme.typography.titleSmall, color = SageGreen)
+                        Text("QR Code generato ✅", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
                         Spacer(modifier = Modifier.height(12.dp))
                         Image(bitmap = bitmap.asImageBitmap(), contentDescription = "QR Code export", modifier = Modifier.size(280.dp))
                         Spacer(modifier = Modifier.height(8.dp))
@@ -190,11 +186,11 @@ fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
             // Risultato: file
             uiState.filePath?.let { path ->
                 Spacer(modifier = Modifier.height(24.dp))
-                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = FitlyBlueLight)) {
+                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("File salvato ✅", style = MaterialTheme.typography.titleSmall, color = SageGreen)
+                        Text("File salvato ✅", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Il payload era troppo grande per un QR code. Il file JSON è stato salvato in:", style = MaterialTheme.typography.bodySmall, color = NavyBlue)
+                        Text("Il payload era troppo grande per un QR code. Il file JSON è stato salvato in:", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(path, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }

@@ -19,8 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.model.ExerciseCategory
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,14 +36,22 @@ fun ExerciseEditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (uiState.id == 0L) "Nuovo esercizio" else "Modifica esercizio", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
+                title = { Text(if (uiState.id == 0L) "Nuovo esercizio" else "Modifica esercizio") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro") } },
                 actions = {
                     IconButton(onClick = viewModel::save, enabled = uiState.name.isNotBlank() && uiState.description.isNotBlank()) {
-                        Icon(Icons.Default.Save, "Salva", tint = if (uiState.name.isNotBlank()) FitlyBlue else NavyBlue.copy(alpha = 0.5f))
+                        Icon(
+                            Icons.Default.Save,
+                            "Salva",
+                            tint = if (uiState.name.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                        )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     ) { padding ->
@@ -99,7 +105,7 @@ fun ExerciseEditorScreen(
             )
 
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Parametri predefiniti", style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+            Text("Parametri predefiniti", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {

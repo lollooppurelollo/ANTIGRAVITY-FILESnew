@@ -24,8 +24,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.data.local.entity.GoalEntity
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,13 +39,21 @@ fun GoalManagerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Obiettivi paziente", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text("Obiettivi paziente") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro") } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onAddGoal, containerColor = FitlyBlue, contentColor = Color.White) {
+            FloatingActionButton(
+                onClick = onAddGoal,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
                 Icon(Icons.Default.Add, "Aggiungi obiettivo")
             }
         }
@@ -105,7 +111,7 @@ fun GoalListItem(goal: GoalEntity, onDelete: () -> Unit, onToggleActive: () -> U
         goal.title.contains("Gold", ignoreCase = true) -> Color(0xFFFFD700)
         goal.title.contains("Silver", ignoreCase = true) -> Color(0xFFC0C0C0)
         goal.title.contains("Bronze", ignoreCase = true) -> Color(0xFFCD7F32)
-        else -> FitlyBlue
+        else -> MaterialTheme.colorScheme.primary
     }
 
     Card(
@@ -120,7 +126,7 @@ fun GoalListItem(goal: GoalEntity, onDelete: () -> Unit, onToggleActive: () -> U
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(goal.title, style = MaterialTheme.typography.titleSmall, color = NavyBlue, fontWeight = FontWeight.Bold)
+                Text(goal.title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
                 val thresholds = listOfNotNull(
                     "B: ${goal.targetValue.toInt()}",
                     goal.silverValue?.let { "S: ${it.toInt()}" },

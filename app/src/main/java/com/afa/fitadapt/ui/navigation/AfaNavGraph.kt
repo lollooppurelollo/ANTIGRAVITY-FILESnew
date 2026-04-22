@@ -16,7 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -217,6 +219,32 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
 
             composable(Screen.Session.route) {
                 val sessionViewModel: SessionViewModel = hiltViewModel()
+                var showCompletionDialog by remember { mutableStateOf(false) }
+
+                LaunchedEffect(Unit) {
+                    sessionViewModel.onSessionTargetReached = {
+                        showCompletionDialog = true
+                    }
+                }
+
+                if (showCompletionDialog) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = { showCompletionDialog = false },
+                        title = { Text("Obiettivo raggiunto!") },
+                        text = { Text("Hai completato tutte le sessioni previste per questa scheda. Vuoi passare alla prossima?") },
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(
+                                onClick = {
+                                    showCompletionDialog = false
+                                    // La logica di avanzamento è già gestita dal repository
+                                    // ma qui potremmo voler navigare o fare altro.
+                                    // Per ora chiudiamo solo il dialogo.
+                                }
+                            ) { Text("OK") }
+                        }
+                    )
+                }
+
                 SessionScreen(
                     sessionViewModel = sessionViewModel,
                     onBack = { navController.popBackStack() },

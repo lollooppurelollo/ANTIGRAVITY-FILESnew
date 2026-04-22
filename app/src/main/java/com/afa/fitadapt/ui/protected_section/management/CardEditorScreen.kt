@@ -20,8 +20,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.data.local.entity.ExerciseEntity
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,18 +39,23 @@ fun CardEditorScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Editor Scheda", color = Color.White) },
+                title = { Text("Editor Scheda") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
                     }
                 },
                 actions = {
                     IconButton(onClick = { viewModel.saveCard() }) {
-                        Icon(Icons.Default.Save, contentDescription = "Salva", tint = Color.White)
+                        Icon(Icons.Default.Save, contentDescription = "Salva")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyBlue)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         }
     ) { padding ->
@@ -69,7 +72,7 @@ fun CardEditorScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 item {
-                    Text("Informazioni Generali", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                    Text("Informazioni Generali", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     OutlinedTextField(
@@ -121,10 +124,9 @@ fun CardEditorScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Esercizi in Scheda", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                        Text("Esercizi in Scheda", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
                         Button(
-                            onClick = onPickExercise,
-                            colors = ButtonDefaults.buttonColors(containerColor = FitlyBlue)
+                            onClick = onPickExercise
                         ) {
                             Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(4.dp))

@@ -19,8 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.data.local.entity.TrainingCardEntity
 import com.afa.fitadapt.model.CardStatus
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,20 +33,24 @@ fun CardManagerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Gestione Schede", color = Color.White) },
+                title = { Text("Gestione Schede") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Indietro")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = NavyBlue)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddCard,
-                containerColor = FitlyBlue,
-                contentColor = Color.White
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Aggiungi Scheda")
             }
@@ -114,7 +116,7 @@ fun CardItem(
                         text = card.title,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = NavyBlue
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     StatusBadge(status = card.status)
@@ -132,7 +134,7 @@ fun CardItem(
                     Text(
                         text = "Avanzamento automatico attivo",
                         style = MaterialTheme.typography.labelSmall,
-                        color = FitlyBlue
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -190,8 +192,8 @@ fun CardItem(
 fun StatusBadge(status: String) {
     val color = when (status) {
         CardStatus.ACTIVE.name -> Color(0xFF4CAF50)
-        CardStatus.COMPLETED.name -> Color.Gray
-        else -> FitlyBlue
+        CardStatus.COMPLETED.name -> MaterialTheme.colorScheme.outline
+        else -> MaterialTheme.colorScheme.primary
     }
     
     Surface(

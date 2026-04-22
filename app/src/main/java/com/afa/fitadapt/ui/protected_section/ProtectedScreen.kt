@@ -30,11 +30,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.repository.PatientProfileRepository
 import com.afa.fitadapt.security.PasswordManager
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-
-import com.afa.fitadapt.ui.theme.SageGreen
-import com.afa.fitadapt.ui.theme.SoftAmber
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -129,7 +124,7 @@ fun ProtectedGateScreen(
     // Se stiamo ancora caricando lo stato dal DataStore, mostriamo un caricamento
     if (uiState.isPasswordConfigured == null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator(color = FitlyBlue)
+            CircularProgressIndicator()
         }
         return
     }
@@ -139,9 +134,13 @@ fun ProtectedGateScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (isConfigured) "Area protetta" else "Configura Area Protetta", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text(if (isConfigured) "Area protetta" else "Configura Area Protetta") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro") } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     ) { padding ->
@@ -153,14 +152,14 @@ fun ProtectedGateScreen(
             Icon(
                 imageVector = if (isConfigured) Icons.Outlined.Lock else Icons.Outlined.AdminPanelSettings,
                 contentDescription = "Protetta",
-                tint = NavyBlue,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(56.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = if (isConfigured) "Inserisci la password" else "Crea una password",
                 style = MaterialTheme.typography.headlineSmall,
-                color = NavyBlue
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
@@ -242,15 +241,19 @@ fun ProtectedDashboardScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Configurazione", color = NavyBlue) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue) } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
+                title = { Text("Configurazione") },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro") } },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onSurface
+                )
             )
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp)) {
             // Codice paziente
-            Text("Codice paziente", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+            Text("Codice paziente", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
             Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -265,7 +268,7 @@ fun ProtectedDashboardScreen(
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                             Column {
                                 Text("Codice attuale", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Text(uiState.patientCode.ifBlank { "Non impostato" }, style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                                Text(uiState.patientCode.ifBlank { "Non impostato" }, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                             }
                             TextButton(onClick = { newCode = uiState.patientCode; editingCode = true }) { Text("Modifica") }
                         }
@@ -274,16 +277,16 @@ fun ProtectedDashboardScreen(
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Gestione", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+            Text("Gestione", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
 
-            DashboardCard(Icons.Outlined.FitnessCenter, "Schede di allenamento", "Crea, modifica e gestisci le schede", FitlyBlue, onManageCards)
+            DashboardCard(Icons.Outlined.FitnessCenter, "Schede di allenamento", "Crea, modifica e gestisci le schede", MaterialTheme.colorScheme.primary, onManageCards)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.Outlined.Flag, "Obiettivi", "Configura gli obiettivi della paziente", SageGreen, onManageGoals)
+            DashboardCard(Icons.Outlined.Flag, "Obiettivi", "Configura gli obiettivi della paziente", MaterialTheme.colorScheme.secondary, onManageGoals)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", SoftAmber, onManageExercises)
+            DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", MaterialTheme.colorScheme.tertiary, onManageExercises)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", NavyBlue, onManageArticles)
+            DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", MaterialTheme.colorScheme.primary, onManageArticles)
 
             Spacer(modifier = Modifier.height(32.dp))
         }
@@ -305,7 +308,7 @@ private fun DashboardCard(icon: ImageVector, title: String, subtitle: String, co
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(title, style = MaterialTheme.typography.titleSmall, color = NavyBlue)
+                Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
                 Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }

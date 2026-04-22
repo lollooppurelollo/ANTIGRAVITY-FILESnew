@@ -47,9 +47,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.afa.fitadapt.ui.components.VideoPlayer
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
 
 /**
  * Dettaglio di un singolo esercizio.
@@ -77,10 +74,14 @@ fun ExerciseDetailScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         TopAppBar(
-            title = { Text("Esercizio", color = NavyBlue) },
+            title = { Text("Esercizio", color = MaterialTheme.colorScheme.onBackground) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue)
+                    Icon(
+                        Icons.AutoMirrored.Filled.ArrowBack,
+                        "Indietro",
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -100,13 +101,13 @@ fun ExerciseDetailScreen(
             Text(
                 text = exercise.name,
                 style = MaterialTheme.typography.headlineMedium,
-                color = NavyBlue
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .background(FitlyBlueLight)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             ) {
                 Text(
@@ -114,7 +115,7 @@ fun ExerciseDetailScreen(
                         .lowercase()
                         .replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.labelMedium,
-                    color = NavyBlue
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
 
@@ -126,7 +127,7 @@ fun ExerciseDetailScreen(
                     .fillMaxWidth()
                     .height(200.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (exercise.videoUri != null) Color.Black else FitlyBlueLight
+                    containerColor = if (exercise.videoUri != null) Color.Black else MaterialTheme.colorScheme.surfaceVariant
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -141,14 +142,14 @@ fun ExerciseDetailScreen(
                             Icon(
                                 Icons.Outlined.Videocam,
                                 "Video",
-                                tint = NavyBlue.copy(alpha = 0.4f),
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
                                 modifier = Modifier.size(48.dp)
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 "Video non disponibile",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = NavyBlue.copy(alpha = 0.5f)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                             )
                         }
                     }
@@ -158,7 +159,11 @@ fun ExerciseDetailScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Parametri
-            Text("Parametri", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+            Text(
+                "Parametri",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
             Spacer(modifier = Modifier.height(12.dp))
 
             Row(
@@ -189,7 +194,11 @@ fun ExerciseDetailScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Descrizione
-            Text("Descrizione", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+            Text(
+                "Descrizione",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground
+            )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 exercise.description,
@@ -202,13 +211,21 @@ fun ExerciseDetailScreen(
                 Spacer(modifier = Modifier.height(20.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = FitlyBlueLight.copy(alpha = 0.5f)),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
+                            alpha = 0.3f
+                        )
+                    ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(modifier = Modifier.padding(16.dp)) {
                         Text("💡", style = MaterialTheme.typography.bodyLarge)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(notes, style = MaterialTheme.typography.bodyMedium, color = NavyBlue)
+                        Text(
+                            notes,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
                 }
             }
@@ -229,10 +246,19 @@ private fun ParameterCard(icon: ImageVector, value: String, label: String) {
             modifier = Modifier.padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(icon, label, tint = FitlyBlue, modifier = Modifier.size(24.dp))
+            Icon(icon, label, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.height(8.dp))
-            Text(value, style = MaterialTheme.typography.titleSmall, color = NavyBlue, textAlign = TextAlign.Center)
-            Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                value,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

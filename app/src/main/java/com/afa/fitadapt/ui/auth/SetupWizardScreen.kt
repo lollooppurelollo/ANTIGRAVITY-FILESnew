@@ -57,10 +57,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.SageGreen
 import com.afa.fitadapt.ui.theme.TextSecondary
 
 /**
@@ -94,7 +90,7 @@ fun SetupWizardScreen(
         Text(
             text = "Benvenuta in Fitly",
             style = MaterialTheme.typography.headlineLarge,
-            color = NavyBlue
+            color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -147,9 +143,9 @@ private fun StepIndicator(currentStep: Int) {
             val isCurrent = i == currentStep
             val isDone = i < currentStep
             val color = when {
-                isDone -> SageGreen
-                isCurrent -> FitlyBlue
-                else -> FitlyBlueLight
+                isDone -> MaterialTheme.colorScheme.secondary
+                isCurrent -> MaterialTheme.colorScheme.primary
+                else -> MaterialTheme.colorScheme.primaryContainer
             }
 
             Box(
@@ -160,14 +156,14 @@ private fun StepIndicator(currentStep: Int) {
                 contentAlignment = Alignment.Center
             ) {
                 if (isDone) {
-                    Icon(Icons.Default.Check, "Completato", tint = Color.White, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Check, "Completato", tint = MaterialTheme.colorScheme.onSecondary, modifier = Modifier.size(16.dp))
                 } else {
-                    Text("${i + 1}", color = if (isCurrent) Color.White else NavyBlue, style = MaterialTheme.typography.labelMedium)
+                    Text("${i + 1}", color = if (isCurrent) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer, style = MaterialTheme.typography.labelMedium)
                 }
             }
             if (i < 2) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Box(modifier = Modifier.width(32.dp).height(2.dp).background(if (isDone) SageGreen else FitlyBlueLight))
+                Box(modifier = Modifier.width(32.dp).height(2.dp).background(if (isDone) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primaryContainer))
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
@@ -189,9 +185,9 @@ private fun PasswordStep(
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Icon(Icons.Default.Lock, "Password", tint = NavyBlue, modifier = Modifier.size(40.dp))
+            Icon(Icons.Default.Lock, "Password", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Crea una password", style = MaterialTheme.typography.titleLarge, color = NavyBlue)
+            Text("Crea una password", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "Questa password protegge la sezione di configurazione dell'app.",
@@ -257,9 +253,9 @@ private fun PatientCodeStep(
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            Icon(Icons.Default.Person, "Codice", tint = NavyBlue, modifier = Modifier.size(40.dp))
+            Icon(Icons.Default.Person, "Codice", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Codice paziente", style = MaterialTheme.typography.titleLarge, color = NavyBlue)
+            Text("Codice paziente", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "Inserisci il codice assegnato dal tuo operatore sanitario. Questo codice identifica i tuoi dati in modo anonimo.",
@@ -305,14 +301,14 @@ private fun ConfirmStep(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                modifier = Modifier.size(64.dp).clip(CircleShape).background(SageGreen),
+                modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(Icons.Default.Check, "OK", tint = Color.White, modifier = Modifier.size(32.dp))
+                Icon(Icons.Default.Check, "OK", tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(32.dp))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            Text("Tutto pronto!", style = MaterialTheme.typography.titleLarge, color = NavyBlue)
+            Text("Tutto pronto!", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "La configurazione di Fitly è terminata. Inizia subito il tuo percorso!",
@@ -325,13 +321,12 @@ private fun ConfirmStep(
             Button(
                 onClick = onConfirm,
                 modifier = Modifier.fillMaxWidth().height(52.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = FitlyBlue),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Entra in Fitly", color = Color.White)
+                Text("Entra in Fitly")
             }
             Spacer(modifier = Modifier.height(8.dp))
-            TextButton(onClick = onBack) { Text("Indietro", color = TextSecondary) }
+            TextButton(onClick = onBack) { Text("Indietro") }
         }
     }
 }
