@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
 
 // ══════════════════════════════════════════════════════════
 // PALETTE PRINCIPALE FITLY (Premium Health Edition)
-// Background: #F8FAFC (Off-white), Primary: #2563EB (Modern Blue), Secondary: #6EE7B7 (Sage)
+// Background: #F8FAFC (Off-white), Primary: #2563EB (Modern Blue), Secondary: #10B981 (Sage)
 // ══════════════════════════════════════════════════════════
 
 // Sfondi e Superfici Premium
@@ -24,7 +24,6 @@ val PremiumSageLight = Color(0xFFD1FAE5)  // Soft Sage tint
 
 // Testi (Slate Palette)
 val Slate900 = Color(0xFF0F172A)          // Dark Slate (Primary Text)
-val Slate700 = Color(0xFF334155)          // Medium Slate
 val Slate500 = Color(0xFF64748B)          // Gray-Slate (Secondary Text)
 val Slate400 = Color(0xFF94A3B8)          // Light Slate
 
@@ -33,16 +32,6 @@ val SoftAmber = Color(0xFFF59E0B)       // Modern Amber
 val SoftAmberLight = Color(0xFFFEF3C7)
 val SoftRose = Color(0xFFEF4444)        // Modern Red
 val SoftRoseLight = Color(0xFFFEE2E2)
-
-// Vecchi nomi mantenuti per non rompere riferimenti immediati ma mappati sui nuovi
-val NavyBlue = Slate900
-val FitlyBlue = PremiumBlue
-val FitlyBlueLight = PremiumBlueLight
-val SageGreen = PremiumSage
-val SageGreenLight = PremiumSageLight
-val WarmWhite = PremiumCard
-val IceWhite = PremiumBackground
-val TextSecondary = Slate500
 
 // ══════════════════════════════════════════════════════════
 // SCHEMA COLORI MATERIAL 3 (tema chiaro)

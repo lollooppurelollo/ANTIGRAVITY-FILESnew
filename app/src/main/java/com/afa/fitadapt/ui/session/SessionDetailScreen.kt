@@ -22,10 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.afa.fitadapt.data.local.entity.SessionWithExercises
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.SageGreen
-import com.afa.fitadapt.ui.theme.SoftRose
 import com.afa.fitadapt.util.DateUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,10 +65,10 @@ fun SessionDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Dettaglio Sessione", color = NavyBlue) },
+                title = { Text("Dettaglio Sessione", color = MaterialTheme.colorScheme.onSurface) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = MaterialTheme.colorScheme.onSurface)
                     }
                 },
                 actions = {
@@ -97,7 +93,12 @@ fun SessionDetailScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = if (session.completed) SageGreen.copy(alpha = 0.1f) else SoftRose.copy(alpha = 0.1f))
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (session.completed) 
+                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f) 
+                        else 
+                            MaterialTheme.colorScheme.error.copy(alpha = 0.1f)
+                    )
                 ) {
                     Row(
                         modifier = Modifier.padding(20.dp),
@@ -107,19 +108,19 @@ fun SessionDetailScreen(
                             Text(
                                 text = DateUtils.toDisplayString(session.date),
                                 style = MaterialTheme.typography.headlineSmall,
-                                color = NavyBlue,
+                                color = MaterialTheme.colorScheme.onSurface,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = if (session.completed) "Sessione Eseguita" else "Sessione saltata",
-                                color = if (session.completed) SageGreen else SoftRose,
+                                color = if (session.completed) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                                 fontWeight = FontWeight.Medium
                             )
                         }
                         Icon(
                             imageVector = if (session.completed) Icons.Default.CheckCircle else Icons.Default.Cancel,
                             contentDescription = null,
-                            tint = if (session.completed) SageGreen else SoftRose,
+                            tint = if (session.completed) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -128,7 +129,7 @@ fun SessionDetailScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Parametri (Durata, Fatica, Umore, Sonno)
-                Text("Parametri registrati", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                Text("Parametri registrati", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -137,14 +138,18 @@ fun SessionDetailScreen(
                         icon = Icons.Default.Timer,
                         label = "Durata",
                         value = session.actualDurationMin?.let { "$it min" } ?: "--",
-                        color = FitlyBlue
+                        color = MaterialTheme.colorScheme.primary
                     )
                     DetailMetricCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.FlashOn,
                         label = "Fatica",
                         value = session.perceivedEffort?.let { "$it/10" } ?: "--",
-                        color = SoftRose
+                        color = when {
+                            (session.perceivedEffort ?: 0) <= 4 -> Color(0xFF2E7D32) // Green
+                            (session.perceivedEffort ?: 0) <= 6 -> Color(0xFFFBC02D) // Yellow
+                            else -> Color(0xFFD32F2F) // Red
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
@@ -154,20 +159,28 @@ fun SessionDetailScreen(
                         icon = Icons.Default.Mood,
                         label = "Umore",
                         value = session.mood?.let { "$it/10" } ?: "--",
-                        color = SageGreen
+                        color = when {
+                            (session.mood ?: 0) >= 7 -> Color(0xFF2E7D32) // Green
+                            (session.mood ?: 0) >= 5 -> Color(0xFFFBC02D) // Yellow
+                            else -> Color(0xFFD32F2F) // Red
+                        }
                     )
                     DetailMetricCard(
                         modifier = Modifier.weight(1f),
                         icon = Icons.Default.Bedtime,
                         label = "Sonno",
                         value = session.sleepQuality?.let { "$it/10" } ?: "--",
-                        color = NavyBlue
+                        color = when {
+                            (session.sleepQuality ?: 0) >= 7 -> Color(0xFF2E7D32) // Green
+                            (session.sleepQuality ?: 0) >= 5 -> Color(0xFFFBC02D) // Yellow
+                            else -> Color(0xFFD32F2F) // Red
+                        }
                     )
                 }
 
                 if (!session.notes.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text("Note", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                    Text("Note", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -185,7 +198,7 @@ fun SessionDetailScreen(
                 // Dettaglio esercizi se presenti
                 if (data.exerciseCompletions.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(24.dp))
-                    Text("Dettaglio Esercizi", style = MaterialTheme.typography.titleMedium, color = NavyBlue)
+                    Text("Dettaglio Esercizi", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                     Spacer(modifier = Modifier.height(8.dp))
                     data.exerciseCompletions.forEach { se ->
                         Card(
@@ -197,7 +210,7 @@ fun SessionDetailScreen(
                                 Icon(
                                     imageVector = if (se.sessionExercise.completed) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
                                     contentDescription = null,
-                                    tint = if (se.sessionExercise.completed) SageGreen else MaterialTheme.colorScheme.outline
+                                    tint = if (se.sessionExercise.completed) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.outline
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(

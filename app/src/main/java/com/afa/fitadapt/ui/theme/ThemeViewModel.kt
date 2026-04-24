@@ -24,9 +24,22 @@ class ThemeViewModel @Inject constructor(
             initialValue = ThemeOption.LIGHT_BLUE
         )
 
+    val useOriginalColors: StateFlow<Boolean> = userPreferences.useOriginalColors
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = false
+        )
+
     fun setTheme(theme: ThemeOption) {
         viewModelScope.launch {
             userPreferences.setAppTheme(theme.ordinal)
+        }
+    }
+
+    fun setUseOriginalColors(enabled: Boolean) {
+        viewModelScope.launch {
+            userPreferences.setUseOriginalColors(enabled)
         }
     }
 }

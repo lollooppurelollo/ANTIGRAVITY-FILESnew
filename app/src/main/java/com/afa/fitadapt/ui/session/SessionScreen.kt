@@ -25,14 +25,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,18 +46,25 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Brush
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.afa.fitadapt.R
+import com.afa.fitadapt.ui.theme.ThemeViewModel
 
 /**
  * Schermata di registrazione sessione di allenamento.
@@ -70,10 +78,12 @@ import androidx.compose.ui.graphics.Brush
 @Composable
 fun SessionScreen(
     sessionViewModel: SessionViewModel,
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onDone: () -> Unit
 ) {
     val uiState by sessionViewModel.uiState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
 
     Column(
         modifier = Modifier
@@ -94,9 +104,32 @@ fun SessionScreen(
             )
         )
 
+        var showDatePicker by remember { mutableStateOf(false) }
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = uiState.selectedDate)
+
+        if (showDatePicker) {
+            DatePickerDialog(
+                onDismissRequest = { showDatePicker = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        datePickerState.selectedDateMillis?.let { sessionViewModel.updateDate(it) }
+                        showDatePicker = false
+                    }) { Text("OK") }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDatePicker = false }) { Text("Annulla") }
+                }
+            ) {
+                DatePicker(state = datePickerState)
+            }
+        }
+
         AnimatedContent(targetState = uiState.phase, label = "sessionPhase") { phase ->
             when (phase) {
                 SessionPhase.QUESTION -> QuestionPhase(
+                    selectedDate = uiState.selectedDate,
+                    onShowDatePicker = { showDatePicker = true },
+                    useOriginalColors = useOriginalColors,
                     onYes = { sessionViewModel.answerCompleted() },
                     onPartial = { sessionViewModel.answerPartial() },
                     onNo = { sessionViewModel.answerNotCompleted() }
@@ -104,9 +137,14 @@ fun SessionScreen(
                 SessionPhase.DETAILS -> DetailsPhase(
                     uiState = uiState,
                     viewModel = sessionViewModel,
+                    useOriginalColors = useOriginalColors,
                     onSubmit = { sessionViewModel.submitSession() }
                 )
-                SessionPhase.SUBMITTED -> SubmittedPhase(onDone = onDone)
+                SessionPhase.SUBMITTED -> SubmittedPhase(
+                    useOriginalColors = useOriginalColors,
+                    onDone = onDone,
+                    onNewSession = { sessionViewModel.reset() }
+                )
             }
         }
     }
@@ -114,21 +152,55 @@ fun SessionScreen(
 
 @Composable
 private fun QuestionPhase(
+    selectedDate: Long,
+    onShowDatePicker: () -> Unit,
+    useOriginalColors: Boolean,
     onYes: () -> Unit,
     onPartial: () -> Unit,
     onNo: () -> Unit
 ) {
+    val themePrimary = MaterialTheme.colorScheme.primary
+    val themeSecondary = MaterialTheme.colorScheme.secondary
+    val themeError = MaterialTheme.colorScheme.error
+
+    val legacyPurple = colorResource(R.color.legacy_purple)
+    val legacyRed = colorResource(R.color.legacy_red)
+    val legacyBlue = colorResource(R.color.legacy_blue)
+    val legacyGreen = colorResource(R.color.legacy_green)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        // Selettore Data
+        Card(
+            onClick = onShowDatePicker,
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+            shape = RoundedCornerShape(16.dp),
+            modifier = Modifier.padding(bottom = 24.dp)
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Outlined.Edit, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (com.afa.fitadapt.util.DateUtils.isToday(selectedDate)) "Oggi" 
+                           else com.afa.fitadapt.util.DateUtils.toDisplayString(selectedDate),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+
         Box(
             modifier = Modifier
                 .size(120.dp)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.05f), CircleShape),
+                .background((if (useOriginalColors) legacyPurple else themePrimary).copy(alpha = 0.05f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text("🏃‍♀️", fontSize = 64.sp)
@@ -154,7 +226,7 @@ private fun QuestionPhase(
         Button(
             onClick = onYes,
             modifier = Modifier.fillMaxWidth().height(64.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            colors = ButtonDefaults.buttonColors(containerColor = if (useOriginalColors) legacyGreen else themeSecondary),
             shape = RoundedCornerShape(24.dp),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
         ) {
@@ -170,10 +242,10 @@ private fun QuestionPhase(
             onClick = onPartial,
             modifier = Modifier.fillMaxWidth().height(56.dp),
             shape = RoundedCornerShape(20.dp),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
-            border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = if (useOriginalColors) legacyBlue else themePrimary),
+            border = androidx.compose.foundation.BorderStroke(1.dp, (if (useOriginalColors) legacyBlue else themePrimary).copy(alpha = 0.3f))
         ) {
-            Icon(Icons.Outlined.Edit, "Parziale", tint = MaterialTheme.colorScheme.primary)
+            Icon(Icons.Outlined.Edit, "Parziale", tint = if (useOriginalColors) legacyBlue else themePrimary)
             Spacer(modifier = Modifier.width(12.dp))
             Text("Sì, ma solo in parte", style = MaterialTheme.typography.titleSmall)
         }
@@ -185,7 +257,7 @@ private fun QuestionPhase(
             onClick = onNo,
             modifier = Modifier.fillMaxWidth().height(56.dp)
         ) {
-            Text("No, oggi no", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.titleSmall)
+            Text("No, oggi no", color = if (useOriginalColors) legacyRed else themeError, style = MaterialTheme.typography.titleSmall)
         }
     }
 }
@@ -194,8 +266,13 @@ private fun QuestionPhase(
 private fun DetailsPhase(
     uiState: SessionUiState,
     viewModel: SessionViewModel,
+    useOriginalColors: Boolean,
     onSubmit: () -> Unit
 ) {
+    val legacyPurple = colorResource(R.color.legacy_purple)
+    val accentColor = if (useOriginalColors) legacyPurple else MaterialTheme.colorScheme.primary
+    val secondaryColor = if (useOriginalColors) colorResource(R.color.legacy_green) else MaterialTheme.colorScheme.secondary
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -204,14 +281,15 @@ private fun DetailsPhase(
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)),
-            shape = RoundedCornerShape(24.dp)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(24.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Text(
                     if (uiState.partial) "Sessione parziale" else "Ottimo lavoro! 🎉",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary
+                    color = accentColor
                 )
                 Text(
                     "Aggiungi qualche dettaglio sulla tua attività",
@@ -230,6 +308,7 @@ private fun DetailsPhase(
             range = 0f..120f,
             steps = 23,
             displayValue = "${uiState.durationMin ?: 0} min",
+            accentColor = accentColor,
             onValueChange = { viewModel.updateDuration(it.toInt().takeIf { v -> v > 0 }) }
         )
 
@@ -240,6 +319,7 @@ private fun DetailsPhase(
             range = 0f..10f,
             steps = 9,
             displayValue = "${uiState.perceivedEffort ?: 0}/10",
+            accentColor = accentColor,
             onValueChange = { viewModel.updateEffort(it.toInt().takeIf { v -> v > 0 }) }
         )
 
@@ -250,6 +330,7 @@ private fun DetailsPhase(
             range = 0f..10f,
             steps = 9,
             displayValue = "${uiState.mood ?: 5}/10",
+            accentColor = accentColor,
             onValueChange = { viewModel.updateMood(it.toInt()) }
         )
 
@@ -260,6 +341,7 @@ private fun DetailsPhase(
             range = 0f..10f,
             steps = 9,
             displayValue = "${uiState.sleepQuality ?: 5}/10",
+            accentColor = accentColor,
             onValueChange = { viewModel.updateSleepQuality(it.toInt()) }
         )
 
@@ -281,14 +363,15 @@ private fun DetailsPhase(
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(if (checked) MaterialTheme.colorScheme.primary.copy(alpha = 0.05f) else Color.Transparent)
+                        .background(if (checked) accentColor.copy(alpha = 0.05f) else Color.Transparent)
                         .clickable { viewModel.toggleExercise(ce.id) }
                         .padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
                         checked = checked,
-                        onCheckedChange = { viewModel.toggleExercise(ce.id) }
+                        onCheckedChange = { viewModel.toggleExercise(ce.id) },
+                        colors = CheckboxDefaults.colors(checkedColor = accentColor)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
@@ -310,9 +393,9 @@ private fun DetailsPhase(
             shape = RoundedCornerShape(16.dp),
             maxLines = 4,
             colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = accentColor,
                 unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                focusedLabelColor = accentColor,
                 unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
             )
         )
@@ -324,7 +407,7 @@ private fun DetailsPhase(
             onClick = onSubmit,
             modifier = Modifier.fillMaxWidth().height(64.dp),
             enabled = !uiState.isSubmitting,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            colors = ButtonDefaults.buttonColors(containerColor = secondaryColor),
             shape = RoundedCornerShape(24.dp)
         ) {
             if (uiState.isSubmitting) {
@@ -341,11 +424,18 @@ private fun DetailsPhase(
 }
 
 @Composable
-private fun SubmittedPhase(onDone: () -> Unit) {
+private fun SubmittedPhase(
+    useOriginalColors: Boolean, 
+    onDone: () -> Unit,
+    onNewSession: () -> Unit
+) {
+    val legacyGreen = colorResource(R.color.legacy_green)
+    val successColor = if (useOriginalColors) legacyGreen else MaterialTheme.colorScheme.secondary
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(32.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -353,10 +443,10 @@ private fun SubmittedPhase(onDone: () -> Unit) {
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)),
+                .background(successColor.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
-            Icon(Icons.Default.Check, "OK", tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(56.dp))
+            Icon(Icons.Default.Check, "OK", tint = successColor, modifier = Modifier.size(56.dp))
         }
         Spacer(modifier = Modifier.height(32.dp))
         Text(
@@ -372,13 +462,26 @@ private fun SubmittedPhase(onDone: () -> Unit) {
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(48.dp))
+        
         Button(
             onClick = onDone,
             modifier = Modifier.fillMaxWidth().height(64.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            colors = ButtonDefaults.buttonColors(containerColor = if (useOriginalColors) successColor else MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(24.dp)
         ) {
             Text("Torna alla Home", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(
+            onClick = onNewSession,
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(20.dp),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = if (useOriginalColors) successColor else MaterialTheme.colorScheme.primary),
+            border = androidx.compose.foundation.BorderStroke(1.dp, (if (useOriginalColors) successColor else MaterialTheme.colorScheme.primary).copy(alpha = 0.3f))
+        ) {
+            Text("Registra un altro allenamento", style = MaterialTheme.typography.titleSmall)
         }
     }
 }
@@ -390,12 +493,13 @@ private fun OptionalSlider(
     range: ClosedFloatingPointRange<Float>,
     steps: Int,
     displayValue: String,
+    accentColor: Color = MaterialTheme.colorScheme.primary,
     onValueChange: (Float) -> Unit
 ) {
     Column(modifier = Modifier.padding(vertical = 12.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(label, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onBackground)
-            Text(displayValue, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+            Text(displayValue, style = MaterialTheme.typography.titleMedium, color = accentColor, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(8.dp))
         Slider(
@@ -404,8 +508,8 @@ private fun OptionalSlider(
             valueRange = range,
             steps = steps,
             colors = SliderDefaults.colors(
-                thumbColor = MaterialTheme.colorScheme.primary,
-                activeTrackColor = MaterialTheme.colorScheme.primary,
+                thumbColor = accentColor,
+                activeTrackColor = accentColor,
                 inactiveTrackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)
             )
         )

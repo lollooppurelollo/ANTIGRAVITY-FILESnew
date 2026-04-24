@@ -32,7 +32,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.afa.fitadapt.security.BiometricHelper
-import com.afa.fitadapt.ui.theme.NavyBlue
 import com.afa.fitadapt.ui.articles.ArticleDetailScreen
 import com.afa.fitadapt.ui.articles.ArticlesScreen
 import com.afa.fitadapt.ui.articles.ArticlesViewModel
@@ -522,7 +521,7 @@ private fun PlaceholderScreen(title: String, subtitle: String) {
             Text(
                 title,
                 style = MaterialTheme.typography.headlineSmall,
-                color = NavyBlue
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(

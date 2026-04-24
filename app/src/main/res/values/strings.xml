@@ -4,8 +4,8 @@
     Stringhe dell'app (italiano)
 -->
 <resources>
-    <string name="app_name">Fitly</string>
-    <string name="app_full_name">Fitly - Fit your life</string>
-    <string name="app_description">Fit your life: Il tuo percorso di attività fisica personalizzato</string>
-    <string name="app_slogan">Fit your life</string>
+    <string name="app_name">KinApto</string>
+    <string name="app_full_name">KinApto - Attività Fisica Adattata</string>
+    <string name="app_description">KinApto: Il tuo percorso di attività fisica personalizzato</string>
+    <string name="app_slogan">Sempre in movimento</string>
 </resources>

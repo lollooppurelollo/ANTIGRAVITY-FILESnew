@@ -44,7 +44,8 @@ data class SettingsUiState(
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
     val biometricsEnabled: Boolean = true,
-    val motivationalEnabled: Boolean = true
+    val motivationalEnabled: Boolean = true,
+    val useOriginalColors: Boolean = false
 )
 
 @HiltViewModel
@@ -61,6 +62,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { userPreferences.notificationMinute.collect { v -> _uiState.update { it.copy(notificationMinute = v) } } }
         viewModelScope.launch { userPreferences.biometricsEnabled.collect { v -> _uiState.update { it.copy(biometricsEnabled = v) } } }
         viewModelScope.launch { userPreferences.motivationalMessagesEnabled.collect { v -> _uiState.update { it.copy(motivationalEnabled = v) } } }
+        viewModelScope.launch { userPreferences.useOriginalColors.collect { v -> _uiState.update { it.copy(useOriginalColors = v) } } }
     }
 
     fun toggleNotifications(enabled: Boolean) {
@@ -75,6 +77,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun toggleBiometrics(enabled: Boolean) { viewModelScope.launch { userPreferences.setBiometricsEnabled(enabled) } }
+
+    fun toggleOriginalColors(enabled: Boolean) { viewModelScope.launch { userPreferences.setUseOriginalColors(enabled) } }
 
     fun toggleMotivational(enabled: Boolean) {
         viewModelScope.launch {
@@ -152,6 +156,24 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) {
                             )
                         }
                     }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Sezione aspetto
+            Text("Aspetto", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    SettingSwitch("Colori originali (icone e schede)", uiState.useOriginalColors) { settingsViewModel.toggleOriginalColors(it) }
+                    Text(
+                        "Usa i colori originali per le icone e i riquadri di allenamento invece del colore del tema scelto.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
             }
 

@@ -25,7 +25,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.afa.fitadapt.R
+import com.afa.fitadapt.ui.theme.ThemeViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.repository.PatientProfileRepository
@@ -105,10 +109,14 @@ class ProtectedViewModel @Inject constructor(
 @Composable
 fun ProtectedGateScreen(
     protectedViewModel: ProtectedViewModel,
+    themeViewModel: ThemeViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onAuthenticated: () -> Unit
 ) {
     val uiState by protectedViewModel.uiState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
+    val legacyRed = colorResource(R.color.legacy_red)
+    
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
@@ -152,7 +160,7 @@ fun ProtectedGateScreen(
             Icon(
                 imageVector = if (isConfigured) Icons.Outlined.Lock else Icons.Outlined.AdminPanelSettings,
                 contentDescription = "Protetta",
-                tint = MaterialTheme.colorScheme.primary,
+                tint = if (useOriginalColors) legacyRed else MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(56.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -222,6 +230,7 @@ fun ProtectedGateScreen(
 @Composable
 fun ProtectedDashboardScreen(
     protectedViewModel: ProtectedViewModel,
+    themeViewModel: ThemeViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onManageCards: () -> Unit,
     onManageGoals: () -> Unit,
@@ -229,6 +238,13 @@ fun ProtectedDashboardScreen(
     onManageArticles: () -> Unit
 ) {
     val uiState by protectedViewModel.uiState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
+
+    val legacyRed = colorResource(R.color.legacy_red)
+    val legacyPurple = colorResource(R.color.legacy_purple)
+    val legacyGold = colorResource(R.color.legacy_gold)
+    val legacyGreen = colorResource(R.color.legacy_green)
+
     var editingCode by remember { mutableStateOf(false) }
     var newCode by remember { mutableStateOf(uiState.patientCode) }
 
@@ -253,7 +269,7 @@ fun ProtectedDashboardScreen(
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp)) {
             // Codice paziente
-            Text("Codice paziente", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Text("Codice paziente", style = MaterialTheme.typography.titleMedium, color = if (useOriginalColors) legacyRed else MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
             Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(14.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -262,7 +278,10 @@ fun ProtectedDashboardScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                             TextButton(onClick = { editingCode = false }) { Text("Annulla") }
-                            Button(onClick = { protectedViewModel.updatePatientCode(newCode); editingCode = false }) { Text("Salva") }
+                            Button(
+                                onClick = { protectedViewModel.updatePatientCode(newCode); editingCode = false },
+                                colors = if (useOriginalColors) ButtonDefaults.buttonColors(containerColor = legacyRed) else ButtonDefaults.buttonColors()
+                            ) { Text("Salva") }
                         }
                     } else {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
@@ -270,23 +289,26 @@ fun ProtectedDashboardScreen(
                                 Text("Codice attuale", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 Text(uiState.patientCode.ifBlank { "Non impostato" }, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                             }
-                            TextButton(onClick = { newCode = uiState.patientCode; editingCode = true }) { Text("Modifica") }
+                            TextButton(
+                                onClick = { newCode = uiState.patientCode; editingCode = true },
+                                colors = if (useOriginalColors) ButtonDefaults.textButtonColors(contentColor = legacyRed) else ButtonDefaults.textButtonColors()
+                            ) { Text("Modifica") }
                         }
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
-            Text("Gestione", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            Text("Gestione", style = MaterialTheme.typography.titleMedium, color = if (useOriginalColors) legacyRed else MaterialTheme.colorScheme.primary)
             Spacer(modifier = Modifier.height(8.dp))
 
-            DashboardCard(Icons.Outlined.FitnessCenter, "Schede di allenamento", "Crea, modifica e gestisci le schede", MaterialTheme.colorScheme.primary, onManageCards)
+            DashboardCard(Icons.Outlined.FitnessCenter, "Schede di allenamento", "Crea, modifica e gestisci le schede", if (useOriginalColors) legacyPurple else MaterialTheme.colorScheme.primary, onManageCards)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.Outlined.Flag, "Obiettivi", "Configura gli obiettivi della paziente", MaterialTheme.colorScheme.secondary, onManageGoals)
+            DashboardCard(Icons.Outlined.Flag, "Obiettivi", "Configura gli obiettivi della paziente", if (useOriginalColors) legacyRed else MaterialTheme.colorScheme.secondary, onManageGoals)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", MaterialTheme.colorScheme.tertiary, onManageExercises)
+            DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", if (useOriginalColors) legacyPurple else MaterialTheme.colorScheme.tertiary, onManageExercises)
             Spacer(modifier = Modifier.height(8.dp))
-            DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", MaterialTheme.colorScheme.primary, onManageArticles)
+            DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", if (useOriginalColors) legacyGold else MaterialTheme.colorScheme.primary, onManageArticles)
 
             Spacer(modifier = Modifier.height(32.dp))
         }

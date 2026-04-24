@@ -31,23 +31,29 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 /**
  * Schermata "Altro" — menu esteso con collegamento a tutte le sezioni secondarie.
  */
 @Composable
 fun MoreScreen(
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel(),
     onNavigateToDiary: () -> Unit,
     onNavigateToArticles: () -> Unit,
     onNavigateToExport: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToProtected: () -> Unit
 ) {
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +82,7 @@ fun MoreScreen(
             icon = Icons.AutoMirrored.Outlined.MenuBook,
             title = "Consigli",
             subtitle = "Articoli su attività fisica, alimentazione, sonno e altro",
-            color = MaterialTheme.colorScheme.secondary,
+            color = if (useOriginalColors) Color(0xFFFBC02D) else MaterialTheme.colorScheme.secondary,
             onClick = onNavigateToArticles
         )
 
@@ -87,7 +93,7 @@ fun MoreScreen(
             icon = Icons.Outlined.QrCode,
             title = "Export dati",
             subtitle = "Esporta i tuoi dati in formato JSON o QR code",
-            color = MaterialTheme.colorScheme.tertiary,
+            color = if (useOriginalColors) Color(0xFF7B1FA2) else MaterialTheme.colorScheme.tertiary,
             onClick = onNavigateToExport
         )
 
@@ -98,7 +104,7 @@ fun MoreScreen(
             icon = Icons.Outlined.Settings,
             title = "Impostazioni",
             subtitle = "Notifiche, biometria, preferenze",
-            color = MaterialTheme.colorScheme.primary,
+            color = if (useOriginalColors) Color(0xFF1976D2) else MaterialTheme.colorScheme.primary,
             onClick = onNavigateToSettings
         )
 
@@ -116,7 +122,7 @@ fun MoreScreen(
             icon = Icons.Outlined.Lock,
             title = "Area protetta",
             subtitle = "Gestisci schede, esercizi, obiettivi (richiede password)",
-            color = MaterialTheme.colorScheme.primary,
+            color = if (useOriginalColors) Color(0xFFD32F2F) else MaterialTheme.colorScheme.primary,
             onClick = onNavigateToProtected
         )
 

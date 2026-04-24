@@ -4,6 +4,7 @@
 // =============================================================
 package com.afa.fitadapt.ui.auth
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Fingerprint
 import androidx.compose.material3.Button
@@ -30,16 +32,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import com.afa.fitadapt.security.BiometricHelper
 
 /**
- * Schermata di blocco biometrico.
- * Chiede l'autenticazione biometrica all'avvio dell'app.
- * Dopo successo, naviga alla Home.
+ * Schermata di blocco biometrico KinApto.
+ * Posiziona il brand nella parte centro-alta per coerenza con lo splash.
  */
 @Composable
 fun BiometricLockScreen(
@@ -77,59 +84,64 @@ fun BiometricLockScreen(
     }
 
     // ── UI ──
-    Box(modifier = Modifier.fillMaxSize()) {
-        val primary = MaterialTheme.colorScheme.primary
-        val secondary = MaterialTheme.colorScheme.secondary
-        val onPrimary = MaterialTheme.colorScheme.onPrimary
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.linearGradient(
+                    0.0f to Color(0xFF0077FF),
+                    1.0f to Color(0xFF00C853)
+                )
+            ),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        // Onde di sfondo
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val width = size.width
+            val height = size.height
+            val path1 = Path().apply {
+                moveTo(0f, height * 0.75f)
+                cubicTo(width * 0.4f, height * 0.7f, width * 0.7f, height * 0.9f, width, height * 0.8f)
+                lineTo(width, height)
+                lineTo(0f, height)
+                close()
+            }
+            drawPath(path1, Color.White.copy(alpha = 0.08f))
+        }
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(primary, secondary)
-                    )
-                )
-                .padding(32.dp),
+                .padding(top = 160.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
-            // Icona impronta
-            Icon(
-                imageVector = Icons.Outlined.Fingerprint,
-                contentDescription = "Autenticazione biometrica",
-                modifier = Modifier.size(80.dp),
-                tint = onPrimary
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
+            // Nome app
             Text(
-                text = "Benvenuta",
-                style = MaterialTheme.typography.displaySmall,
-                color = onPrimary
+                text = "KinApto",
+                style = MaterialTheme.typography.displayLarge.copy(
+                    letterSpacing = (-2).sp,
+                    fontWeight = FontWeight.Black,
+                    fontSize = 72.sp
+                ),
+                color = Color.White
             )
 
             Spacer(modifier = Modifier.height(4.dp))
 
+            // Slogan
             Text(
-                text = "Fit your life",
-                style = MaterialTheme.typography.titleMedium,
-                color = onPrimary.copy(alpha = 0.7f)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Autenticati per accedere\nal tuo percorso",
-                style = MaterialTheme.typography.bodyLarge,
-                color = onPrimary.copy(alpha = 0.8f),
+                text = "Sempre in movimento",
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    letterSpacing = 1.2.sp,
+                    fontWeight = FontWeight.Medium
+                ),
+                color = Color.White.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(48.dp))
+            Spacer(modifier = Modifier.height(180.dp))
 
-            // Pulsante per ritentare l'autenticazione
+            // Pulsante sblocco stilizzato
             Button(
                 onClick = {
                     if (activity != null && biometricHelper.canAuthenticate()) {
@@ -141,17 +153,18 @@ fun BiometricLockScreen(
                     }
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = onPrimary,
-                    contentColor = primary
-                )
+                    containerColor = Color.White,
+                    contentColor = Color(0xFF0077FF)
+                ),
+                shape = RoundedCornerShape(16.dp),
+                modifier = Modifier.height(56.dp).padding(horizontal = 32.dp)
             ) {
-                Icon(Icons.Outlined.Fingerprint, "Riprova", modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.size(8.dp))
-                Text("Sblocca l'app")
+                Icon(Icons.Outlined.Fingerprint, null)
+                Spacer(modifier = Modifier.size(12.dp))
+                Text("Sblocca per iniziare", fontWeight = FontWeight.Bold)
             }
         }
 
-        // Snackbar per errori
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter)

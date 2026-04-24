@@ -46,7 +46,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.afa.fitadapt.ui.components.VideoPlayer
+import com.afa.fitadapt.ui.theme.ThemeViewModel
 
 /**
  * Dettaglio di un singolo esercizio.
@@ -58,9 +60,11 @@ fun ExerciseDetailScreen(
     cardViewModel: CardViewModel,
     exerciseId: Long,
     cardExerciseId: Long,
+    themeViewModel: ThemeViewModel = hiltViewModel(),
     onBack: () -> Unit
 ) {
     val uiState by cardViewModel.exerciseDetailState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
 
     LaunchedEffect(exerciseId) {
         cardViewModel.loadExerciseDetail(exerciseId, cardExerciseId)
@@ -104,10 +108,14 @@ fun ExerciseDetailScreen(
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
+            val accentColor = if (useOriginalColors) Color(0xFF7B1FA2) else MaterialTheme.colorScheme.primary
+            val onAccentColor = if (useOriginalColors) Color.White else MaterialTheme.colorScheme.onPrimaryContainer
+            val badgeBackground = if (useOriginalColors) accentColor.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primaryContainer
+
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .background(badgeBackground)
                     .padding(horizontal = 12.dp, vertical = 4.dp)
             ) {
                 Text(
@@ -115,13 +123,12 @@ fun ExerciseDetailScreen(
                         .lowercase()
                         .replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = if (useOriginalColors) accentColor else onAccentColor
                 )
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Video player o placeholder
             Card(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -27,12 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.afa.fitadapt.ui.theme.PremiumBlue
-import com.afa.fitadapt.ui.theme.PremiumBlueLight
-import com.afa.fitadapt.ui.theme.Slate900
-import com.afa.fitadapt.ui.theme.PremiumCard
-import com.afa.fitadapt.ui.theme.Slate500
+import com.afa.fitadapt.ui.navigation.Screen
 
 /**
  * Elemento della bottom navigation bar.
@@ -69,7 +66,7 @@ fun BottomNavBar(
             .clip(RoundedCornerShape(28.dp)),
         tonalElevation = 8.dp,
         shadowElevation = 8.dp,
-        color = PremiumCard.copy(alpha = 0.98f)
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.98f)
     ) {
         NavigationBar(
             containerColor = Color.Transparent,
@@ -100,15 +97,16 @@ fun BottomNavBar(
                     label = { 
                         Text(
                             text = item.label,
-                            style = MaterialTheme.typography.labelSmall,
-                            maxLines = 1
+                            style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
+                            maxLines = 1,
+                            softWrap = false
                         ) 
                     },
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MaterialTheme.colorScheme.primary,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
-                        unselectedIconColor = Slate500,
-                        unselectedTextColor = Slate500,
+                        unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
                         indicatorColor = MaterialTheme.colorScheme.primaryContainer,
                     )
                 )

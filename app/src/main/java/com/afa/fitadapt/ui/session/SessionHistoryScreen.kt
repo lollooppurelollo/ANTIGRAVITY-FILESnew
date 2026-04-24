@@ -28,11 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.afa.fitadapt.data.local.entity.SessionEntity
-import com.afa.fitadapt.ui.theme.FitlyBlue
-import com.afa.fitadapt.ui.theme.FitlyBlueLight
-import com.afa.fitadapt.ui.theme.NavyBlue
-import com.afa.fitadapt.ui.theme.SageGreen
-import com.afa.fitadapt.ui.theme.SoftRose
 import com.afa.fitadapt.util.DateUtils
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,10 +42,10 @@ fun SessionHistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Storico Sessioni", color = NavyBlue) },
+                title = { Text("Storico Sessioni", color = MaterialTheme.colorScheme.onBackground) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = NavyBlue)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Indietro", tint = MaterialTheme.colorScheme.onBackground)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background)
@@ -60,9 +55,9 @@ fun SessionHistoryScreen(
         if (sessions.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(Icons.Default.History, null, modifier = Modifier.size(64.dp), tint = NavyBlue.copy(alpha = 0.2f))
+                    Icon(Icons.Default.History, null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Nessuna sessione registrata", color = NavyBlue.copy(alpha = 0.5f))
+                    Text("Nessuna sessione registrata", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
                 }
             }
         } else {
@@ -96,13 +91,13 @@ private fun SessionItem(session: SessionEntity, onClick: () -> Unit) {
                 modifier = Modifier
                     .size(48.dp)
                     .clip(CircleShape)
-                    .background(if (session.completed) SageGreen.copy(alpha = 0.1f) else SoftRose.copy(alpha = 0.1f)),
+                    .background(if (session.completed) MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.error.copy(alpha = 0.1f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = if (session.completed) Icons.Default.Check else Icons.Default.Close,
                     contentDescription = null,
-                    tint = if (session.completed) SageGreen else SoftRose
+                    tint = if (session.completed) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error
                 )
             }
 
@@ -112,7 +107,7 @@ private fun SessionItem(session: SessionEntity, onClick: () -> Unit) {
                 Text(
                     text = DateUtils.toDisplayString(session.date),
                     style = MaterialTheme.typography.titleMedium,
-                    color = NavyBlue
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = if (session.completed) {
@@ -127,7 +122,7 @@ private fun SessionItem(session: SessionEntity, onClick: () -> Unit) {
                 Text(
                     text = "${session.actualDurationMin} min",
                     style = MaterialTheme.typography.labelLarge,
-                    color = FitlyBlue,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold
                 )
             }

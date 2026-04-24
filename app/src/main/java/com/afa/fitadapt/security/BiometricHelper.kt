@@ -101,8 +101,8 @@ class BiometricHelper @Inject constructor(
 
         // Configura il prompt
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Accesso a Fitly")
-            .setSubtitle("Autenticati per accedere")
+            .setTitle("Accesso a KinApto")
+            .setSubtitle("Sempre in movimento")
             .setDescription("Usa l'impronta digitale o il codice di sblocco del tuo telefono")
             .setAllowedAuthenticators(authenticators)
             .build()

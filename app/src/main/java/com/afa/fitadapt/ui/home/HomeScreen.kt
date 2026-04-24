@@ -22,8 +22,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.FitnessCenter
 import androidx.compose.material.icons.outlined.LocalFireDepartment
@@ -32,14 +32,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,7 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.filled.Check
 
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.ui.graphics.Color
@@ -77,12 +72,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.afa.fitadapt.data.local.entity.ScheduledSessionEntity
 import com.afa.fitadapt.data.local.entity.TrainingCardEntity
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.res.colorResource
+import com.afa.fitadapt.R
 
 /**
  * Schermata Home — dashboard principale.
@@ -91,13 +89,14 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     homeViewModel: HomeViewModel,
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel(),
     onNavigateToSession: () -> Unit,
     onNavigateToCard: () -> Unit,
     onNavigateToArticle: (Long) -> Unit,
     onNavigateToHistory: () -> Unit
 ) {
     val uiState by homeViewModel.uiState.collectAsState()
-    var isMonthlyView by remember { mutableStateOf(false) }
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     var selectedDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
 
@@ -109,13 +108,14 @@ fun HomeScreen(
     ) {
         // ... (Header and CTA stay same) ...
         // ── Header con gradiente Premium ──
+        val headerColor = MaterialTheme.colorScheme.primary
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .background(
                     Brush.linearGradient(
-                        colors = listOf(MaterialTheme.colorScheme.primary, MaterialTheme.colorScheme.primary.copy(alpha = 0.8f))
+                        colors = listOf(headerColor, headerColor.copy(alpha = 0.8f))
                     ),
                     shape = RoundedCornerShape(32.dp)
                 )
@@ -163,6 +163,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         // ── Calendario Allenamenti ──
+        val accentColor = MaterialTheme.colorScheme.primary
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -171,25 +172,28 @@ fun HomeScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                if (isMonthlyView) "Calendario Mensile" else "Calendario Settimanale",
+                if (uiState.isMonthlyView) "Calendario Mensile" else "Calendario Settimanale",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
             Row {
-                IconButton(onClick = { showAddDialog = true }) {
-                    Icon(Icons.Default.Add, contentDescription = "Aggiungi programmato", tint = MaterialTheme.colorScheme.primary)
+                IconButton(onClick = { 
+                    selectedDateMillis = System.currentTimeMillis()
+                    showAddDialog = true 
+                }) {
+                    Icon(Icons.Default.Add, contentDescription = "Aggiungi programmato", tint = accentColor)
                 }
-                IconButton(onClick = { isMonthlyView = !isMonthlyView }) {
+                IconButton(onClick = { homeViewModel.setCalendarView(!uiState.isMonthlyView) }) {
                     Icon(
-                        if (isMonthlyView) Icons.Outlined.ViewWeek else Icons.Outlined.CalendarMonth,
+                        if (uiState.isMonthlyView) Icons.Outlined.ViewWeek else Icons.Outlined.CalendarMonth,
                         contentDescription = "Cambia vista",
-                        tint = MaterialTheme.colorScheme.primary
+                        tint = accentColor
                     )
                 }
             }
         }
         
-    if (isMonthlyView) {
+    if (uiState.isMonthlyView) {
         MonthlyCalendar(
             scheduled = uiState.scheduledSessions,
             onDayClick = { date ->
@@ -201,6 +205,10 @@ fun HomeScreen(
     } else {
         ModernWeeklyCalendar(
             scheduled = uiState.scheduledSessions,
+            onDayClick = { date ->
+                selectedDateMillis = date
+                showAddDialog = true
+            },
             onDeleteSession = { homeViewModel.deleteScheduledSession(it) }
         )
     }
@@ -208,47 +216,57 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         // ── CTA Registra Sessione ──
-        if (!uiState.completedToday && uiState.activeCard != null) {
-            Button(
-                onClick = onNavigateToSession,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp)
-                    .height(64.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                shape = RoundedCornerShape(20.dp),
-                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-            ) {
-                Icon(Icons.Default.Add, "Registra", modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(12.dp))
-                Text("Registra allenamento", style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold))
-            }
-        } else if (uiState.completedToday) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)),
-                shape = RoundedCornerShape(20.dp),
-                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
-            ) {
-                Row(
-                    modifier = Modifier.padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(MaterialTheme.colorScheme.secondary, CircleShape),
-                        contentAlignment = Alignment.Center
+        if (uiState.activeCard != null) {
+            val buttonColor = MaterialTheme.colorScheme.primary
+            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
+                if (uiState.completedToday) {
+                    val containerColor = if (useOriginalColors) Color(0xFFC8E6C9) else MaterialTheme.colorScheme.secondaryContainer
+                    val contentColor = if (useOriginalColors) Color(0xFF2E7D32) else MaterialTheme.colorScheme.onSecondaryContainer
+                    val iconBgColor = if (useOriginalColors) Color(0xFF4CAF50) else MaterialTheme.colorScheme.secondary
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = containerColor),
+                        shape = RoundedCornerShape(20.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, contentColor.copy(alpha = 0.2f))
                     ) {
-                        Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.onSecondary, modifier = Modifier.size(24.dp))
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .background(iconBgColor, CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Default.Check, null, tint = if (useOriginalColors) Color.White else MaterialTheme.colorScheme.onSecondary, modifier = Modifier.size(20.dp))
+                            }
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text("Allenamento registrato", style = MaterialTheme.typography.titleSmall, color = contentColor, fontWeight = FontWeight.Bold)
+                                Text("Ottimo lavoro per oggi!", style = MaterialTheme.typography.bodySmall, color = contentColor.copy(alpha = 0.8f))
+                            }
+                        }
                     }
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Column {
-                        Text("Allenamento registrato", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
-                        Text("Ottimo lavoro per oggi!", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                Button(
+                    onClick = onNavigateToSession,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(64.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = buttonColor),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                ) {
+                    Icon(Icons.Default.Add, "Registra", modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        if (uiState.completedToday) "Registra un altro allenamento" else "Registra allenamento",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+                    )
                 }
             }
         }
@@ -258,6 +276,7 @@ fun HomeScreen(
         // ── Scheda Attiva ──
         uiState.activeCard?.let { card ->
             SectionTitle("Piano attivo")
+            val cardIconColor = MaterialTheme.colorScheme.primary
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -273,10 +292,10 @@ fun HomeScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(RoundedCornerShape(14.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer),
+                                .background(cardIconColor.copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Outlined.FitnessCenter, "Scheda", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                            Icon(Icons.Outlined.FitnessCenter, "Scheda", tint = cardIconColor, modifier = Modifier.size(24.dp))
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
@@ -317,6 +336,7 @@ fun HomeScreen(
         // ── Articolo in evidenza ──
         uiState.featuredArticle?.let { article ->
             SectionTitle("Consiglio della settimana")
+            val articleIconColor = if (useOriginalColors) Color(0xFFFBC02D) else MaterialTheme.colorScheme.primary
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -332,10 +352,10 @@ fun HomeScreen(
                             modifier = Modifier
                                 .size(48.dp)
                                 .clip(CircleShape)
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                                .background(articleIconColor.copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.AutoMirrored.Outlined.Article, "Articolo", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                            Icon(Icons.AutoMirrored.Outlined.Article, "Articolo", tint = articleIconColor, modifier = Modifier.size(24.dp))
                         }
                         Spacer(modifier = Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
@@ -353,20 +373,86 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(20.dp))
             SectionTitle("I tuoi obiettivi")
             uiState.activeGoals.take(3).forEach { goal ->
-                val progress = if (goal.targetValue > 0) (goal.currentValue / goal.targetValue).coerceIn(0f, 1f) else 0f
+                val nextTarget = when {
+                    goal.currentValue < goal.targetValue -> goal.targetValue
+                    goal.silverValue != null && goal.currentValue < goal.silverValue -> goal.silverValue
+                    goal.goldValue != null && goal.currentValue < goal.goldValue -> goal.goldValue
+                    else -> goal.goldValue ?: goal.silverValue ?: goal.targetValue
+                }
+                val medalLabel = when {
+                    goal.currentValue < goal.targetValue -> "Target: Bronzo"
+                    goal.silverValue != null && goal.currentValue < goal.silverValue -> "Target: Argento"
+                    goal.goldValue != null && goal.currentValue < goal.goldValue -> "Target: Oro"
+                    else -> "Obiettivo completato! 🏆"
+                }
+                val progress = if (nextTarget > 0) (goal.currentValue / nextTarget).coerceIn(0f, 1f) else 0f
+                val goalAccentColor = MaterialTheme.colorScheme.primary
                 Card(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 4.dp),
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    elevation = CardDefaults.cardElevation(1.dp)
                 ) {
-                    Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Text("🎯", fontSize = 20.sp)
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(goal.title, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
-                        Text("${goal.currentValue.toInt()} / ${goal.targetValue.toInt()}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Text("${(progress * 100).toInt()}%", style = MaterialTheme.typography.titleSmall, color = if (progress >= 1f) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text("🎯", fontSize = 20.sp)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    goal.title,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        medalLabel,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = goalAccentColor
+                                    )
+                                    if (goal.currentValue >= goal.targetValue) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        val reachedText = when {
+                                            goal.goldValue != null && goal.currentValue >= goal.goldValue -> "Traguardi: 🥉 🥈 🥇"
+                                            goal.silverValue != null && goal.currentValue >= goal.silverValue -> "Traguardi: 🥉 🥈"
+                                            goal.currentValue >= goal.targetValue -> "Traguardi: 🥉"
+                                            else -> ""
+                                        }
+                                        Text(
+                                            reachedText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                }
+                            }
+                            Text(
+                                "${(progress * 100).toInt()}%",
+                                style = MaterialTheme.typography.titleSmall,
+                                color = if (useOriginalColors) Color.Black else (if (progress >= 1f) MaterialTheme.colorScheme.secondary else goalAccentColor),
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                        androidx.compose.material3.LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                            color = if (progress >= 1f) MaterialTheme.colorScheme.secondary else goalAccentColor,
+                            trackColor = goalAccentColor.copy(alpha = 0.1f),
+                            strokeCap = androidx.compose.ui.graphics.StrokeCap.Round,
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            "${goal.currentValue.toInt()} / ${nextTarget.toInt()}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }
@@ -772,6 +858,7 @@ fun AddScheduledSessionDialog(
 @Composable
 fun ModernWeeklyCalendar(
     scheduled: List<ScheduledSessionEntity>,
+    onDayClick: (Long) -> Unit,
     onDeleteSession: (ScheduledSessionEntity) -> Unit
 ) {
     val calendar = Calendar.getInstance()
@@ -800,6 +887,7 @@ fun ModernWeeklyCalendar(
                         .clip(RoundedCornerShape(20.dp))
                         .background(if (isToday) MaterialTheme.colorScheme.primary else if (hasSession) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface)
                         .clickable {
+                            onDayClick(day.timeInMillis)
                             if (hasSession) {
                                 selectedDaySessions = daySessions
                                 showDayDetails = true
@@ -836,7 +924,7 @@ fun ModernWeeklyCalendar(
                     selectedDaySessions = selectedDaySessions.filter { s -> s.id != it.id }
                     if (selectedDaySessions.isEmpty()) showDayDetails = false
                 },
-                onAddMore = { showDayDetails = false }
+                onAddMore = { onDayClick(days.first().timeInMillis) } // Simplified, will use the selected date from state anyway
             )
         }
     }

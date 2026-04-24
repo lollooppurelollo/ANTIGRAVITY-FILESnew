@@ -20,8 +20,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import com.afa.fitadapt.R
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.afa.fitadapt.data.local.entity.ArticleEntity
@@ -76,9 +80,19 @@ class ArticlesViewModel @Inject constructor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticlesScreen(articlesViewModel: ArticlesViewModel, onBack: () -> Unit, onArticleClick: (Long) -> Unit) {
+fun ArticlesScreen(
+    articlesViewModel: ArticlesViewModel,
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel(),
+    onBack: () -> Unit,
+    onArticleClick: (Long) -> Unit
+) {
     val uiState by articlesViewModel.uiState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
     val filtered = if (uiState.selectedCategory != null) uiState.articles.filter { it.category == uiState.selectedCategory } else uiState.articles
+
+    val legacyGold = colorResource(R.color.legacy_gold)
+    val accentColor = if (useOriginalColors) legacyGold else MaterialTheme.colorScheme.primary
+    val onAccentColor = if (useOriginalColors) Color.Black else MaterialTheme.colorScheme.onPrimary
 
     Scaffold(
         topBar = {
@@ -107,14 +121,38 @@ fun ArticlesScreen(articlesViewModel: ArticlesViewModel, onBack: () -> Unit, onA
                     FilterChip(
                         selected = uiState.selectedCategory == null,
                         onClick = { articlesViewModel.selectCategory(null) },
-                        label = { Text("Tutti") }
+                        label = { Text("Tutti") },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = accentColor,
+                            selectedLabelColor = onAccentColor,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = uiState.selectedCategory == null,
+                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                            selectedBorderColor = accentColor
+                        )
                     )
                 }
                 items(uiState.categories) { cat ->
                     FilterChip(
                         selected = uiState.selectedCategory == cat,
                         onClick = { articlesViewModel.selectCategory(cat) },
-                        label = { Text(cat) }
+                        label = { Text(cat) },
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = accentColor,
+                            selectedLabelColor = onAccentColor,
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        border = FilterChipDefaults.filterChipBorder(
+                            enabled = true,
+                            selected = uiState.selectedCategory == cat,
+                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                            selectedBorderColor = accentColor
+                        )
                     )
                 }
             }
@@ -138,13 +176,13 @@ fun ArticlesScreen(articlesViewModel: ArticlesViewModel, onBack: () -> Unit, onA
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(6.dp))
-                                    .background(MaterialTheme.colorScheme.primaryContainer)
+                                    .background(accentColor.copy(alpha = 0.15f))
                                     .padding(horizontal = 8.dp, vertical = 2.dp)
                             ) {
                                 Text(
                                     article.category,
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    color = if (useOriginalColors) colorResource(R.color.legacy_gold) else MaterialTheme.colorScheme.primary
                                 )
                             }
                             Spacer(modifier = Modifier.height(8.dp))
@@ -175,12 +213,23 @@ fun ArticlesScreen(articlesViewModel: ArticlesViewModel, onBack: () -> Unit, onA
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleDetailScreen(articlesViewModel: ArticlesViewModel, articleId: Long, onBack: () -> Unit) {
+fun ArticleDetailScreen(
+    articlesViewModel: ArticlesViewModel,
+    articleId: Long,
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel(),
+    onBack: () -> Unit
+) {
     val uiState by articlesViewModel.uiState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
 
     LaunchedEffect(articleId) { articlesViewModel.loadArticle(articleId) }
 
     val article = uiState.selectedArticle
+
+    val legacyGold = colorResource(R.color.legacy_gold)
+    val accentColor = if (useOriginalColors) legacyGold else MaterialTheme.colorScheme.primary
+    val onAccentColor = if (useOriginalColors) Color.Black else MaterialTheme.colorScheme.onPrimaryContainer
+    val badgeBackground = if (useOriginalColors) accentColor.copy(alpha = 0.2f) else MaterialTheme.colorScheme.primaryContainer
 
     Scaffold(
         topBar = {
@@ -210,13 +259,13 @@ fun ArticleDetailScreen(articlesViewModel: ArticlesViewModel, articleId: Long, o
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .background(badgeBackground)
                         .padding(horizontal = 12.dp, vertical = 4.dp)
                 ) {
                     Text(
                         article.category,
                         style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                        color = if (useOriginalColors) legacyGold else onAccentColor
                     )
                 }
                 Spacer(modifier = Modifier.height(12.dp))
@@ -229,7 +278,7 @@ fun ArticleDetailScreen(articlesViewModel: ArticlesViewModel, articleId: Long, o
                 Text(
                     article.summary,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = accentColor
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 HorizontalDivider()

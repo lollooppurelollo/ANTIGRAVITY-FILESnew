@@ -40,7 +40,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import com.afa.fitadapt.R
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.afa.fitadapt.data.local.entity.CardExerciseEntity
 import com.afa.fitadapt.data.local.entity.ExerciseEntity
 
@@ -51,9 +54,11 @@ import com.afa.fitadapt.data.local.entity.ExerciseEntity
 @Composable
 fun ActiveCardScreen(
     cardViewModel: CardViewModel,
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel(),
     onExerciseClick: (exerciseId: Long, cardExerciseId: Long) -> Unit
 ) {
     val uiState by cardViewModel.cardState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
 
     if (uiState.noActiveCard) {
         // Nessuna scheda attiva
@@ -100,6 +105,7 @@ fun ActiveCardScreen(
     ) {
         // Header della scheda - Floating Gradient Card
         item {
+            val headerColor = MaterialTheme.colorScheme.primary
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -107,8 +113,8 @@ fun ActiveCardScreen(
                     .background(
                         Brush.linearGradient(
                             colors = listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                                headerColor,
+                                headerColor.copy(alpha = 0.8f)
                             )
                         ),
                         shape = RoundedCornerShape(32.dp)
@@ -119,7 +125,7 @@ fun ActiveCardScreen(
                     Text(
                         text = cardWithExercises.card.title,
                         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                        color = Color.White
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -127,14 +133,16 @@ fun ActiveCardScreen(
                             InfoChip(
                                 icon = Icons.Outlined.FitnessCenter,
                                 text = "${uiState.completedSessionsCount}/$target sessioni",
-                                isLight = true
+                                isLight = true,
+                                useOriginalColors = useOriginalColors
                             )
                         }
                         cardWithExercises.card.durationWeeks?.let { weeks ->
                             InfoChip(
                                 icon = Icons.Outlined.Timer,
                                 text = "$weeks settimane",
-                                isLight = true
+                                isLight = true,
+                                useOriginalColors = useOriginalColors
                             )
                         }
                     }
@@ -142,7 +150,7 @@ fun ActiveCardScreen(
                     Text(
                         "${cardWithExercises.cardExercises.size} esercizi in programma",
                         style = MaterialTheme.typography.labelMedium,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
                     )
                 }
             }
@@ -157,8 +165,7 @@ fun ActiveCardScreen(
             )
         }
 
-        // Lista esercizi
-        itemsIndexed(
+                itemsIndexed(
             cardWithExercises.cardExercises.sortedBy { it.orderIndex }
         ) { index, cardExercise ->
             val exercise = uiState.exerciseDetails[cardExercise.exerciseId]
@@ -167,6 +174,7 @@ fun ActiveCardScreen(
                     index = index + 1,
                     exercise = exercise,
                     cardExercise = cardExercise,
+                    useOriginalColors = useOriginalColors,
                     onClick = { onExerciseClick(exercise.id, cardExercise.id) }
                 )
             }
@@ -181,14 +189,16 @@ private fun ExerciseListItem(
     index: Int,
     exercise: ExerciseEntity,
     cardExercise: CardExerciseEntity,
+    useOriginalColors: Boolean,
     onClick: () -> Unit
 ) {
+    val accentColor = MaterialTheme.colorScheme.primary
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(2.dp),
         shape = RoundedCornerShape(24.dp)
     ) {
@@ -200,13 +210,13 @@ private fun ExerciseListItem(
             Box(
                 modifier = Modifier
                     .size(40.dp)
-                    .background(MaterialTheme.colorScheme.primaryContainer, CircleShape),
+                    .background(accentColor.copy(alpha = 0.15f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "$index",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary
+                    color = accentColor
                 )
             }
 
@@ -245,7 +255,7 @@ private fun ExerciseListItem(
             Icon(
                 Icons.Outlined.PlayArrow,
                 "Dettaglio",
-                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f),
+                tint = accentColor.copy(alpha = 0.6f),
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -256,10 +266,20 @@ private fun ExerciseListItem(
 private fun InfoChip(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     text: String,
-    isLight: Boolean = false
+    isLight: Boolean = false,
+    useOriginalColors: Boolean = false
 ) {
-    val contentColor = if (isLight) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
-    val bgColor = if (isLight) Color.White.copy(alpha = 0.15f) else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    val contentColor = if (isLight) {
+        if (useOriginalColors) Color.White else MaterialTheme.colorScheme.onPrimary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    
+    val bgColor = if (isLight) {
+        if (useOriginalColors) Color.White.copy(alpha = 0.15f) else MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.15f)
+    } else {
+        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+    }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

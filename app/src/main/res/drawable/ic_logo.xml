@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="1024"
+    android:viewportHeight="1024">
+
+    <!-- Sfondo Bianco Arrotondato (come l'immagine fornita) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M256,128h512c70.7,0 128,57.3 128,128v512c0,70.7 -57.3,128 -128,128h-512c-70.7,0 -128,-57.3 -128,-128v-512c0,-70.7 57.3,-128 128,-128z" />
+
+    <!-- Omino Dinamico KinApto -->
+    <path
+        android:pathData="M523.6,357.5c28.7,0 52,-23.3 52,-52s-23.3,-52 -52,-52s-52,23.3 -52,52S494.9,357.5 523.6,357.5z M448.8,382.7l-64.4,51.8c-9.2,8.1 -11.5,20.7 -3.5,29.9c8.1,9.2 20.7,11.5 29.9,3.5l52.9,-42.6v116.2l-78.2,163.3c-4.6,10.4 -1.2,23 9.2,28.8c10.4,4.6 23,1.2 28.8,-9.2l66.7,-139.2l28.8,59.8v185.2c0,11.5 9.2,20.7 20.7,20.7s20.7,-9.2 20.7,-20.7V661.1c0,-6.9 -3.5,-13.8 -9.2,-17.3l-51.8,-107v-109.3l52.9,42.6c9.2,8.1 23,5.8 29.9,-3.5c8.1,-9.2 5.8,-23 -3.5,-29.9l-64.4,-51.8C480.9,378.1 463.7,378.1 448.8,382.7z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="400"
+                android:startY="250"
+                android:endX="600"
+                android:endY="750"
+                android:type="linear">
+                <item android:offset="0" android:color="#00C853" />
+                <item android:offset="1" android:color="#0077FF" />
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Onda/Montagna KinApto -->
+    <path
+        android:pathData="M180,820c150,-50 280,-180 420,-220c100,-30 180,50 240,180c20,45 40,100 55,155c3,10 13,15 23,12c10,-3 15,-13 12,-23c-16,-62 -38,-123 -61,-174c-68,-148 -165,-235 -289,-198c-148,44 -285,185 -440,237c-10,3 -15,14 -12,24C140,823 169,824 180,820z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="150"
+                android:startY="750"
+                android:endX="950"
+                android:endY="750"
+                android:type="linear">
+                <item android:offset="0" android:color="#0077FF" />
+                <item android:offset="1" android:color="#00C853" />
+            </gradient>
+        </aapt:attr>
+    </path>
+</vector>

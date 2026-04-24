@@ -31,7 +31,8 @@ data class HomeUiState(
     val totalCompleted: Int = 0,
     val featuredArticle: ArticleEntity? = null,
     val activeGoals: List<GoalEntity> = emptyList(),
-    val scheduledSessions: List<ScheduledSessionEntity> = emptyList()
+    val scheduledSessions: List<ScheduledSessionEntity> = emptyList(),
+    val isMonthlyView: Boolean = false
 )
 
 /**
@@ -46,7 +47,8 @@ class HomeViewModel @Inject constructor(
     private val articleRepository: ArticleRepository,
     private val goalRepository: GoalRepository,
     private val calendarRepository: CalendarRepository,
-    private val workScheduler: WorkScheduler
+    private val workScheduler: WorkScheduler,
+    private val userPreferences: com.afa.fitadapt.data.local.datastore.UserPreferences
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -102,8 +104,21 @@ class HomeViewModel @Inject constructor(
         // Calendario
         viewModelScope.launch {
             calendarRepository.getAllScheduled().collect { scheduled ->
-                _uiState.update { it.copy(scheduledSessions = scheduled, isLoading = false) }
+                _uiState.update { it.copy(scheduledSessions = scheduled) }
             }
+        }
+        
+        // Vista calendario salvata
+        viewModelScope.launch {
+            userPreferences.calendarMonthlyView.collect { isMonthly ->
+                _uiState.update { it.copy(isMonthlyView = isMonthly, isLoading = false) }
+            }
+        }
+    }
+
+    fun setCalendarView(isMonthly: Boolean) {
+        viewModelScope.launch {
+            userPreferences.setCalendarMonthlyView(isMonthly)
         }
     }
 

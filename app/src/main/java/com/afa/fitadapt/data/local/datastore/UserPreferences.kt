@@ -60,6 +60,8 @@ class UserPreferences @Inject constructor(
         val FIRST_SETUP_COMPLETED = booleanPreferencesKey("first_setup_completed")
         val BIOMETRICS_ENABLED = booleanPreferencesKey("biometrics_enabled")
         val APP_THEME = intPreferencesKey("app_theme")
+        val USE_ORIGINAL_COLORS = booleanPreferencesKey("use_original_colors")
+        val CALENDAR_MONTHLY_VIEW = booleanPreferencesKey("calendar_monthly_view")
 
         // ── Valori predefiniti ──
         const val DEFAULT_NOTIFICATION_HOUR = 9
@@ -70,6 +72,10 @@ class UserPreferences @Inject constructor(
     // ══════════════════════════════════════════════════════════
     // LETTURA (Flow — si aggiornano automaticamente)
     // ══════════════════════════════════════════════════════════
+
+    /** Vista calendario (mensile se true, settimanale se false) */
+    val calendarMonthlyView: Flow<Boolean> = context.userSettingsDataStore.data
+        .map { it[CALENDAR_MONTHLY_VIEW] ?: false }
 
     /** Tema dell'app selezionato */
     val appTheme: Flow<Int> = context.userSettingsDataStore.data
@@ -99,6 +105,10 @@ class UserPreferences @Inject constructor(
     /** Se l'autenticazione biometrica è attiva */
     val biometricsEnabled: Flow<Boolean> = context.userSettingsDataStore.data
         .map { it[BIOMETRICS_ENABLED] ?: true }
+
+    /** Se usare i colori originali per icone e riquadri allenamento */
+    val useOriginalColors: Flow<Boolean> = context.userSettingsDataStore.data
+        .map { it[USE_ORIGINAL_COLORS] ?: false }
 
     // ══════════════════════════════════════════════════════════
     // LETTURA SINCRONA (per controlli all'avvio)
@@ -160,5 +170,15 @@ class UserPreferences @Inject constructor(
     /** Imposta il tema dell'app */
     suspend fun setAppTheme(themeOrdinal: Int) {
         context.userSettingsDataStore.edit { it[APP_THEME] = themeOrdinal }
+    }
+
+    /** Imposta se usare i colori originali */
+    suspend fun setUseOriginalColors(enabled: Boolean) {
+        context.userSettingsDataStore.edit { it[USE_ORIGINAL_COLORS] = enabled }
+    }
+
+    /** Imposta la vista calendario predefinita */
+    suspend fun setCalendarMonthlyView(isMonthly: Boolean) {
+        context.userSettingsDataStore.edit { it[CALENDAR_MONTHLY_VIEW] = isMonthly }
     }
 }

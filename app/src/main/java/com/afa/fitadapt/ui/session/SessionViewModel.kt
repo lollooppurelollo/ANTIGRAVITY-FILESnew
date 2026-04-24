@@ -49,6 +49,7 @@ data class SessionUiState(
     // Checklist esercizi (per sessioni parziali)
     val exerciseChecklist: Map<Long, Boolean> = emptyMap(),
 
+    val selectedDate: Long = System.currentTimeMillis(),
     val isSubmitting: Boolean = false,
     val noActiveCard: Boolean = false
 )
@@ -128,7 +129,7 @@ class SessionViewModel @Inject constructor(
             sessionRepository.registerSession(
                 SessionEntity(
                     cardId = cardId,
-                    date = System.currentTimeMillis(),
+                    date = _uiState.value.selectedDate,
                     completed = false,
                     notes = _uiState.value.notes.ifBlank { null }
                 )
@@ -159,6 +160,10 @@ class SessionViewModel @Inject constructor(
         _uiState.update { it.copy(notes = text) }
     }
 
+    fun updateDate(timestamp: Long) {
+        _uiState.update { it.copy(selectedDate = timestamp) }
+    }
+
     fun toggleExercise(cardExerciseId: Long) {
         _uiState.update {
             val updated = it.exerciseChecklist.toMutableMap()
@@ -178,7 +183,7 @@ class SessionViewModel @Inject constructor(
         viewModelScope.launch {
             val session = SessionEntity(
                 cardId = cardId,
-                date = System.currentTimeMillis(),
+                date = state.selectedDate,
                 completed = state.completed,
                 partial = state.partial,
                 actualDurationMin = state.durationMin,
@@ -241,6 +246,7 @@ class SessionViewModel @Inject constructor(
                 mood = null,
                 sleepQuality = null,
                 notes = "",
+                selectedDate = System.currentTimeMillis(),
                 isSubmitting = false
             )
         }

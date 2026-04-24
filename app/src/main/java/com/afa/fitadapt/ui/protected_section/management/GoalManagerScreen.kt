@@ -69,7 +69,10 @@ fun GoalManagerScreen(
 
             if (uiState.goals.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Nessun obiettivo impostato", color = Color.Gray)
+                    Text(
+                        "Nessun obiettivo impostato",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -85,7 +88,6 @@ fun GoalManagerScreen(
             }
         }
     }
-// ... rest of the file ...
 
     if (showDeleteDialog != null) {
         AlertDialog(
@@ -96,7 +98,7 @@ fun GoalManagerScreen(
                 TextButton(onClick = { 
                     showDeleteDialog?.let { viewModel.deleteGoal(it) }
                     showDeleteDialog = null
-                }) { Text("Elimina", color = Color.Red) }
+                }) { Text("Elimina", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = null }) { Text("Annulla") }
@@ -132,10 +134,10 @@ fun GoalListItem(goal: GoalEntity, onDelete: () -> Unit, onToggleActive: () -> U
                     goal.silverValue?.let { "S: ${it.toInt()}" },
                     goal.goldValue?.let { "G: ${it.toInt()}" }
                 ).joinToString(" | ")
-                Text("${goal.targetType} ($thresholds)", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+                Text("${goal.targetType} ($thresholds)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Switch(checked = goal.isActive, onCheckedChange = { onToggleActive() })
-            IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Elimina", tint = Color.Red.copy(alpha = 0.6f)) }
+            IconButton(onClick = onDelete) { Icon(Icons.Default.Delete, "Elimina", tint = MaterialTheme.colorScheme.error.copy(alpha = 0.6f)) }
         }
     }
 }

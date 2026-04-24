@@ -55,6 +55,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import com.afa.fitadapt.data.local.entity.SessionEntity
 import java.text.SimpleDateFormat
@@ -66,8 +67,14 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProgressScreen(progressViewModel: ProgressViewModel) {
+fun ProgressScreen(
+    progressViewModel: ProgressViewModel,
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel()
+) {
     val uiState by progressViewModel.uiState.collectAsState()
+    val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
+
+    val headerColor = MaterialTheme.colorScheme.primary
 
     Column(
         modifier = Modifier
@@ -83,8 +90,8 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                 .background(
                     Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                            headerColor,
+                            headerColor.copy(alpha = 0.8f)
                         )
                     ),
                     shape = RoundedCornerShape(32.dp)
@@ -161,6 +168,8 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Statistiche griglia
+        val streakColor = if (useOriginalColors) Color(0xFF42A5F5) else MaterialTheme.colorScheme.tertiary
+        val recordColor = if (useOriginalColors) Color(0xFFFBC02D) else MaterialTheme.colorScheme.secondary
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -172,27 +181,28 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                 icon = Icons.Outlined.LocalFireDepartment,
                 value = "${uiState.currentStreak}",
                 label = "Streak attuale",
-                color = MaterialTheme.colorScheme.tertiary
+                color = streakColor
             )
             StatCard(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Outlined.EmojiEvents,
                 value = "${uiState.longestStreak}",
                 label = "Record personale",
-                color = MaterialTheme.colorScheme.secondary
+                color = recordColor
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Card Sessioni Totali (Unificata)
+        val activityColor = MaterialTheme.colorScheme.primary
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(
-                    alpha = 0.4f
+                containerColor = activityColor.copy(
+                    alpha = 0.08f
                 )
             ),
             shape = RoundedCornerShape(24.dp)
@@ -205,14 +215,14 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                     Icon(
                         Icons.Outlined.FitnessCenter,
                         null,
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = activityColor,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         "Attività totale",
                         style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                        color = MaterialTheme.colorScheme.primary
+                        color = activityColor
                     )
                 }
                 Text(
@@ -244,13 +254,13 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                         modifier = Modifier
                             .width(1.dp)
                             .height(32.dp)
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
+                            .background(activityColor.copy(alpha = 0.1f))
                     )
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             "${uiState.partialSessions}",
                             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.primary
+                            color = activityColor
                         )
                         Text(
                             "Sess. Parziali",
@@ -264,6 +274,7 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        val minutesColor = MaterialTheme.colorScheme.primary
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -275,7 +286,7 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                 icon = Icons.Outlined.Timer,
                 value = "${uiState.totalMinutes}",
                 label = "Minuti totali",
-                color = MaterialTheme.colorScheme.primary
+                color = minutesColor
             )
             Spacer(modifier = Modifier.weight(1f))
         }
@@ -316,13 +327,15 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                     else -> goal.goldValue ?: goal.silverValue ?: goal.targetValue
                 }
                 val medalLabel = when {
-                    goal.currentValue < goal.targetValue -> "Target: Bronze"
-                    goal.silverValue != null && goal.currentValue < goal.silverValue -> "Target: Silver"
-                    goal.goldValue != null && goal.currentValue < goal.goldValue -> "Target: Gold"
+                    goal.currentValue < goal.targetValue -> "Target: Bronzo"
+                    goal.silverValue != null && goal.currentValue < goal.silverValue -> "Target: Argento"
+                    goal.goldValue != null && goal.currentValue < goal.goldValue -> "Target: Oro"
                     else -> "Obiettivo completato! 🏆"
                 }
                 val progress =
                     if (nextTarget > 0) (goal.currentValue / nextTarget).coerceIn(0f, 1f) else 0f
+
+                val currentGoalAccentColor = MaterialTheme.colorScheme.primary
 
                 Card(
                     modifier = Modifier
@@ -342,14 +355,30 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                                     style = MaterialTheme.typography.titleSmall,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
-                                Text(
-                                    medalLabel,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Text(
+                                        medalLabel,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = currentGoalAccentColor
+                                    )
+                                    if (goal.currentValue >= goal.targetValue) {
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        val reachedText = when {
+                                            goal.goldValue != null && goal.currentValue >= goal.goldValue -> "Traguardi: 🥉 🥈 🥇"
+                                            goal.silverValue != null && goal.currentValue >= goal.silverValue -> "Traguardi: 🥉 🥈"
+                                            goal.currentValue >= goal.targetValue -> "Traguardi: 🥉"
+                                            else -> ""
+                                        }
+                                        Text(
+                                            reachedText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                                        )
+                                    }
+                                }
                             }
                             val colorProgress =
-                                if (progress >= 1f) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+                                if (useOriginalColors) Color.Black else (if (progress >= 1f) MaterialTheme.colorScheme.secondary else currentGoalAccentColor)
                             Text(
                                 "${(progress * 100).toInt()}%",
                                 style = MaterialTheme.typography.titleSmall,
@@ -358,15 +387,16 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
                             )
                         }
                         Spacer(modifier = Modifier.height(8.dp))
+                        val progressColor = if (progress >= 1f) MaterialTheme.colorScheme.secondary else currentGoalAccentColor
                         LinearProgressIndicator(
                             progress = { progress },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp)),
-                            color = if (progress >= 1f) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            strokeCap = StrokeCap.Round,
+                            color = progressColor,
+                            trackColor = currentGoalAccentColor.copy(alpha = 0.1f),
+                            strokeCap = StrokeCap.Round
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -383,7 +413,6 @@ fun ProgressScreen(progressViewModel: ProgressViewModel) {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TrendChartCard(
     title: String,
@@ -401,6 +430,15 @@ private fun TrendChartCard(
     var showPain by remember { mutableStateOf(true) }
     var showRestDyspnea by remember { mutableStateOf(false) }
     var showExertionDyspnea by remember { mutableStateOf(false) }
+
+    // Colori fissi per i parametri (per coerenza con i grafici medici)
+    val colorAsthenia = Color(0xFFE7D3A3) // Gold
+    val colorPain = Color(0xFFA67C52) // Brown
+    val colorDyspneaRest = Color(0xFF66BB6A) // Green
+    val colorDyspneaExertion = Color(0xFFFFA726) // Orange
+    val colorEffort = Color(0xFFEF5350) // Red
+    val colorMood = Color(0xFF42A5F5) // Blue
+    val colorSleep = Color(0xFF7E57C2) // Purple
 
     // Unifichiamo i dati per asse X (date)
     val allDates = (completedSessions.map { it.date } + scaleEntries.map { it.date })
@@ -446,40 +484,17 @@ private fun TrendChartCard(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    FilterChip(
+                    SmallFilterChip(
                         selected = showAsthenia,
-                        onClick = { showAsthenia = !showAsthenia },
-                        label = { Text("Astenia", fontSize = 10.sp) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            selectedLabelColor = MaterialTheme.colorScheme.primary
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected = showAsthenia,
-                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                            selectedBorderColor = MaterialTheme.colorScheme.primary
-                        ),
-                        modifier = Modifier.height(32.dp)
-                    )
-                    FilterChip(
+                        label = "Astenia",
+                        color = colorAsthenia,
+                        onClick = { showAsthenia = !showAsthenia })
+                    SmallFilterChip(
                         selected = showPain,
-                        onClick = { showPain = !showPain },
-                        label = { Text("Dolore", fontSize = 10.sp) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
-                            selectedLabelColor = MaterialTheme.colorScheme.tertiary
-                        ),
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected = showPain,
-                            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                            selectedBorderColor = MaterialTheme.colorScheme.tertiary
-                        ),
-                        modifier = Modifier.height(32.dp)
-                    )
+                        label = "Dolore",
+                        color = colorPain,
+                        onClick = { showPain = !showPain })
                 }
-                // ... (simplified chip style for others)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -487,20 +502,38 @@ private fun TrendChartCard(
                     SmallFilterChip(
                         selected = showRestDyspnea,
                         label = "Dispnea Riposo",
+                        color = colorDyspneaRest,
                         onClick = { showRestDyspnea = !showRestDyspnea })
                     SmallFilterChip(
                         selected = showExertionDyspnea,
                         label = "Dispnea Sforzo",
+                        color = colorDyspneaExertion,
                         onClick = { showExertionDyspnea = !showExertionDyspnea })
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SmallFilterChip(
+                        selected = showEffort,
+                        label = "Fatica",
+                        color = colorEffort,
+                        onClick = { showEffort = !showEffort })
+                    SmallFilterChip(
+                        selected = showMood,
+                        label = "Umore",
+                        color = colorMood,
+                        onClick = { showMood = !showMood })
+                    SmallFilterChip(
+                        selected = showSleep,
+                        label = "Sonno",
+                        color = colorSleep,
+                        onClick = { showSleep = !showSleep })
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            val primaryColor = MaterialTheme.colorScheme.primary
-            val tertiaryColor = MaterialTheme.colorScheme.tertiary
-            val secondaryColor = MaterialTheme.colorScheme.secondary
-            val errorColor = MaterialTheme.colorScheme.error
             val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
 
             Row(
@@ -571,7 +604,7 @@ private fun TrendChartCard(
                                 }
                                 s?.perceivedEffort?.let { i to it.toFloat() }
                             }
-                            drawTrendLine(pts, errorColor)
+                            drawTrendLine(pts, colorEffort)
                         }
                         if (showMood) {
                             val pts = allDates.mapIndexedNotNull { i, d ->
@@ -583,7 +616,7 @@ private fun TrendChartCard(
                                 }
                                 s?.mood?.let { i to it.toFloat() }
                             }
-                            drawTrendLine(pts, secondaryColor)
+                            drawTrendLine(pts, colorMood)
                         }
                         if (showAsthenia) {
                             val pts = allDates.mapIndexedNotNull { i, d ->
@@ -595,7 +628,7 @@ private fun TrendChartCard(
                                 }
                                 e?.asthenia?.let { i to it.toFloat() }
                             }
-                            drawTrendLine(pts, primaryColor)
+                            drawTrendLine(pts, colorAsthenia)
                         }
                         if (showPain) {
                             val pts = allDates.mapIndexedNotNull { i, d ->
@@ -607,7 +640,7 @@ private fun TrendChartCard(
                                 }
                                 e?.osteoarticularPain?.let { i to it.toFloat() }
                             }
-                            drawTrendLine(pts, tertiaryColor)
+                            drawTrendLine(pts, colorPain)
                         }
                         if (showRestDyspnea) {
                             val pts = allDates.mapIndexedNotNull { i, d ->
@@ -619,7 +652,7 @@ private fun TrendChartCard(
                                 }
                                 e?.restDyspnea?.let { i to it.toFloat() }
                             }
-                            drawTrendLine(pts, Color.Cyan)
+                            if (pts.isNotEmpty()) drawTrendLine(pts, colorDyspneaRest)
                         }
                         if (showExertionDyspnea) {
                             val pts = allDates.mapIndexedNotNull { i, d ->
@@ -631,7 +664,7 @@ private fun TrendChartCard(
                                 }
                                 e?.exertionDyspnea?.let { i to it.toFloat() }
                             }
-                            drawTrendLine(pts, Color.Magenta)
+                            if (pts.isNotEmpty()) drawTrendLine(pts, colorDyspneaExertion)
                         }
                         if (showSleep) {
                             val pts = allDates.mapIndexedNotNull { i, d ->
@@ -643,7 +676,7 @@ private fun TrendChartCard(
                                 }
                                 s?.sleepQuality?.let { i to it.toFloat() }
                             }
-                            drawTrendLine(pts, Color.Gray)
+                            drawTrendLine(pts, colorSleep)
                         }
                     }
                 }
@@ -678,17 +711,17 @@ private fun TrendChartCard(
             // Legenda dinamica
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (showAsthenia) LegendItem("Astenia", primaryColor)
-                    if (showPain) LegendItem("Dolore", tertiaryColor)
+                    if (showAsthenia) LegendItem("Astenia", colorAsthenia)
+                    if (showPain) LegendItem("Dolore", colorPain)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (showRestDyspnea) LegendItem("Dispnea a riposo", Color.Cyan)
-                    if (showExertionDyspnea) LegendItem("Dispnea a sforzi minimi", Color.Magenta)
+                    if (showRestDyspnea) LegendItem("Dispnea a riposo", colorDyspneaRest)
+                    if (showExertionDyspnea) LegendItem("Dispnea a sforzi minimi", colorDyspneaExertion)
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (showEffort) LegendItem("Fatica Sessione", errorColor)
-                    if (showMood) LegendItem("Umore", secondaryColor)
-                    if (showSleep) LegendItem("Qualità sonno", Color.Gray)
+                    if (showEffort) LegendItem("Fatica Sessione", colorEffort)
+                    if (showMood) LegendItem("Umore", colorMood)
+                    if (showSleep) LegendItem("Qualità sonno", colorSleep)
                 }
             }
         }
@@ -696,20 +729,22 @@ private fun TrendChartCard(
 }
 
 @Composable
-private fun SmallFilterChip(selected: Boolean, label: String, onClick: () -> Unit) {
+private fun SmallFilterChip(selected: Boolean, label: String, color: Color, onClick: () -> Unit) {
     FilterChip(
         selected = selected,
         onClick = onClick,
         label = { Text(label, fontSize = 10.sp) },
         colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
-            selectedLabelColor = MaterialTheme.colorScheme.onSurface
+            selectedContainerColor = color,
+            selectedLabelColor = Color.White,
+            containerColor = MaterialTheme.colorScheme.surface,
+            labelColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),
         border = FilterChipDefaults.filterChipBorder(
             enabled = true,
             selected = selected,
-            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-            selectedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+            borderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+            selectedBorderColor = color
         ),
         modifier = Modifier.height(32.dp)
     )

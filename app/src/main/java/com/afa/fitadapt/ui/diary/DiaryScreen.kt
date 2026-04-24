@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -226,8 +227,9 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                        shape = RoundedCornerShape(16.dp)
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        shape = RoundedCornerShape(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             val titleText = remember(uiState.editingDiaryEntry, uiState.editingScaleEntry) {
@@ -396,14 +398,41 @@ private fun ScaleSlider(label: String, value: Float, onValueChange: (Float) -> U
             Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface)
             Text("${value.toInt()}/10", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         }
-        Slider(value = value, onValueChange = onValueChange, valueRange = 0f..10f, steps = 9)
+                            Slider(
+                                value = value, 
+                                onValueChange = onValueChange, 
+                                valueRange = 0f..10f, 
+                                steps = 9,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = MaterialTheme.colorScheme.primary,
+                                    activeTrackColor = MaterialTheme.colorScheme.primary,
+                                    inactiveTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.24f),
+                                    activeTickColor = Color.Transparent,
+                                    inactiveTickColor = Color.Transparent
+                                )
+                            )
     }
 }
 
 @Composable
 private fun ScaleBadge(label: String, value: Int) {
+    val themePrimary = MaterialTheme.colorScheme.primary
+    val themeOnSurface = MaterialTheme.colorScheme.onSurface
+    
+    // Check if the primary color is "red-like" (very simple heuristic)
+    // In a real app we might check the theme name or specific palette tokens
+    val isRedTheme = themePrimary.red > 0.7f && themePrimary.green < 0.4f && themePrimary.blue < 0.4f
+
+    val valueColor = when {
+        value >= 7 -> MaterialTheme.colorScheme.error
+        value <= 6 -> {
+            if (isRedTheme) themeOnSurface else themePrimary
+        }
+        else -> themePrimary
+    }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text("$value", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = when { value <= 3 -> MaterialTheme.colorScheme.secondary; value <= 6 -> MaterialTheme.colorScheme.primary; else -> MaterialTheme.colorScheme.error })
+        Text("$value", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = valueColor)
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

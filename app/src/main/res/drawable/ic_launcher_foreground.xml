@@ -1,19 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Icona in primo piano — lettera "A" stilizzata in blu navy.
-    Placeholder: sostituire con il logo definitivo tramite Android Studio > Image Asset Studio.
--->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <!-- Lettera A stilizzata -->
+
+    <!-- Omino che corre con gradiente (stilizzato KinApto) -->
     <path
-        android:fillColor="#1B3A5C"
-        android:pathData="M54,28 L36,80 L44,80 L48,68 L60,68 L64,80 L72,80 Z M54,42 L58,60 L50,60 Z" />
-    <!-- Piccolo cuore/salute sotto la A -->
+        android:pathData="M52.3,31.2c2.5,0,4.5-2,4.5-4.5s-2-4.5-4.5-4.5s-4.5,2-4.5,4.5S49.8,31.2,52.3,31.2z M45.8,33.4l-5.6,4.5c-0.8,0.7-1,1.8-0.3,2.6c0.7,0.8,1.8,1,2.6,0.3l4.6-3.7v10.1l-6.8,14.2c-0.4,0.9-0.1,2,0.8,2.5c0.9,0.4,2,0.1,2.5-0.8l5.8-12.1l2.5,5.2v16.1c0,1,0.8,1.8,1.8,1.8s1.8-0.8,1.8-1.8V57.6c0-0.6-0.3-1.2-0.8-1.5l-4.5-9.3v-9.5l4.6,3.7c0.8,0.7,2,0.5,2.6-0.3c0.7-0.8,0.5-2-0.3-2.6l-5.6-4.5C48.6,33,47.1,33,45.8,33.4z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="40.2"
+                android:startY="22.2"
+                android:endX="60.2"
+                android:endY="75.2"
+                android:type="linear">
+                <item android:offset="0" android:color="#00C853" /> <!-- Verde -->
+                <item android:offset="1" android:color="#0077FF" /> <!-- Blu -->
+            </gradient>
+        </aapt:attr>
+    </path>
+
+    <!-- Montagna/Onda con gradiente -->
     <path
-        android:fillColor="#4A90D9"
-        android:pathData="M54,84 C54,84 48,80 48,77 C48,75 50,74 52,74 C53,74 54,75 54,75 C54,75 55,74 56,74 C58,74 60,75 60,77 C60,80 54,84 54,84 Z" />
+        android:pathData="M23,78.5c15,-5 28,-18 42,-22c10,-3 18,5 24,18c2,4.5 4,10 5.5,15.5c0.3,1 1.3,1.5 2.3,1.2c1,-0.3 1.5,-1.3 1.2,-2.3c-1.6,-6.2-3.8,-12.3-6.1,-17.4c-6.8,-14.8-16.5,-23.5-28.9,-19.8c-14.8,4.4-28.5,18.5-44,23.7c-1,0.3-1.5,1.4-1.2,2.4C19.1,78.8 21.9,78.9 23,78.5z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:startX="20"
+                android:startY="70"
+                android:endX="90"
+                android:endY="70"
+                android:type="linear">
+                <item android:offset="0" android:color="#0077FF" /> <!-- Blu -->
+                <item android:offset="1" android:color="#00C853" /> <!-- Verde -->
+            </gradient>
+        </aapt:attr>
+    </path>
 </vector>

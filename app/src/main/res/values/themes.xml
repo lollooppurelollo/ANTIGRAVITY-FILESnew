@@ -7,6 +7,7 @@
 <resources>
     <style name="Theme.AFA" parent="android:Theme.Material.Light.NoActionBar">
         <!-- Sfondo della finestra durante il caricamento -->
-        <item name="android:windowBackground">@color/background</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
     </style>
 </resources>

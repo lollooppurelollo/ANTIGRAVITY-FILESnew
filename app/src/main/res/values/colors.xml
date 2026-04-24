@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- AFA - Colori base per risorse XML (il tema Compose usa i propri) -->
 <resources>
-    <color name="primary">#1B3A5C</color>
-    <color name="primary_container">#DCEEFB</color>
-    <color name="secondary">#4A90D9</color>
-    <color name="background">#F0F5FA</color>
-    <color name="surface">#FAFCFE</color>
+    <color name="primary">#00A3FF</color>
+    <color name="primary_container">#E0F3FF</color>
+    <color name="secondary">#2E7D32</color>
+    <color name="background">#F5F9FF</color>
+    <color name="surface">#FFFFFF</color>
     <color name="white">#FFFFFF</color>
     <color name="success">#4CAF7D</color>
     <color name="warning">#F5A623</color>
     <color name="error">#D9534F</color>
+
+    <!-- Legacy Palette for "Original Colors" mode -->
+    <color name="legacy_purple">#7B1FA2</color>
+    <color name="legacy_gold">#FBC02D</color>
+    <color name="legacy_green">#2E7D32</color>
+    <color name="legacy_blue">#1976D2</color>
+    <color name="legacy_red">#D32F2F</color>
 </resources>
