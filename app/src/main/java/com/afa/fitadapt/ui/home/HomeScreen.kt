@@ -123,7 +123,7 @@ fun HomeScreen(
         ) {
             Column {
                 Text(
-                    text = "Buongiorno! 👋",
+                    text = "Buongiorno!",
                     style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                     color = Color.White
                 )

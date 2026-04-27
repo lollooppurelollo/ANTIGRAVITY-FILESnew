@@ -189,7 +189,12 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
 
             composable(Screen.Progress.route) {
                 val progressViewModel: ProgressViewModel = hiltViewModel()
-                ProgressScreen(progressViewModel = progressViewModel)
+                ProgressScreen(
+                    progressViewModel = progressViewModel,
+                    onNavigateToHistory = {
+                        navController.navigate(Screen.SessionHistory.route)
+                    }
+                )
             }
 
             composable(Screen.More.route) {

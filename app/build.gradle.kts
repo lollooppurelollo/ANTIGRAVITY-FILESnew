@@ -138,6 +138,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
     // ══════════════════════════════════════════════════════════
+    // 3D VIEWER (per avatar animati)
+    // ══════════════════════════════════════════════════════════
+    implementation("io.github.sceneview:sceneview:2.2.1")
+
+    // ══════════════════════════════════════════════════════════
     // CORE ANDROID
     // ══════════════════════════════════════════════════════════
     implementation("androidx.core:core-ktx:1.16.0")

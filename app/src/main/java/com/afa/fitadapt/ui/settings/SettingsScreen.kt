@@ -45,7 +45,8 @@ data class SettingsUiState(
     val notificationMinute: Int = 0,
     val biometricsEnabled: Boolean = true,
     val motivationalEnabled: Boolean = true,
-    val useOriginalColors: Boolean = false
+    val useOriginalColors: Boolean = false,
+    val guidedTrainingMode: Boolean = false
 )
 
 @HiltViewModel
@@ -63,6 +64,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { userPreferences.biometricsEnabled.collect { v -> _uiState.update { it.copy(biometricsEnabled = v) } } }
         viewModelScope.launch { userPreferences.motivationalMessagesEnabled.collect { v -> _uiState.update { it.copy(motivationalEnabled = v) } } }
         viewModelScope.launch { userPreferences.useOriginalColors.collect { v -> _uiState.update { it.copy(useOriginalColors = v) } } }
+        viewModelScope.launch { userPreferences.guidedTrainingMode.collect { v -> _uiState.update { it.copy(guidedTrainingMode = v) } } }
     }
 
     fun toggleNotifications(enabled: Boolean) {
@@ -79,6 +81,8 @@ class SettingsViewModel @Inject constructor(
     fun toggleBiometrics(enabled: Boolean) { viewModelScope.launch { userPreferences.setBiometricsEnabled(enabled) } }
 
     fun toggleOriginalColors(enabled: Boolean) { viewModelScope.launch { userPreferences.setUseOriginalColors(enabled) } }
+
+    fun toggleGuidedTrainingMode(enabled: Boolean) { viewModelScope.launch { userPreferences.setGuidedTrainingMode(enabled) } }
 
     fun toggleMotivational(enabled: Boolean) {
         viewModelScope.launch {
@@ -170,6 +174,14 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel, onBack: () -> Unit) {
                     SettingSwitch("Colori originali (icone e schede)", uiState.useOriginalColors) { settingsViewModel.toggleOriginalColors(it) }
                     Text(
                         "Usa i colori originali per le icone e i riquadri di allenamento invece del colore del tema scelto.",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                    SettingSwitch("Modalità allenamento guidato", uiState.guidedTrainingMode) { settingsViewModel.toggleGuidedTrainingMode(it) }
+                    Text(
+                        "Mostra gli esercizi uno sotto l'altro con timer integrato invece della visualizzazione a schede singole.",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp)

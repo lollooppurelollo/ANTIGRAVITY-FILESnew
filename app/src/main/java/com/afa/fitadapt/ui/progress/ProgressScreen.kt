@@ -6,6 +6,7 @@ package com.afa.fitadapt.ui.progress
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.afa.fitadapt.ui.components.AnimatedAvatar
 import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import com.afa.fitadapt.data.local.entity.SessionEntity
 import java.text.SimpleDateFormat
@@ -69,7 +71,8 @@ import java.util.Locale
 @Composable
 fun ProgressScreen(
     progressViewModel: ProgressViewModel,
-    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel()
+    themeViewModel: com.afa.fitadapt.ui.theme.ThemeViewModel = hiltViewModel(),
+    onNavigateToHistory: () -> Unit
 ) {
     val uiState by progressViewModel.uiState.collectAsState()
     val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
@@ -98,18 +101,32 @@ fun ProgressScreen(
                 )
                 .padding(24.dp)
         ) {
-            Column {
-                Text(
-                    "I tuoi progressi",
-                    style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "Monitora il tuo percorso di salute",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        "I tuoi progressi",
+                        style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        "Monitora il tuo percorso di salute",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
+                
+                // Avatar festoso
+                Box(modifier = Modifier.size(100.dp)) {
+                    AnimatedAvatar(
+                        exerciseName = "vittoria",
+                        category = "SUCCESS",
+                        isRunning = true
+                    )
+                }
             }
         }
 
@@ -180,7 +197,7 @@ fun ProgressScreen(
                 modifier = Modifier.weight(1f),
                 icon = Icons.Outlined.LocalFireDepartment,
                 value = "${uiState.currentStreak}",
-                label = "Streak attuale",
+                label = "Giorni Consecutivi",
                 color = streakColor
             )
             StatCard(
@@ -199,7 +216,8 @@ fun ProgressScreen(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .clickable { onNavigateToHistory() },
             colors = CardDefaults.cardColors(
                 containerColor = activityColor.copy(
                     alpha = 0.08f
@@ -305,6 +323,7 @@ fun ProgressScreen(
             title = "Dati biometrici e percezione",
             sessions = uiState.recentSessions.reversed(),
             scaleEntries = uiState.scaleEntries.sortedBy { it.date },
+            useOriginalColors = useOriginalColors,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
 
@@ -418,6 +437,7 @@ private fun TrendChartCard(
     title: String,
     sessions: List<SessionEntity>,
     scaleEntries: List<ScaleEntryEntity>,
+    useOriginalColors: Boolean,
     modifier: Modifier = Modifier
 ) {
     val completedSessions = sessions.filter { it.completed }
@@ -432,13 +452,13 @@ private fun TrendChartCard(
     var showExertionDyspnea by remember { mutableStateOf(false) }
 
     // Colori fissi per i parametri (per coerenza con i grafici medici)
-    val colorAsthenia = Color(0xFFE7D3A3) // Gold
-    val colorPain = Color(0xFFA67C52) // Brown
-    val colorDyspneaRest = Color(0xFF66BB6A) // Green
-    val colorDyspneaExertion = Color(0xFFFFA726) // Orange
-    val colorEffort = Color(0xFFEF5350) // Red
-    val colorMood = Color(0xFF42A5F5) // Blue
-    val colorSleep = Color(0xFF7E57C2) // Purple
+    val colorAsthenia = if (useOriginalColors) Color(0xFF00E5FF) else Color(0xFFE7D3A3) // Cyan vivace
+    val colorPain = if (useOriginalColors) Color(0xFFFF1744) else Color(0xFFA67C52) // Rosso vivace
+    val colorDyspneaRest = if (useOriginalColors) Color(0xFF00E676) else Color(0xFF66BB6A) // Verde vivace
+    val colorDyspneaExertion = if (useOriginalColors) Color(0xFFFF9100) else Color(0xFFFFA726) // Arancione vivace
+    val colorEffort = if (useOriginalColors) Color(0xFF2979FF) else Color(0xFFEF5350) // Blu vivace
+    val colorMood = if (useOriginalColors) Color(0xFFFFEA00) else Color(0xFF42A5F5) // Giallo vivace
+    val colorSleep = if (useOriginalColors) Color(0xFFAA00FF) else Color(0xFF7E57C2) // Viola vivace
 
     // Unifichiamo i dati per asse X (date)
     val allDates = (completedSessions.map { it.date } + scaleEntries.map { it.date })
@@ -709,19 +729,28 @@ private fun TrendChartCard(
 
             Spacer(modifier = Modifier.height(16.dp))
             // Legenda dinamica
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (showAsthenia) LegendItem("Astenia", colorAsthenia)
-                    if (showPain) LegendItem("Dolore", colorPain)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (showRestDyspnea) LegendItem("Dispnea a riposo", colorDyspneaRest)
-                    if (showExertionDyspnea) LegendItem("Dispnea a sforzi minimi", colorDyspneaExertion)
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    if (showEffort) LegendItem("Fatica Sessione", colorEffort)
-                    if (showMood) LegendItem("Umore", colorMood)
-                    if (showSleep) LegendItem("Qualità sonno", colorSleep)
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                val legendItems = listOfNotNull(
+                    if (showAsthenia) "Astenia" to colorAsthenia else null,
+                    if (showPain) "Dolore" to colorPain else null,
+                    if (showRestDyspnea) "Dispnea Riposo" to colorDyspneaRest else null,
+                    if (showExertionDyspnea) "Dispnea Sforzo" to colorDyspneaExertion else null,
+                    if (showEffort) "Fatica" to colorEffort else null,
+                    if (showMood) "Umore" to colorMood else null,
+                    if (showSleep) "Sonno" to colorSleep else null
+                )
+
+                legendItems.chunked(2).forEach { rowItems ->
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        rowItems.forEach { (label, color) ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                LegendItem(label, color)
+                            }
+                        }
+                        if (rowItems.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
                 }
             }
         }

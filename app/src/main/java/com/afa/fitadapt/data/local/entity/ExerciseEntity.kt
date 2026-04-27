@@ -36,6 +36,16 @@ data class ExerciseEntity(
 
     val videoUri: String? = null,
 
+    val modelAssetPath: String = "models/avatar_fitness.glb",
+
+    val animationAssetPath: String? = null,
+
+    val animationName: String? = null,
+
+    val movementInstructions: String = "",
+
+    val commonErrors: String = "", // Salvati come stringa separata da virgole o JSON
+
     val defaultDurationSec: Int? = null,
 
     val defaultRepetitions: Int? = null,

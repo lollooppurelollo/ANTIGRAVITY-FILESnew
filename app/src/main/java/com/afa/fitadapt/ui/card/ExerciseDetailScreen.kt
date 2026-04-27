@@ -47,8 +47,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.afa.fitadapt.ui.components.Avatar3DViewer
 import com.afa.fitadapt.ui.components.VideoPlayer
 import com.afa.fitadapt.ui.theme.ThemeViewModel
+import com.afa.fitadapt.model.ExerciseAnimationMap
 
 /**
  * Dettaglio di un singolo esercizio.
@@ -145,18 +147,25 @@ fun ExerciseDetailScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                Icons.Outlined.Videocam,
-                                "Video",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                                modifier = Modifier.size(48.dp)
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                        Avatar3DViewer(
+                            modelPath = exercise.modelAssetPath,
+                            animationPath = exercise.animationAssetPath ?: ExerciseAnimationMap.getAnimationPath(exercise.animationName ?: exercise.name),
+                            animationName = exercise.animationName,
+                            isPlaying = true,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        // Overlay testo opzionale per chiarezza
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .padding(bottom = 8.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
                             Text(
-                                "Video non disponibile",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                                "Guida Animata",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }

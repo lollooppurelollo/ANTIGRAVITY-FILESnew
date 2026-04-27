@@ -15,6 +15,7 @@ import com.afa.fitadapt.data.repository.TrainingCardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,7 +41,8 @@ data class ExerciseDetailUiState(
 class CardViewModel @Inject constructor(
     private val cardRepository: TrainingCardRepository,
     private val exerciseRepository: ExerciseRepository,
-    private val sessionRepository: SessionRepository
+    private val sessionRepository: SessionRepository,
+    private val userPreferences: com.afa.fitadapt.data.local.datastore.UserPreferences
 ) : ViewModel() {
 
     private val _cardState = MutableStateFlow(CardUiState())
@@ -48,6 +50,15 @@ class CardViewModel @Inject constructor(
 
     private val _exerciseDetailState = MutableStateFlow(ExerciseDetailUiState())
     val exerciseDetailState = _exerciseDetailState.asStateFlow()
+
+    val guidedTrainingMode = userPreferences.guidedTrainingMode
+
+    fun toggleGuidedTrainingMode() {
+        viewModelScope.launch {
+            val current = userPreferences.guidedTrainingMode.first()
+            userPreferences.setGuidedTrainingMode(!current)
+        }
+    }
 
     init {
         loadActiveCard()

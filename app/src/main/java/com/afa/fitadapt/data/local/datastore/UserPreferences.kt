@@ -62,6 +62,7 @@ class UserPreferences @Inject constructor(
         val APP_THEME = intPreferencesKey("app_theme")
         val USE_ORIGINAL_COLORS = booleanPreferencesKey("use_original_colors")
         val CALENDAR_MONTHLY_VIEW = booleanPreferencesKey("calendar_monthly_view")
+        val GUIDED_TRAINING_MODE = booleanPreferencesKey("guided_training_mode")
 
         // ── Valori predefiniti ──
         const val DEFAULT_NOTIFICATION_HOUR = 9
@@ -109,6 +110,10 @@ class UserPreferences @Inject constructor(
     /** Se usare i colori originali per icone e riquadri allenamento */
     val useOriginalColors: Flow<Boolean> = context.userSettingsDataStore.data
         .map { it[USE_ORIGINAL_COLORS] ?: false }
+
+    /** Se usare la modalità guidata (esercizi espansi in un'unica lista) */
+    val guidedTrainingMode: Flow<Boolean> = context.userSettingsDataStore.data
+        .map { it[GUIDED_TRAINING_MODE] ?: false }
 
     // ══════════════════════════════════════════════════════════
     // LETTURA SINCRONA (per controlli all'avvio)
@@ -180,5 +185,10 @@ class UserPreferences @Inject constructor(
     /** Imposta la vista calendario predefinita */
     suspend fun setCalendarMonthlyView(isMonthly: Boolean) {
         context.userSettingsDataStore.edit { it[CALENDAR_MONTHLY_VIEW] = isMonthly }
+    }
+
+    /** Imposta se usare la modalità di allenamento guidata */
+    suspend fun setGuidedTrainingMode(enabled: Boolean) {
+        context.userSettingsDataStore.edit { it[GUIDED_TRAINING_MODE] = enabled }
     }
 }
