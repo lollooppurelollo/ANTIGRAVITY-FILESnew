@@ -10,7 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.afa.fitadapt.security.BiometricHelper
 import com.afa.fitadapt.ui.navigation.AfaNavGraph
-import com.afa.fitadapt.ui.theme.FitlyTheme
+import com.afa.fitadapt.ui.theme.KinAptoTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import androidx.compose.foundation.layout.Box
@@ -51,7 +51,7 @@ class MainActivity : FragmentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            FitlyTheme {
+            KinAptoTheme {
                 AfaNavGraph(biometricHelper = biometricHelper)
             }
         }
@@ -60,14 +60,14 @@ class MainActivity : FragmentActivity() {
 
 @Preview(showBackground = true)
 @Composable
-fun FitlyPreview() {
-    FitlyTheme {
+fun KinAptoPreview() {
+    KinAptoTheme {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Fitly - Fit your life 🚀",
+                text = "KinApto - Active life 🚀",
                 fontSize = 24.sp
             )
         }

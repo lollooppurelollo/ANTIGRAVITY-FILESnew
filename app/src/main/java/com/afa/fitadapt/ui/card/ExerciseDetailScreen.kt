@@ -47,10 +47,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.afa.fitadapt.ui.components.Avatar3DViewer
 import com.afa.fitadapt.ui.components.VideoPlayer
 import com.afa.fitadapt.ui.theme.ThemeViewModel
-import com.afa.fitadapt.model.ExerciseAnimationMap
 
 /**
  * Dettaglio di un singolo esercizio.
@@ -136,40 +134,14 @@ fun ExerciseDetailScreen(
                     .fillMaxWidth()
                     .height(200.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (exercise.videoUri != null) Color.Black else MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = Color.Black
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                if (exercise.videoUri != null) {
-                    VideoPlayer(videoUri = exercise.videoUri)
-                } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Avatar3DViewer(
-                            modelPath = exercise.modelAssetPath,
-                            animationPath = exercise.animationAssetPath ?: ExerciseAnimationMap.getAnimationPath(exercise.animationName ?: exercise.name),
-                            animationName = exercise.animationName,
-                            isPlaying = true,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                        // Overlay testo opzionale per chiarezza
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .padding(bottom = 8.dp)
-                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f), RoundedCornerShape(8.dp))
-                                .padding(horizontal = 8.dp, vertical = 2.dp)
-                        ) {
-                            Text(
-                                "Guida Animata",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                }
+                VideoPlayer(
+                    videoUri = exercise.videoUri,
+                    isPlaying = true // Nel dettaglio lo riproduciamo subito
+                )
             }
 
             Spacer(modifier = Modifier.height(24.dp))

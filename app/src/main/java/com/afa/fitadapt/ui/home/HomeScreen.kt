@@ -196,6 +196,7 @@ fun HomeScreen(
     if (uiState.isMonthlyView) {
         MonthlyCalendar(
             scheduled = uiState.scheduledSessions,
+            completedDates = uiState.completedSessionsDates,
             onDayClick = { date ->
                 selectedDateMillis = date
                 showAddDialog = true
@@ -205,6 +206,7 @@ fun HomeScreen(
     } else {
         ModernWeeklyCalendar(
             scheduled = uiState.scheduledSessions,
+            completedDates = uiState.completedSessionsDates,
             onDayClick = { date ->
                 selectedDateMillis = date
                 showAddDialog = true
@@ -477,6 +479,7 @@ fun HomeScreen(
 @Composable
 fun MonthlyCalendar(
     scheduled: List<ScheduledSessionEntity>,
+    completedDates: List<Long>,
     onDayClick: (Long) -> Unit,
     onDeleteSession: (ScheduledSessionEntity) -> Unit
 ) {
@@ -556,42 +559,68 @@ fun MonthlyCalendar(
                                 val isToday = DateUtils.isToday(dayCal.timeInMillis)
                                 val daySessions = scheduled.filter { DateUtils.isSameDay(it.date, dayCal.timeInMillis) }
                                 val hasSession = daySessions.isNotEmpty()
+                                val isCompleted = completedDates.any { DateUtils.isSameDay(it, dayCal.timeInMillis) }
+
+                                val hasPreviousCompleted = completedDates.any { DateUtils.isSameDay(it, dayCal.timeInMillis - 86400000) }
+                                val hasNextCompleted = completedDates.any { DateUtils.isSameDay(it, dayCal.timeInMillis + 86400000) }
 
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
                                         .aspectRatio(1f)
-                                        .padding(2.dp)
-                                        .clip(CircleShape)
-                                        .background(
-                                            if (isToday) MaterialTheme.colorScheme.primary 
-                                            else if (hasSession) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
-                                            else Color.Transparent
-                                        )
-                                        .clickable { 
-                                            if (hasSession) {
-                                                selectedDaySessions = daySessions
-                                                showDayDetails = true
-                                            } else {
-                                                onDayClick(dayCal.timeInMillis)
-                                            }
-                                        },
+                                        .padding(vertical = 2.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = dayNum.toString(),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
-                                        fontWeight = if (isToday || hasSession) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                    if (hasSession && !isToday) {
+                                    // Streak highlighting
+                                    if (isCompleted) {
+                                        // Simplified way to combine shapes for the background "strip"
                                         Box(
                                             modifier = Modifier
-                                                .align(Alignment.BottomCenter)
-                                                .padding(bottom = 4.dp)
-                                                .size(4.dp)
-                                                .background(MaterialTheme.colorScheme.primary, CircleShape)
+                                                .fillMaxWidth()
+                                                .height(32.dp)
+                                                .clip(if (!hasPreviousCompleted && !hasNextCompleted) CircleShape 
+                                                      else if (!hasPreviousCompleted) RoundedCornerShape(topStart = 16.dp, bottomStart = 16.dp)
+                                                      else if (!hasNextCompleted) RoundedCornerShape(topEnd = 16.dp, bottomEnd = 16.dp)
+                                                      else RoundedCornerShape(0.dp))
+                                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
                                         )
+                                    }
+
+                                    Box(
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clip(CircleShape)
+                                            .background(
+                                                if (isToday) MaterialTheme.colorScheme.primary 
+                                                else if (isCompleted) MaterialTheme.colorScheme.primary
+                                                else if (hasSession) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                                else Color.Transparent
+                                            )
+                                            .clickable { 
+                                                if (hasSession) {
+                                                    selectedDaySessions = daySessions
+                                                    showDayDetails = true
+                                                } else {
+                                                    onDayClick(dayCal.timeInMillis)
+                                                }
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = dayNum.toString(),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = if (isToday || isCompleted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface,
+                                            fontWeight = if (isToday || hasSession || isCompleted) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                        if (hasSession && !isToday && !isCompleted) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .align(Alignment.BottomCenter)
+                                                    .padding(bottom = 4.dp)
+                                                    .size(4.dp)
+                                                    .background(MaterialTheme.colorScheme.primary, CircleShape)
+                                            )
+                                        }
                                     }
                                 }
                             } else {
@@ -858,6 +887,7 @@ fun AddScheduledSessionDialog(
 @Composable
 fun ModernWeeklyCalendar(
     scheduled: List<ScheduledSessionEntity>,
+    completedDates: List<Long>,
     onDayClick: (Long) -> Unit,
     onDeleteSession: (ScheduledSessionEntity) -> Unit
 ) {
@@ -880,12 +910,18 @@ fun ModernWeeklyCalendar(
                 val isToday = DateUtils.isToday(day.timeInMillis)
                 val daySessions = scheduled.filter { DateUtils.isSameDay(it.date, day.timeInMillis) }
                 val hasSession = daySessions.isNotEmpty()
+                val isCompleted = completedDates.any { DateUtils.isSameDay(it, day.timeInMillis) }
                 
                 Column(
                     modifier = Modifier
                         .weight(1f)
                         .clip(RoundedCornerShape(20.dp))
-                        .background(if (isToday) MaterialTheme.colorScheme.primary else if (hasSession) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surface)
+                        .background(
+                            if (isToday) MaterialTheme.colorScheme.primary 
+                            else if (isCompleted) MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                            else if (hasSession) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) 
+                            else MaterialTheme.colorScheme.surface
+                        )
                         .clickable {
                             onDayClick(day.timeInMillis)
                             if (hasSession) {
@@ -899,17 +935,19 @@ fun ModernWeeklyCalendar(
                     Text(
                         day.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.ITALY)?.take(1) ?: "",
                         style = MaterialTheme.typography.labelSmall,
-                        color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = if (isToday || isCompleted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         day.get(Calendar.DAY_OF_MONTH).toString(),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = if (isToday) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                        color = if (isToday || isCompleted) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
                     )
-                    if (hasSession) {
+                    if (hasSession && !isCompleted) {
                         Box(modifier = Modifier.padding(top = 6.dp).size(6.dp).background(if (isToday) Color.White else MaterialTheme.colorScheme.primary, CircleShape))
+                    } else if (isCompleted) {
+                        Icon(Icons.Default.Check, null, tint = Color.White, modifier = Modifier.size(10.dp).padding(top = 2.dp))
                     }
                 }
             }

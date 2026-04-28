@@ -7,7 +7,7 @@ package com.afa.fitadapt.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ══════════════════════════════════════════════════════════
-// PALETTE PRINCIPALE FITLY (Premium Health Edition)
+// PALETTE PRINCIPALE KINAPTO (Premium Health Edition)
 // Background: #F8FAFC (Off-white), Primary: #2563EB (Modern Blue), Secondary: #10B981 (Sage)
 // ══════════════════════════════════════════════════════════
 

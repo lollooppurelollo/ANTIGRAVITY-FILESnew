@@ -47,7 +47,7 @@ import com.afa.fitadapt.data.local.entity.*
         GoalEntity::class,
         ScheduledSessionEntity::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -86,10 +86,24 @@ abstract class AfaDatabase : RoomDatabase() {
 
         val MIGRATION_6_7 = object : Migration(6, 7) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE exercises ADD COLUMN modelAssetPath TEXT NOT NULL DEFAULT 'models/avatar_fitness.glb'")
-                db.execSQL("ALTER TABLE exercises ADD COLUMN animationAssetPath TEXT DEFAULT NULL")
+                // Migrazione transitoria (campi ora rimossi nella v8)
                 db.execSQL("ALTER TABLE exercises ADD COLUMN movementInstructions TEXT NOT NULL DEFAULT ''")
                 db.execSQL("ALTER TABLE exercises ADD COLUMN commonErrors TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Rimuoviamo definitivamente ogni residuo del sistema 3D/SceneView
+                try {
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS modelAssetPath")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS animationAssetPath")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS animationName")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS movementInstructions")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS commonErrors")
+                } catch (e: Exception) {
+                    // Supporto per versioni SQLite che non gestiscono DROP COLUMN IF EXISTS
+                }
             }
         }
     }

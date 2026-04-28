@@ -54,7 +54,7 @@ private fun dynamicAfaLightColorScheme(theme: ThemeOption): androidx.compose.mat
  * Combina colori, tipografia e forme in un unico tema Material 3.
  */
 @Composable
-fun FitlyTheme(
+fun KinAptoTheme(
     themeViewModel: ThemeViewModel = viewModel(),
     content: @Composable () -> Unit
 ) {

@@ -132,6 +132,8 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 profileRepository.updatePatientCode(code)
+                // Piccola pausa per assicurarsi che il DB sia aggiornato
+                kotlinx.coroutines.delay(100)
                 _uiState.update { it.copy(setupStep = 2, authError = null) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(authError = "Errore salvataggio codice: ${e.message}") }

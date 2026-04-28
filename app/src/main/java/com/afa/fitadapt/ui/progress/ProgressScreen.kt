@@ -57,7 +57,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.afa.fitadapt.ui.components.AnimatedAvatar
+import androidx.compose.material.icons.outlined.Celebration
 import com.afa.fitadapt.data.local.entity.ScaleEntryEntity
 import com.afa.fitadapt.data.local.entity.SessionEntity
 import java.text.SimpleDateFormat
@@ -119,12 +119,18 @@ fun ProgressScreen(
                     )
                 }
                 
-                // Avatar festoso
-                Box(modifier = Modifier.size(100.dp)) {
-                    AnimatedAvatar(
-                        exerciseName = "vittoria",
-                        category = "SUCCESS",
-                        isRunning = true
+                // Icona celebrativa (al posto dell'avatar)
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Celebration,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(60.dp)
                     )
                 }
             }
@@ -194,7 +200,7 @@ fun ProgressScreen(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             StatCard(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).clickable { onNavigateToHistory() },
                 icon = Icons.Outlined.LocalFireDepartment,
                 value = "${uiState.currentStreak}",
                 label = "Giorni Consecutivi",
@@ -452,13 +458,13 @@ private fun TrendChartCard(
     var showExertionDyspnea by remember { mutableStateOf(false) }
 
     // Colori fissi per i parametri (per coerenza con i grafici medici)
-    val colorAsthenia = if (useOriginalColors) Color(0xFF00E5FF) else Color(0xFFE7D3A3) // Cyan vivace
-    val colorPain = if (useOriginalColors) Color(0xFFFF1744) else Color(0xFFA67C52) // Rosso vivace
-    val colorDyspneaRest = if (useOriginalColors) Color(0xFF00E676) else Color(0xFF66BB6A) // Verde vivace
-    val colorDyspneaExertion = if (useOriginalColors) Color(0xFFFF9100) else Color(0xFFFFA726) // Arancione vivace
-    val colorEffort = if (useOriginalColors) Color(0xFF2979FF) else Color(0xFFEF5350) // Blu vivace
-    val colorMood = if (useOriginalColors) Color(0xFFFFEA00) else Color(0xFF42A5F5) // Giallo vivace
-    val colorSleep = if (useOriginalColors) Color(0xFFAA00FF) else Color(0xFF7E57C2) // Viola vivace
+    val colorAsthenia = if (useOriginalColors) Color(0xFFFBC02D) else Color(0xFFFF9800) // Giallo/Arancio allegro
+    val colorPain = if (useOriginalColors) Color(0xFFE91E63) else Color(0xFFF44336) // Rosa/Rosso vivace
+    val colorDyspneaRest = if (useOriginalColors) Color(0xFF00E676) else Color(0xFF4CAF50) // Verde
+    val colorDyspneaExertion = if (useOriginalColors) Color(0xFFFF5722) else Color(0xFFFF7043) // Arancio profondo
+    val colorEffort = if (useOriginalColors) Color(0xFF2196F3) else Color(0xFF03A9F4) // Blu
+    val colorMood = if (useOriginalColors) Color(0xFFCDDC39) else Color(0xFF8BC34A) // Lime
+    val colorSleep = if (useOriginalColors) Color(0xFF9C27B0) else Color(0xFF673AB7) // Viola
 
     // Unifichiamo i dati per asse X (date)
     val allDates = (completedSessions.map { it.date } + scaleEntries.map { it.date })

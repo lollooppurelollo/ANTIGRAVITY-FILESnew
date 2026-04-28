@@ -32,8 +32,14 @@ class PatientProfileRepository @Inject constructor(
         profileDao.insertOrReplace(profile)
 
     /** Aggiorna il codice paziente (dalla sezione protetta) */
-    suspend fun updatePatientCode(code: String) =
-        profileDao.updatePatientCode(code)
+    suspend fun updatePatientCode(code: String) {
+        val existing = profileDao.getProfileSync()
+        if (existing == null) {
+            profileDao.insertOrReplace(PatientProfileEntity(patientCode = code))
+        } else {
+            profileDao.updatePatientCode(code)
+        }
+    }
 
     /** Segna l'app come inizializzata */
     suspend fun setAppInitialized() =

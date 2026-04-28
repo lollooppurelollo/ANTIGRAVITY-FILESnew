@@ -32,6 +32,7 @@ data class HomeUiState(
     val featuredArticle: ArticleEntity? = null,
     val activeGoals: List<GoalEntity> = emptyList(),
     val scheduledSessions: List<ScheduledSessionEntity> = emptyList(),
+    val completedSessionsDates: List<Long> = emptyList(),
     val isMonthlyView: Boolean = false
 )
 
@@ -105,6 +106,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             calendarRepository.getAllScheduled().collect { scheduled ->
                 _uiState.update { it.copy(scheduledSessions = scheduled) }
+            }
+        }
+
+        // Date sessioni completate per il calendario
+        viewModelScope.launch {
+            sessionRepository.getAllSessions().collect { sessions ->
+                val completedDates = sessions.filter { it.completed }.map { it.date }
+                _uiState.update { it.copy(completedSessionsDates = completedDates) }
             }
         }
         

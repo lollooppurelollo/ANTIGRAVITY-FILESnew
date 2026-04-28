@@ -85,9 +85,9 @@ fun SetupWizardScreen(
     ) {
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Titolo rebranding Fitly
+        // Titolo rebranding KinApto
         Text(
-            text = "Benvenuta in Fitly",
+            text = "Benvenuta in KinApto",
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary
         )
@@ -310,7 +310,7 @@ private fun ConfirmStep(
             Text("Tutto pronto!", style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "La configurazione di Fitly è terminata. Inizia subito il tuo percorso!",
+                "La configurazione di KinApto è terminata. Inizia subito il tuo percorso!",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -322,7 +322,7 @@ private fun ConfirmStep(
                 modifier = Modifier.fillMaxWidth().height(52.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Entra in Fitly")
+                Text("Entra in KinApto")
             }
             Spacer(modifier = Modifier.height(8.dp))
             TextButton(onClick = onBack) { Text("Indietro") }
