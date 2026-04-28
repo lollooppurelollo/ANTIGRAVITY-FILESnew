@@ -5,12 +5,13 @@
 package com.afa.fitadapt.ui.protected_section.management
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,7 +30,24 @@ fun GoalEditorScreen(
         "streak_days" to "Giorni consecutivi",
         "total_sessions" to "Sessioni totali"
     )
+    val periods = listOf(
+        "none" to "Nessuna",
+        "weekly" to "Settimanale",
+        "monthly" to "Mensile",
+        "bimonthly" to "Bimensile",
+        "yearly" to "Annuale",
+        "custom" to "Personalizzata"
+    )
+    val customUnits = listOf(
+        "days" to "Giorni",
+        "weeks" to "Settimane",
+        "months" to "Mesi"
+    )
+
     var showTypeMenu by remember { mutableStateOf(false) }
+    var showPeriodMenu by remember { mutableStateOf(false) }
+    var showUnitMenu by remember { mutableStateOf(false) }
+    var showParentMenu by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSaved) {
         if (uiState.isSaved) onBack()
@@ -48,8 +66,14 @@ fun GoalEditorScreen(
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding).fillMaxSize().padding(24.dp)) {
-            
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = uiState.title, onValueChange = viewModel::updateTitle,
                 label = { Text("Titolo (es. Obiettivo Gold)") }, modifier = Modifier.fillMaxWidth(),
@@ -108,6 +132,108 @@ fun GoalEditorScreen(
                 )
             }
 
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("Scadenza temporale", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ExposedDropdownMenuBox(
+                expanded = showPeriodMenu,
+                onExpandedChange = { showPeriodMenu = !showPeriodMenu }
+            ) {
+                OutlinedTextField(
+                    value = periods.find { it.first == uiState.periodType }?.second ?: uiState.periodType,
+                    onValueChange = {},
+                    readOnly = true, label = { Text("Frequenza reset") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showPeriodMenu) },
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                )
+                ExposedDropdownMenu(expanded = showPeriodMenu, onDismissRequest = { showPeriodMenu = false }) {
+                    periods.forEach { (key, label) ->
+                        DropdownMenuItem(
+                            text = { Text(label) },
+                            onClick = {
+                                viewModel.updatePeriodType(key)
+                                showPeriodMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            if (uiState.periodType == "custom") {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedTextField(
+                        value = uiState.customPeriodValue, onValueChange = viewModel::updateCustomPeriodValue,
+                        label = { Text("Ogni...") }, modifier = Modifier.weight(1f),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        singleLine = true
+                    )
+                    ExposedDropdownMenuBox(
+                        expanded = showUnitMenu,
+                        onExpandedChange = { showUnitMenu = !showUnitMenu },
+                        modifier = Modifier.weight(1.5f)
+                    ) {
+                        OutlinedTextField(
+                            value = customUnits.find { it.first == uiState.customPeriodUnit }?.second ?: uiState.customPeriodUnit,
+                            onValueChange = {},
+                            readOnly = true, label = { Text("Unità") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showUnitMenu) },
+                            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                        )
+                        ExposedDropdownMenu(expanded = showUnitMenu, onDismissRequest = { showUnitMenu = false }) {
+                            customUnits.forEach { (key, label) ->
+                                DropdownMenuItem(
+                                    text = { Text(label) },
+                                    onClick = {
+                                        viewModel.updateCustomPeriodUnit(key)
+                                        showUnitMenu = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("Sblocco sequenziale (Goal Scalabili)", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            ExposedDropdownMenuBox(
+                expanded = showParentMenu,
+                onExpandedChange = { showParentMenu = !showParentMenu }
+            ) {
+                val parentGoal = uiState.availableGoals.find { it.id == uiState.parentGoalId }
+                val parentText = parentGoal?.title ?: "Attiva subito (nessun requisito)"
+                
+                OutlinedTextField(
+                    value = parentText,
+                    onValueChange = {},
+                    readOnly = true, label = { Text("Attiva dopo il raggiungimento di:") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showParentMenu) },
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                )
+                ExposedDropdownMenu(expanded = showParentMenu, onDismissRequest = { showParentMenu = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Attiva subito (nessun requisito)") },
+                        onClick = {
+                            viewModel.updateParentGoalId(null)
+                            showParentMenu = false
+                        }
+                    )
+                    uiState.availableGoals.filter { it.id != uiState.goalId }.forEach { goal ->
+                        DropdownMenuItem(
+                            text = { Text(goal.title) },
+                            onClick = {
+                                viewModel.updateParentGoalId(goal.id)
+                                showParentMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
             
             Button(
@@ -120,6 +246,7 @@ fun GoalEditorScreen(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Salva obiettivo")
             }
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

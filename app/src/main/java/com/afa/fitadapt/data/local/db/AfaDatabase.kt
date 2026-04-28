@@ -47,7 +47,7 @@ import com.afa.fitadapt.data.local.entity.*
         GoalEntity::class,
         ScheduledSessionEntity::class
     ],
-    version = 8,
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -104,6 +104,15 @@ abstract class AfaDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     // Supporto per versioni SQLite che non gestiscono DROP COLUMN IF EXISTS
                 }
+            }
+        }
+
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE goals ADD COLUMN periodType TEXT NOT NULL DEFAULT 'none'")
+                db.execSQL("ALTER TABLE goals ADD COLUMN customPeriodValue INTEGER DEFAULT NULL")
+                db.execSQL("ALTER TABLE goals ADD COLUMN customPeriodUnit TEXT DEFAULT NULL")
+                db.execSQL("ALTER TABLE goals ADD COLUMN parentGoalId INTEGER DEFAULT NULL")
             }
         }
     }

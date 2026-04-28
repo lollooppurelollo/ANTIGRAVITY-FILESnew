@@ -128,4 +128,100 @@ object DateUtils {
     fun isSameDay(t1: Long, t2: Long): Boolean {
         return toDayTimestamp(t1) == toDayTimestamp(t2)
     }
+
+    /**
+     * Ottiene l'inizio della settimana corrente (Lunedì alle 00:00:00).
+     */
+    fun getStartOfWeek(timestamp: Long = System.currentTimeMillis()): Long {
+        val cal = Calendar.getInstance(Locale.ITALY)
+        cal.timeInMillis = timestamp
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        
+        // Imposta al lunedì della settimana corrente
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        
+        // Se cal è dopo il timestamp (perché era già domenica/sabato in una locale diversa),
+        // sottrai una settimana. Ma con Locale.ITALY e MONDAY dovrebbe essere corretto.
+        if (cal.timeInMillis > timestamp) {
+            cal.add(Calendar.WEEK_OF_YEAR, -1)
+        }
+        
+        return cal.timeInMillis
+    }
+
+    /**
+     * Ottiene l'inizio del mese corrente.
+     */
+    fun getStartOfMonth(timestamp: Long = System.currentTimeMillis()): Long {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = timestamp
+        cal.set(Calendar.DAY_OF_MONTH, 1)
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        return cal.timeInMillis
+    }
+
+    /**
+     * Ottiene l'inizio dell'anno corrente.
+     */
+    fun getStartOfYear(timestamp: Long = System.currentTimeMillis()): Long {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = timestamp
+        cal.set(Calendar.DAY_OF_YEAR, 1)
+        cal.set(Calendar.HOUR_OF_DAY, 0)
+        cal.set(Calendar.MINUTE, 0)
+        cal.set(Calendar.SECOND, 0)
+        cal.set(Calendar.MILLISECOND, 0)
+        return cal.timeInMillis
+    }
+
+    /**
+     * Verifica se un obiettivo deve essere resettato in base alla sua periodicità.
+     */
+    fun isPeriodExpired(lastUpdate: Long, periodType: String, customValue: Int?, customUnit: String?): Boolean {
+        if (periodType == "none") return false
+        
+        val now = System.currentTimeMillis()
+        val calLast = Calendar.getInstance()
+        calLast.timeInMillis = lastUpdate
+        
+        val calNow = Calendar.getInstance()
+        calNow.timeInMillis = now
+
+        return when (periodType) {
+            "weekly" -> {
+                calLast.get(Calendar.WEEK_OF_YEAR) != calNow.get(Calendar.WEEK_OF_YEAR) ||
+                calLast.get(Calendar.YEAR) != calNow.get(Calendar.YEAR)
+            }
+            "monthly" -> {
+                calLast.get(Calendar.MONTH) != calNow.get(Calendar.MONTH) ||
+                calLast.get(Calendar.YEAR) != calNow.get(Calendar.YEAR)
+            }
+            "bimonthly" -> {
+                val monthsDiff = (calNow.get(Calendar.YEAR) - calLast.get(Calendar.YEAR)) * 12 + 
+                                 (calNow.get(Calendar.MONTH) - calLast.get(Calendar.MONTH))
+                monthsDiff >= 2
+            }
+            "yearly" -> {
+                calLast.get(Calendar.YEAR) != calNow.get(Calendar.YEAR)
+            }
+            "custom" -> {
+                if (customValue == null || customUnit == null) return false
+                val diffMs = now - lastUpdate
+                val periodMs = when (customUnit) {
+                    "days" -> customValue * 24 * 60 * 60 * 1000L
+                    "weeks" -> customValue * 7 * 24 * 60 * 60 * 1000L
+                    "months" -> customValue * 30 * 24 * 60 * 60 * 1000L // Approssimato
+                    else -> 0L
+                }
+                diffMs >= periodMs
+            }
+            else -> false
+        }
+    }
 }

@@ -95,6 +95,10 @@ class ProgressRepository @Inject constructor(
     fun getActiveGoals(): Flow<List<GoalEntity>> =
         goalDao.getActiveGoals()
 
+    /** Ottiene un obiettivo per ID */
+    suspend fun getGoalById(id: Long): GoalEntity? =
+        goalDao.getById(id)
+
     /** Flow con gli obiettivi raggiunti */
     @Suppress("unused") // Sarà usata nella schermata progressi avanzata
     fun getCompletedGoals(): Flow<List<GoalEntity>> =

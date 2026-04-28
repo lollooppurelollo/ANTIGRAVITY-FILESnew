@@ -50,6 +50,28 @@ data class GoalEntity(
 
     val isActive: Boolean = true,
 
+    /**
+     * Periodicità dell'obiettivo:
+     * "none", "weekly", "monthly", "bimonthly", "yearly", "custom"
+     */
+    val periodType: String = "none",
+
+    /**
+     * Numero di unità se periodType è "custom" (es. 10 giorni)
+     */
+    val customPeriodValue: Int? = null,
+
+    /**
+     * Unità se periodType è "custom" ("days", "weeks", "months")
+     */
+    val customPeriodUnit: String? = null,
+
+    /**
+     * ID dell'obiettivo che deve essere completato (raggiunto Gold)
+     * per sbloccare/attivare questo obiettivo. Se null, è attivo subito.
+     */
+    val parentGoalId: Long? = null,
+
     val createdAt: Long = System.currentTimeMillis(),
 
     val updatedAt: Long = System.currentTimeMillis()

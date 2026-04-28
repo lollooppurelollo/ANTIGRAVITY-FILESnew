@@ -84,8 +84,24 @@ class ProgressViewModel @Inject constructor(
             _uiState.update { it.copy(currentStreak = streak, longestStreak = longest) }
         }
         viewModelScope.launch {
-            progressRepository.getActiveGoals().collect { goals ->
-                _uiState.update { it.copy(activeGoals = goals) }
+            progressRepository.getActiveGoals().collect { allGoals ->
+                // Filtra gli obiettivi scalabili: mostra solo se non hanno parent o se il parent è a "Gold"
+                val filteredGoals = allGoals.filter { goal ->
+                    if (goal.parentGoalId == null) {
+                        true
+                    } else {
+                        // Verifica se il parent ha raggiunto il valore Gold
+                        val parent = allGoals.find { it.id == goal.parentGoalId }
+                        if (parent != null) {
+                            val goldTarget = parent.goldValue ?: parent.targetValue
+                            parent.currentValue >= goldTarget
+                        } else {
+                            // Se non è tra i goals attivi (raro), lo nascondiamo per evitare chiamate sospese in filter
+                            false
+                        }
+                    }
+                }
+                _uiState.update { it.copy(activeGoals = filteredGoals) }
             }
         }
         viewModelScope.launch {

@@ -22,7 +22,12 @@ data class GoalEditorUiState(
     val bronzeValue: String = "",
     val silverValue: String = "",
     val goldValue: String = "",
-    val isSaved: Boolean = false
+    val periodType: String = "none",
+    val customPeriodValue: String = "",
+    val customPeriodUnit: String = "days",
+    val parentGoalId: Long? = null,
+    val isSaved: Boolean = false,
+    val availableGoals: List<GoalEntity> = emptyList()
 )
 
 @HiltViewModel
@@ -33,7 +38,16 @@ class GoalEditorViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(GoalEditorUiState())
     val uiState = _uiState.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            goalRepository.getAllGoals().collect { goals ->
+                _uiState.update { it.copy(availableGoals = goals) }
+            }
+        }
+    }
+
     fun loadGoal(goalId: Long) {
+        if (goalId == -1L) return
         viewModelScope.launch {
             goalRepository.getById(goalId)?.let { goal ->
                 _uiState.update { it.copy(
@@ -42,7 +56,11 @@ class GoalEditorViewModel @Inject constructor(
                     targetType = goal.targetType,
                     bronzeValue = goal.targetValue.toInt().toString(),
                     silverValue = goal.silverValue?.toInt()?.toString() ?: "",
-                    goldValue = goal.goldValue?.toInt()?.toString() ?: ""
+                    goldValue = goal.goldValue?.toInt()?.toString() ?: "",
+                    periodType = goal.periodType,
+                    customPeriodValue = goal.customPeriodValue?.toString() ?: "",
+                    customPeriodUnit = goal.customPeriodUnit ?: "days",
+                    parentGoalId = goal.parentGoalId
                 ) }
             }
         }
@@ -53,6 +71,11 @@ class GoalEditorViewModel @Inject constructor(
     fun updateBronzeValue(value: String) = _uiState.update { it.copy(bronzeValue = value) }
     fun updateSilverValue(value: String) = _uiState.update { it.copy(silverValue = value) }
     fun updateGoldValue(value: String) = _uiState.update { it.copy(goldValue = value) }
+    
+    fun updatePeriodType(type: String) = _uiState.update { it.copy(periodType = type) }
+    fun updateCustomPeriodValue(value: String) = _uiState.update { it.copy(customPeriodValue = value) }
+    fun updateCustomPeriodUnit(unit: String) = _uiState.update { it.copy(customPeriodUnit = unit) }
+    fun updateParentGoalId(id: Long?) = _uiState.update { it.copy(parentGoalId = id) }
 
     fun save() {
         val state = _uiState.value
@@ -62,7 +85,11 @@ class GoalEditorViewModel @Inject constructor(
             targetType = state.targetType,
             targetValue = state.bronzeValue.toFloatOrNull() ?: 0f,
             silverValue = state.silverValue.toFloatOrNull(),
-            goldValue = state.goldValue.toFloatOrNull()
+            goldValue = state.goldValue.toFloatOrNull(),
+            periodType = state.periodType,
+            customPeriodValue = state.customPeriodValue.toIntOrNull(),
+            customPeriodUnit = state.customPeriodUnit,
+            parentGoalId = state.parentGoalId
         )
         viewModelScope.launch {
             if (state.goalId == null) {

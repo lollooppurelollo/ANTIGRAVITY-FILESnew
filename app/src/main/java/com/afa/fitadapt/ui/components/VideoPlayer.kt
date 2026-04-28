@@ -68,20 +68,25 @@ fun VideoPlayer(
         }
     }
 
-    // Sincronizza lo stato di riproduzione con il parametro isPlaying
-    LaunchedEffect(isPlaying) {
-        exoPlayer.playWhenReady = isPlaying
-    }
-
-    // Gestione del ciclo di vita: rilascia il player quando il composable viene rimosso
-    DisposableEffect(videoUri) {
-        val mediaItem = MediaItem.fromUri(videoUri)
-        exoPlayer.setMediaItem(mediaItem)
-        exoPlayer.prepare()
-
+    // Rilascia il player quando il componente esce definitivamente dalla composizione
+    DisposableEffect(Unit) {
         onDispose {
             exoPlayer.release()
         }
+    }
+
+    // Gestione del cambio URI: prepara il nuovo video senza distruggere l'istanza del player
+    LaunchedEffect(videoUri) {
+        if (!videoUri.isNullOrEmpty()) {
+            val mediaItem = MediaItem.fromUri(videoUri)
+            exoPlayer.setMediaItem(mediaItem)
+            exoPlayer.prepare()
+        }
+    }
+
+    // Sincronizza lo stato di riproduzione
+    LaunchedEffect(isPlaying) {
+        exoPlayer.playWhenReady = isPlaying
     }
 
     // Integrazione della vista Android (PlayerView) in Compose
@@ -94,6 +99,9 @@ fun VideoPlayer(
                 setShowPreviousButton(false)
             }
         },
-        modifier = modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize(),
+        update = { view ->
+            view.player = exoPlayer
+        }
     )
 }

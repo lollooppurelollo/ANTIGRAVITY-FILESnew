@@ -107,32 +107,19 @@ fun ProgressScreen(
             ) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        "I tuoi progressi",
+                        "I tuoi Progressi",
                         style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                         color = Color.White
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         "Monitora il tuo percorso di salute",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = Color.White.copy(alpha = 0.9f)
                     )
                 }
                 
-                // Icona celebrativa (al posto dell'avatar)
-                Box(
-                    modifier = Modifier
-                        .size(100.dp)
-                        .background(Color.White.copy(alpha = 0.2f), CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Celebration,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(60.dp)
-                    )
-                }
+                // Icona stilizzata rimossa (come richiesto)
             }
         }
 
@@ -461,7 +448,7 @@ private fun TrendChartCard(
     val colorAsthenia = if (useOriginalColors) Color(0xFFFBC02D) else Color(0xFFFF9800) // Giallo/Arancio allegro
     val colorPain = if (useOriginalColors) Color(0xFFE91E63) else Color(0xFFF44336) // Rosa/Rosso vivace
     val colorDyspneaRest = if (useOriginalColors) Color(0xFF00E676) else Color(0xFF4CAF50) // Verde
-    val colorDyspneaExertion = if (useOriginalColors) Color(0xFFFF5722) else Color(0xFFFF7043) // Arancio profondo
+    val colorDyspneaExertion = if (useOriginalColors) Color(0xFF00BCD4) else Color(0xFF26C6DA) // Ciano acceso per differenziarlo da Astenia
     val colorEffort = if (useOriginalColors) Color(0xFF2196F3) else Color(0xFF03A9F4) // Blu
     val colorMood = if (useOriginalColors) Color(0xFFCDDC39) else Color(0xFF8BC34A) // Lime
     val colorSleep = if (useOriginalColors) Color(0xFF9C27B0) else Color(0xFF673AB7) // Viola

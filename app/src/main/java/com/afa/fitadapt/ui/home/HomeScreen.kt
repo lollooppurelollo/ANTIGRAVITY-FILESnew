@@ -374,7 +374,7 @@ fun HomeScreen(
         if (uiState.activeGoals.isNotEmpty()) {
             Spacer(modifier = Modifier.height(20.dp))
             SectionTitle("I tuoi obiettivi")
-            uiState.activeGoals.take(3).forEach { goal ->
+            uiState.activeGoals.take(4).forEach { goal ->
                 val nextTarget = when {
                     goal.currentValue < goal.targetValue -> goal.targetValue
                     goal.silverValue != null && goal.currentValue < goal.silverValue -> goal.silverValue

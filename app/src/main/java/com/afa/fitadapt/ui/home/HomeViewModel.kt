@@ -97,9 +97,25 @@ class HomeViewModel @Inject constructor(
         }
         // Obiettivi attivi
         viewModelScope.launch {
-            goalRepository.getActiveGoals().collect { goals ->
-                _uiState.update { it.copy(activeGoals = goals) }
-                updateGoalsProgress(goals)
+            goalRepository.getActiveGoals().collect { allGoals ->
+                // Filtra gli obiettivi scalabili: mostra solo se non hanno parent o se il parent è a "Gold"
+                val filteredGoals = allGoals.filter { goal ->
+                    if (goal.parentGoalId == null) {
+                        true
+                    } else {
+                        // Verifica se il parent ha raggiunto il valore Gold
+                        val parent = allGoals.find { it.id == goal.parentGoalId }
+                        if (parent != null) {
+                            val goldTarget = parent.goldValue ?: parent.targetValue
+                            parent.currentValue >= goldTarget
+                        } else {
+                            // Se non è tra i goals attivi (raro), lo carichiamo (qui usiamo firstOrNull per non bloccare)
+                            false // Per ora lo nascondiamo se il parent non è caricato
+                        }
+                    }
+                }
+                _uiState.update { it.copy(activeGoals = filteredGoals) }
+                updateGoalsProgress(allGoals)
             }
         }
         // Calendario
@@ -133,19 +149,43 @@ class HomeViewModel @Inject constructor(
 
     private fun updateGoalsProgress(goals: List<GoalEntity>) {
         viewModelScope.launch {
-            val totalSessions = sessionRepository.countTotalSessions().firstOrNull() ?: 0
-            val fullSessions = sessionRepository.countFullSessions().firstOrNull() ?: 0
-            val totalMin = sessionRepository.totalMinutes().firstOrNull() ?: 0
+            val now = System.currentTimeMillis()
+            val startOfWeek = com.afa.fitadapt.util.DateUtils.getStartOfWeek()
+            val startOfMonth = com.afa.fitadapt.util.DateUtils.getStartOfMonth()
+
+            // Statistiche globali
+            val fullSessionsTotal = sessionRepository.countFullSessions().firstOrNull() ?: 0
             val streak = sessionRepository.calculateCurrentStreak()
+            
+            // Statistiche periodiche
+            val sessionsThisWeek = sessionRepository.getSessionsInRange(startOfWeek, now).firstOrNull()?.count { it.completed && !it.partial } ?: 0
+            val minutesThisWeek = sessionRepository.getSessionsInRange(startOfWeek, now).firstOrNull()?.filter { it.completed }?.sumOf { it.actualDurationMin ?: 0 } ?: 0
+            
+            val sessionsThisMonth = sessionRepository.getSessionsInRange(startOfMonth, now).firstOrNull()?.count { it.completed && !it.partial } ?: 0
 
             goals.forEach { goal ->
+                // 1. Controllo reset temporale
+                val needsReset = com.afa.fitadapt.util.DateUtils.isPeriodExpired(
+                    goal.updatedAt, goal.periodType, goal.customPeriodValue, goal.customPeriodUnit
+                )
+
+                if (needsReset) {
+                    goalRepository.updateProgress(goal.id, 0f)
+                    return@forEach // Salta l'aggiornamento per questo frame, verrà aggiornato al prossimo ciclo o dopo il reset
+                }
+
+                // 2. Calcolo nuovo valore in base al tipo e alla periodicità
                 val newValue = when (goal.targetType) {
-                    "total_sessions" -> fullSessions.toFloat()
-                    "total_minutes_week" -> totalMin.toFloat()
+                    "sessions_per_week" -> sessionsThisWeek.toFloat()
+                    "total_minutes_week" -> minutesThisWeek.toFloat()
                     "streak_days" -> streak.toFloat()
-                    "sessions_per_week" -> fullSessions.toFloat()
+                    "total_sessions" -> {
+                        if (goal.periodType == "monthly") sessionsThisMonth.toFloat()
+                        else fullSessionsTotal.toFloat()
+                    }
                     else -> goal.currentValue
                 }
+
                 if (newValue != goal.currentValue) {
                     goalRepository.updateProgress(goal.id, newValue)
                 }
