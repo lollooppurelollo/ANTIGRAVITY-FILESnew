@@ -78,6 +78,10 @@ sealed class Screen(val route: String) {
         fun createRoute(articleId: Long = -1L) = "article_editor/$articleId"
     }
 
+    // Gestione CRF (Export/Import)
+    object CrfExport : Screen("crf_export")
+    object CrfImport : Screen("crf_import")
+
     @Suppress("unused") // Usata dal Navigator per selezione esercizi nelle schede
     object ExercisePicker : Screen("exercise_picker")
 }

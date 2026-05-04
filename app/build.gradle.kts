@@ -127,6 +127,16 @@ dependencies {
     implementation("com.google.zxing:core:3.5.3")
 
     // ══════════════════════════════════════════════════════════
+    // CAMERAX & ML KIT (scansione QR per import dati)
+    // ══════════════════════════════════════════════════════════
+    val cameraVersion = "1.4.1"
+    implementation("androidx.camera:camera-core:$cameraVersion")
+    implementation("androidx.camera:camera-camera2:$cameraVersion")
+    implementation("androidx.camera:camera-lifecycle:$cameraVersion")
+    implementation("androidx.camera:camera-view:$cameraVersion")
+    implementation("com.google.mlkit:barcode-scanning:17.3.0")
+
+    // ══════════════════════════════════════════════════════════
     // VIDEO PLAYER (riproduzione video esercizi)
     // ══════════════════════════════════════════════════════════
     implementation("androidx.media3:media3-exoplayer:1.6.1")

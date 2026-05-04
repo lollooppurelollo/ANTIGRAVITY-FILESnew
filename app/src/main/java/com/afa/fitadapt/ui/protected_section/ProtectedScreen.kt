@@ -235,7 +235,9 @@ fun ProtectedDashboardScreen(
     onManageCards: () -> Unit,
     onManageGoals: () -> Unit,
     onManageExercises: () -> Unit,
-    onManageArticles: () -> Unit
+    onManageArticles: () -> Unit,
+    onCrfExport: () -> Unit,
+    onCrfImport: () -> Unit
 ) {
     val uiState by protectedViewModel.uiState.collectAsState()
     val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
@@ -309,6 +311,14 @@ fun ProtectedDashboardScreen(
             DashboardCard(Icons.Outlined.Book, "Libreria esercizi", "Aggiungi e gestisci gli esercizi", if (useOriginalColors) legacyPurple else MaterialTheme.colorScheme.tertiary, onManageExercises)
             Spacer(modifier = Modifier.height(8.dp))
             DashboardCard(Icons.AutoMirrored.Outlined.Article, "Articoli", "Aggiungi e gestisci i consigli", if (useOriginalColors) legacyGold else MaterialTheme.colorScheme.primary, onManageArticles)
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Text("CRF (Case Report Form)", style = MaterialTheme.typography.titleMedium, color = if (useOriginalColors) legacyGreen else MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(8.dp))
+
+            DashboardCard(Icons.Outlined.FileUpload, "Esporta CRF", "Genera QR code per l'operatore", if (useOriginalColors) legacyGreen else MaterialTheme.colorScheme.secondary, onCrfExport)
+            Spacer(modifier = Modifier.height(8.dp))
+            DashboardCard(Icons.Outlined.FileDownload, "Importa CRF", "Acquisisci dati da un altro dispositivo", if (useOriginalColors) legacyGreen else MaterialTheme.colorScheme.secondary, onCrfImport)
 
             Spacer(modifier = Modifier.height(32.dp))
         }

@@ -7,6 +7,7 @@ package com.afa.fitadapt.di
 import android.content.Context
 import androidx.room.Room
 import com.afa.fitadapt.data.local.dao.ArticleDao
+import com.afa.fitadapt.data.local.dao.AuditLogDao
 import com.afa.fitadapt.data.local.dao.DiaryDao
 import com.afa.fitadapt.data.local.dao.ExerciseDao
 import com.afa.fitadapt.data.local.dao.ExportLogDao
@@ -87,7 +88,8 @@ object DatabaseModule {
                 AfaDatabase.MIGRATION_5_6,
                 AfaDatabase.MIGRATION_6_7,
                 AfaDatabase.MIGRATION_7_8,
-                AfaDatabase.MIGRATION_8_9
+                AfaDatabase.MIGRATION_8_9,
+                AfaDatabase.MIGRATION_9_10
             )
             .fallbackToDestructiveMigration(dropAllTables = true)     // Se lo schema cambia e non c'è migrazione, ricrea il DB
             .build()
@@ -127,4 +129,7 @@ object DatabaseModule {
 
     @Provides
     fun provideScheduledSessionDao(db: AfaDatabase): ScheduledSessionDao = db.scheduledSessionDao()
+
+    @Provides
+    fun provideAuditLogDao(db: AfaDatabase): AuditLogDao = db.auditLogDao()
 }

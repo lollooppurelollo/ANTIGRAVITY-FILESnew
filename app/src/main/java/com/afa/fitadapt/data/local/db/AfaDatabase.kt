@@ -45,9 +45,10 @@ import com.afa.fitadapt.data.local.entity.*
         ExportLogEntity::class,
         PatientProfileEntity::class,
         GoalEntity::class,
-        ScheduledSessionEntity::class
+        ScheduledSessionEntity::class,
+        AuditLogEntity::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -64,6 +65,7 @@ abstract class AfaDatabase : RoomDatabase() {
     abstract fun patientProfileDao(): PatientProfileDao
     abstract fun goalDao(): GoalDao
     abstract fun scheduledSessionDao(): ScheduledSessionDao
+    abstract fun auditLogDao(): AuditLogDao
 
     companion object {
         /**
@@ -113,6 +115,24 @@ abstract class AfaDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE goals ADD COLUMN customPeriodValue INTEGER DEFAULT NULL")
                 db.execSQL("ALTER TABLE goals ADD COLUMN customPeriodUnit TEXT DEFAULT NULL")
                 db.execSQL("ALTER TABLE goals ADD COLUMN parentGoalId INTEGER DEFAULT NULL")
+            }
+        }
+
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `audit_logs` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                        `timestamp` INTEGER NOT NULL, 
+                        `action` TEXT NOT NULL, 
+                        `patientStudyCode` TEXT NOT NULL, 
+                        `exportId` TEXT, 
+                        `details` TEXT, 
+                        `success` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
             }
         }
     }

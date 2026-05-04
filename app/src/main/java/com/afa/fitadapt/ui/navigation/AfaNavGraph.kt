@@ -208,6 +208,9 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
                     onNavigateToExport = {
                         navController.navigate(Screen.Export.route)
                     },
+                    onNavigateToCrfExport = {
+                        navController.navigate(Screen.CrfExport.route)
+                    },
                     onNavigateToSettings = {
                         navController.navigate(Screen.Settings.route)
                     },
@@ -389,11 +392,25 @@ fun AfaNavGraph(biometricHelper: BiometricHelper) {
                     onManageCards = { navController.navigate(Screen.CardManager.route) },
                     onManageGoals = { navController.navigate(Screen.GoalManager.route) },
                     onManageExercises = { navController.navigate(Screen.ExerciseLibraryManager.route) },
-                    onManageArticles = { navController.navigate(Screen.ArticleManager.route) }
+                    onManageArticles = { navController.navigate(Screen.ArticleManager.route) },
+                    onCrfExport = { navController.navigate(Screen.CrfExport.route) },
+                    onCrfImport = { navController.navigate(Screen.CrfImport.route) }
                 )
             }
 
             // ── Rotte Gestione (Area Protetta) ──
+
+            composable(Screen.CrfExport.route) {
+                CrfExportScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.CrfImport.route) {
+                CrfImportScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
 
             composable(Screen.CardManager.route) {
                 val viewModel: CardManagerViewModel = hiltViewModel()

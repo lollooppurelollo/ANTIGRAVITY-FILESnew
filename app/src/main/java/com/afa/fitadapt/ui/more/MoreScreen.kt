@@ -49,6 +49,7 @@ fun MoreScreen(
     onNavigateToDiary: () -> Unit,
     onNavigateToArticles: () -> Unit,
     onNavigateToExport: () -> Unit,
+    onNavigateToCrfExport: () -> Unit,
     onNavigateToSettings: () -> Unit,
     onNavigateToProtected: () -> Unit
 ) {
@@ -91,10 +92,21 @@ fun MoreScreen(
         // Export dati
         MenuCard(
             icon = Icons.Outlined.QrCode,
-            title = "Export dati",
-            subtitle = "Esporta i tuoi dati in formato JSON o QR code",
+            title = "Export dati (User)",
+            subtitle = "Esporta i tuoi dati personali",
             color = if (useOriginalColors) Color(0xFF7B1FA2) else MaterialTheme.colorScheme.tertiary,
             onClick = onNavigateToExport
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Export CRF (Paziente)
+        MenuCard(
+            icon = Icons.Outlined.QrCode,
+            title = "Export CRF",
+            subtitle = "Genera QR code per il monitoraggio clinico",
+            color = if (useOriginalColors) Color(0xFF00796B) else MaterialTheme.colorScheme.primary,
+            onClick = onNavigateToCrfExport
         )
 
         Spacer(modifier = Modifier.height(12.dp))
