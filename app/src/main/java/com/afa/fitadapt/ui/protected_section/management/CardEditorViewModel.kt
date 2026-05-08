@@ -67,10 +67,7 @@ class CardEditorViewModel @Inject constructor(
                     val exercisesWithDetails = mutableListOf<CardExerciseWithDetails>()
                     
                     for (ce in cardWithExercises.cardExercises) {
-                        val exercise = exerciseRepository.getById(ce.exerciseId)
-                        if (exercise != null) {
-                            exercisesWithDetails.add(CardExerciseWithDetails(ce, exercise))
-                        }
+                        exercisesWithDetails.add(CardExerciseWithDetails(ce.cardExercise, ce.exercise))
                     }
                     
                     _uiState.value = _uiState.value.copy(

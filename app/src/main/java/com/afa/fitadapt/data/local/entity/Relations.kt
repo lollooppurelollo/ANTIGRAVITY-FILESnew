@@ -16,10 +16,11 @@ data class CardWithExercises(
     val card: TrainingCardEntity,
 
     @Relation(
+        entity = CardExerciseEntity::class,
         parentColumn = "id",
         entityColumn = "cardId"
     )
-    val cardExercises: List<CardExerciseEntity>
+    val cardExercises: List<CardExerciseWithExercise>
 )
 
 /**

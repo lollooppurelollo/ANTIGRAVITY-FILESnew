@@ -6,7 +6,7 @@ package com.afa.fitadapt.ui.card
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.afa.fitadapt.data.local.entity.CardExerciseEntity
+import com.afa.fitadapt.data.local.entity.CardExerciseWithExercise
 import com.afa.fitadapt.data.local.entity.CardWithExercises
 import com.afa.fitadapt.data.local.entity.ExerciseEntity
 import com.afa.fitadapt.data.repository.ExerciseRepository
@@ -31,7 +31,7 @@ data class CardUiState(
 data class ExerciseDetailUiState(
     val isLoading: Boolean = true,
     val exercise: ExerciseEntity? = null,
-    val cardExercise: CardExerciseEntity? = null
+    val cardExercise: com.afa.fitadapt.data.local.entity.CardExerciseEntity? = null
 )
 
 /**
@@ -75,10 +75,7 @@ class CardViewModel @Inject constructor(
                     // Carica i dettagli degli esercizi
                     val details = mutableMapOf<Long, ExerciseEntity>()
                     for (ce in cardWithEx.cardExercises) {
-                        val exercise = exerciseRepository.getById(ce.exerciseId)
-                        if (exercise != null) {
-                            details[ce.exerciseId] = exercise
-                        }
+                        details[ce.cardExercise.exerciseId] = ce.exercise
                     }
 
                     val completed = sessionRepository.countCompletedByCard(cardWithEx.card.id)

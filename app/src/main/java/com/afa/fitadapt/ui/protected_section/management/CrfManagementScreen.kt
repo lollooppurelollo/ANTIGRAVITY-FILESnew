@@ -219,6 +219,16 @@ fun CrfImportScreen(
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = onBack, modifier = Modifier.fillMaxWidth()) { Text("Chiudi") }
+                    
+                    TextButton(
+                        onClick = { viewModel.resetImport() },
+                        modifier = Modifier.padding(top = 8.dp),
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Icon(Icons.Outlined.Delete, null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Elimina dati importati")
+                    }
                 } else {
                     Button(
                         onClick = { viewModel.exportToRedCap() },
@@ -227,6 +237,15 @@ fun CrfImportScreen(
                         Icon(Icons.Outlined.FileDownload, null)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Esporta file REDCap")
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    TextButton(
+                        onClick = { viewModel.resetImport() },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text("Annulla e resetta")
                     }
                 }
             }

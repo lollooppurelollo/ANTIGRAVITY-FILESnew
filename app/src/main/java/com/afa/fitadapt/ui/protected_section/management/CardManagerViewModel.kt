@@ -57,7 +57,7 @@ class CardManagerViewModel @Inject constructor(
                     )
                     
                     val newExercises = cardWithExercises.cardExercises.map { 
-                        it.copy(id = 0, cardId = 0) // cardId verrà impostato dal repository
+                        it.cardExercise.copy(id = 0, cardId = 0) // cardId verrà impostato dal repository
                     }
                     
                     cardRepository.createCard(newCard, newExercises)

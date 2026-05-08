@@ -58,24 +58,50 @@ object RedCapExportUtils {
 
     private fun generateCsv(crf: KinAptoCRF): String {
         val sb = StringBuilder()
-        // Header (semplificato per l'esempio, dovrebbe contenere tutti i campi necessari)
-        sb.append("record_id,redcap_event_name,redcap_repeat_instrument,redcap_repeat_instance,session_date,session_time,actual_duration_min,perceived_intensity_rpe,completed,notes\n")
+        // Header esteso per coprire diversi strumenti
+        sb.append("record_id,redcap_event_name,redcap_repeat_instrument,redcap_repeat_instance,")
+        sb.append("date,time,value_1,value_2,value_3,value_4,text_content,completed_flag,notes\n")
         
         val patientId = crf.metadata.patientStudyCode
-        
-        // Evento Baseline
-        sb.append("$patientId,baseline,,, , , , , , \n")
+        val dfDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val dfTime = SimpleDateFormat("HH:mm", Locale.getDefault())
 
-        // Sessioni di allenamento (strumento ripetibile)
+        // 1. Evento Baseline (Metadata e Profilo)
+        sb.append("$patientId,baseline,,,")
+        sb.append("${dfDate.format(Date(crf.metadata.exportTimestamp))},${dfTime.format(Date(crf.metadata.exportTimestamp))},")
+        sb.append(",,,,KinApto Export ${crf.metadata.appVersion},1,\n")
+
+        // 2. Sessioni di allenamento (Instrument: exercise_session)
         crf.performedSessions.forEachIndexed { index, session ->
-            val date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date(session.date))
-            val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(session.date))
-            val completed = if (session.completed) "1" else "0"
-            val duration = session.actualDurationMin ?: ""
-            val rpe = session.perceivedEffort ?: ""
+            val date = dfDate.format(Date(session.date))
+            val time = dfTime.format(Date(session.date))
             val notes = (session.notes ?: "").replace("\n", " ").replace(",", ";")
-            
-            sb.append("$patientId,exercise_session,exercise_session,${index + 1},$date,$time,$duration,$rpe,$completed,$notes\n")
+            sb.append("$patientId,exercise_session,exercise_session,${index + 1},")
+            sb.append("$date,$time,${session.actualDurationMin ?: ""},${session.perceivedEffort ?: ""},${session.mood ?: ""},${session.sleepQuality ?: ""},,${if (session.completed) 1 else 0},$notes\n")
+        }
+
+        // 3. Scale Rapide (Instrument: daily_scales)
+        crf.scaleEntries.forEachIndexed { index, scale ->
+            val date = dfDate.format(Date(scale.date))
+            sb.append("$patientId,daily_scales,daily_scales,${index + 1},")
+            sb.append("$date,,${scale.asthenia ?: ""},${scale.osteoarticularPain ?: ""},${scale.restDyspnea ?: ""},${scale.exertionDyspnea ?: ""},,, \n")
+        }
+
+        // 4. Diario Libero (Instrument: diary_entry)
+        crf.diaryEntries.forEachIndexed { index, entry ->
+            val date = dfDate.format(Date(entry.date))
+            val text = entry.text.replace("\n", " ").replace(",", ";")
+            sb.append("$patientId,diary_entry,diary_entry,${index + 1},")
+            sb.append("$date,,,,,,$text,, \n")
+        }
+
+        // 5. Audit Log (Instrument: audit_trail)
+        crf.auditLog.forEachIndexed { index, log ->
+            val date = dfDate.format(Date(log.timestamp))
+            val time = dfTime.format(Date(log.timestamp))
+            val details = (log.details ?: "").replace("\n", " ").replace(",", ";")
+            sb.append("$patientId,audit_trail,audit_trail,${index + 1},")
+            sb.append("$date,$time,,,,,,${log.action},$details\n")
         }
         
         return sb.toString()
@@ -85,10 +111,11 @@ object RedCapExportUtils {
         val sb = StringBuilder()
         sb.append("Variable / Field Name,Form Name,Section Header,Field Type,Field Label,Choices, Unit, List enumerations,Field Note,Text Validation Type,Text Validation Min,Text Validation Max,Identifier,Branching Logic,Required Field,Custom Alignment,Question Number,Matrix Group Name,Matrix Ranking,Field Annotation\n")
         sb.append("record_id,profile,,text,Record ID,,,,,,,,,,,,,,,,\n")
-        sb.append("session_date,exercise_session,,text,Data sessione,,,,date_ymd,,,,,,,,,,,,\n")
-        sb.append("actual_duration_min,exercise_session,,text,Durata (min),,,,integer,,,,,,,,,,,,\n")
-        sb.append("perceived_intensity_rpe,exercise_session,,text,RPE (0-10),,,,integer,0,10,,,,,,,,,,\n")
-        sb.append("completed,exercise_session,,yesno,Completato,,,,,,,,,,,,,,,,\n")
+        sb.append("date,exercise_session,,text,Data,,,,date_ymd,,,,,,,,,,,,\n")
+        sb.append("value_1,exercise_session,,text,Valore 1 (Durata/Astenia),,,,,,,,,,,,,,,,\n")
+        sb.append("value_2,exercise_session,,text,Valore 2 (RPE/Dolore),,,,,,,,,,,,,,,,\n")
+        sb.append("text_content,diary_entry,,notes,Contenuto Testuale,,,,,,,,,,,,,,,,\n")
+        sb.append("completed_flag,exercise_session,,yesno,Completato,,,,,,,,,,,,,,,,\n")
         return sb.toString()
     }
 }

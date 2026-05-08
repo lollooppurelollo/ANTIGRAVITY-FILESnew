@@ -32,7 +32,7 @@ enum class SessionPhase {
 data class SessionUiState(
     val phase: SessionPhase = SessionPhase.QUESTION,
     val activeCardId: Long? = null,
-    val cardExercises: List<CardExerciseEntity> = emptyList(),
+    val cardExercises: List<com.afa.fitadapt.data.local.entity.CardExerciseWithExercise> = emptyList(),
     val exerciseDetails: Map<Long, ExerciseEntity> = emptyMap(),
 
     // Risposta obbligatoria
@@ -89,9 +89,8 @@ class SessionViewModel @Inject constructor(
                     val details = mutableMapOf<Long, ExerciseEntity>()
                     val checklist = mutableMapOf<Long, Boolean>()
                     for (ce in cardWithEx.cardExercises) {
-                        val ex = exerciseRepository.getById(ce.exerciseId)
-                        if (ex != null) details[ce.exerciseId] = ex
-                        checklist[ce.id] = true // di default tutti selezionati
+                        details[ce.cardExercise.exerciseId] = ce.exercise
+                        checklist[ce.cardExercise.id] = true // di default tutti selezionati
                     }
                     _uiState.update {
                         it.copy(

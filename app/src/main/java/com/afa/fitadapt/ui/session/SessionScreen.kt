@@ -356,26 +356,26 @@ private fun DetailsPhase(
             Spacer(modifier = Modifier.height(12.dp))
 
             uiState.cardExercises.forEach { ce ->
-                val exercise = uiState.exerciseDetails[ce.exerciseId]
-                val checked = uiState.exerciseChecklist[ce.id] ?: true
+                val exercise = uiState.exerciseDetails[ce.cardExercise.exerciseId]
+                val checked = uiState.exerciseChecklist[ce.cardExercise.id] ?: true
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
                         .clip(RoundedCornerShape(12.dp))
                         .background(if (checked) accentColor.copy(alpha = 0.05f) else Color.Transparent)
-                        .clickable { viewModel.toggleExercise(ce.id) }
+                        .clickable { viewModel.toggleExercise(ce.cardExercise.id) }
                         .padding(horizontal = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Checkbox(
                         checked = checked,
-                        onCheckedChange = { viewModel.toggleExercise(ce.id) },
+                        onCheckedChange = { viewModel.toggleExercise(ce.cardExercise.id) },
                         colors = CheckboxDefaults.colors(checkedColor = accentColor)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        exercise?.name ?: "Esercizio #${ce.exerciseId}",
+                        exercise?.name ?: "Esercizio #${ce.cardExercise.exerciseId}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = if (checked) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant
                     )

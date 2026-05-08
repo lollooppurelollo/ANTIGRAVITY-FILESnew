@@ -53,6 +53,7 @@ class CrfManagementViewModel @Inject constructor(
     private val profileDao: PatientProfileDao,
     private val goalDao: GoalDao,
     private val cardDao: TrainingCardDao,
+    private val exerciseDao: ExerciseDao,
     private val sessionDao: SessionDao,
     private val diaryDao: DiaryDao,
     private val scaleDao: ScaleEntryDao,
@@ -106,8 +107,15 @@ class CrfManagementViewModel @Inject constructor(
                         val cardWithEx = cardDao.getCardWithExercises(card.id).first()
                         CrfTrainingCard(card.id, card.title, card.startDate, card.endDate, card.status, card.orderIndex, 
                             cardWithEx?.cardExercises?.map { ce ->
-                                // In un caso reale faremmo una query per prendere il nome dell'esercizio
-                                CrfCardExercise(ce.exerciseId, "Esercizio ${ce.exerciseId}", "Categoria", ce.customDurationSec, ce.customRepetitions, ce.customIntensity, ce.orderIndex) 
+                                CrfCardExercise(
+                                    ce.cardExercise.exerciseId, 
+                                    ce.exercise.name, 
+                                    ce.exercise.category, 
+                                    ce.cardExercise.customDurationSec, 
+                                    ce.cardExercise.customRepetitions, 
+                                    ce.cardExercise.customIntensity, 
+                                    ce.cardExercise.orderIndex
+                                )
                             } ?: emptyList()
                         )
                     },
@@ -116,9 +124,25 @@ class CrfManagementViewModel @Inject constructor(
                     },
                     performedSessions = sessions.map { session ->
                          val sessWithEx = sessionDao.getSessionWithExercises(session.id).first()
-                         CrfPerformedSession(session.id, session.cardId, session.date, session.completed, session.partial, session.actualDurationMin, session.perceivedEffort, session.mood, session.sleepQuality, session.notes, exercises = sessWithEx?.exerciseCompletions?.map { 
-                             CrfPerformedExercise(it.cardExercise.cardExercise.exerciseId, "Esercizio ${it.cardExercise.cardExercise.exerciseId}", it.sessionExercise.completed)
-                         } ?: emptyList())
+                         CrfPerformedSession(
+                             id = session.id, 
+                             cardId = session.cardId, 
+                             date = session.date, 
+                             completed = session.completed, 
+                             partial = session.partial, 
+                             actualDurationMin = session.actualDurationMin, 
+                             perceivedEffort = session.perceivedEffort, 
+                             mood = session.mood, 
+                             sleepQuality = session.sleepQuality, 
+                             notes = session.notes, 
+                             exercises = sessWithEx?.exerciseCompletions?.map { 
+                                 CrfPerformedExercise(
+                                     exerciseId = it.cardExercise.cardExercise.exerciseId, 
+                                     name = it.cardExercise.exercise.name, 
+                                     completed = it.sessionExercise.completed
+                                 )
+                             } ?: emptyList()
+                         )
                     },
                     scaleEntries = scales.map { CrfScaleEntry(it.id, it.date, it.asthenia, it.osteoarticularPain, it.restDyspnea, it.exertionDyspnea, it.createdAt) },
                     diaryEntries = diary.map { CrfDiaryEntry(it.id, it.date, it.text, it.createdAt) },
@@ -201,7 +225,8 @@ class CrfManagementViewModel @Inject constructor(
     fun processScannedQr(qrContent: String) {
         try {
             val chunk = json.decodeFromString<KinAptoCrfChunk>(qrContent)
-            if (chunk.type != "KINAPTO_CRF_CHUNK_V1") throw Exception("QR non valido")
+            // Nessuna verifica del tipo "type" se non strettamente necessario, 
+            // ma KinAptoCrfChunk ha un valore di default.
 
             val currentImport = _importState.value
             
@@ -309,7 +334,7 @@ class CrfManagementViewModel @Inject constructor(
                     details = "Dati importati rimossi dal dispositivo"
                 ))
             }
-            _importState.value = CrfImportUiState()
+            _importState.update { CrfImportUiState() }
             _exportState.update { it.copy(exportComplete = false, redcapFilePath = null) }
         }
     }

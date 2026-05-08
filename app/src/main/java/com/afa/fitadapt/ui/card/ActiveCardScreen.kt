@@ -74,6 +74,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.afa.fitadapt.data.local.entity.CardExerciseEntity
+import com.afa.fitadapt.data.local.entity.CardExerciseWithExercise
 import com.afa.fitadapt.data.local.entity.ExerciseEntity
 import com.afa.fitadapt.ui.components.VideoPlayer
 import kotlinx.coroutines.delay
@@ -169,7 +170,7 @@ fun ActiveCardScreen(
             if (guidedTrainingMode) {
                 GuidedTrainingView(
                     cardTitle = cardWithExercises.card.title,
-                    cardExercises = cardWithExercises.cardExercises.sortedBy { it.orderIndex },
+                    cardExercises = cardWithExercises.cardExercises.sortedBy { it.cardExercise.orderIndex },
                     exerciseDetails = uiState.exerciseDetails,
                     useOriginalColors = useOriginalColors
                 )
@@ -244,18 +245,16 @@ fun ActiveCardScreen(
                     }
 
                     itemsIndexed(
-                        cardWithExercises.cardExercises.sortedBy { it.orderIndex }
-                    ) { index, cardExercise ->
-                        val exercise = uiState.exerciseDetails[cardExercise.exerciseId]
-                        if (exercise != null) {
-                            ExerciseListItem(
-                                index = index + 1,
-                                exercise = exercise,
-                                cardExercise = cardExercise,
-                                useOriginalColors = useOriginalColors,
-                                onClick = { onExerciseClick(exercise.id, cardExercise.id) }
-                            )
-                        }
+                        cardWithExercises.cardExercises.sortedBy { it.cardExercise.orderIndex }
+                    ) { index, cardExerciseWithEx ->
+                        val exercise = cardExerciseWithEx.exercise
+                        ExerciseListItem(
+                            index = index + 1,
+                            exercise = exercise,
+                            cardExercise = cardExerciseWithEx.cardExercise,
+                            useOriginalColors = useOriginalColors,
+                            onClick = { onExerciseClick(exercise.id, cardExerciseWithEx.cardExercise.id) }
+                        )
                     }
 
                     item { Spacer(modifier = Modifier.height(80.dp)) }
@@ -268,11 +267,11 @@ fun ActiveCardScreen(
 @Composable
 fun GuidedTrainingView(
     cardTitle: String,
-    cardExercises: List<CardExerciseEntity>,
+    cardExercises: List<CardExerciseWithExercise>,
     exerciseDetails: Map<Long, ExerciseEntity>,
     useOriginalColors: Boolean
 ) {
-    val sortedExercises = remember(cardExercises) { cardExercises.sortedBy { it.orderIndex } }
+    val sortedExercises = remember(cardExercises) { cardExercises.sortedBy { it.cardExercise.orderIndex } }
     val pagerState = rememberPagerState(pageCount = { sortedExercises.size })
     val scope = rememberCoroutineScope()
 
@@ -310,24 +309,22 @@ fun GuidedTrainingView(
             pageSpacing = 16.dp,
             verticalAlignment = Alignment.Top
         ) { page ->
-            val cardExercise = sortedExercises[page]
-            val exercise = exerciseDetails[cardExercise.exerciseId]
-            if (exercise != null) {
-                Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    GuidedExerciseCard(
-                        index = page + 1,
-                        exercise = exercise,
-                        cardExercise = cardExercise,
-                        useOriginalColors = useOriginalColors,
-                        onFinished = {
-                            if (page < sortedExercises.size - 1) {
-                                scope.launch {
-                                    pagerState.animateScrollToPage(page + 1)
-                                }
+            val cardExerciseWithEx = sortedExercises[page]
+            val exercise = cardExerciseWithEx.exercise
+            Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                GuidedExerciseCard(
+                    index = page + 1,
+                    exercise = exercise,
+                    cardExercise = cardExerciseWithEx.cardExercise,
+                    useOriginalColors = useOriginalColors,
+                    onFinished = {
+                        if (page < sortedExercises.size - 1) {
+                            scope.launch {
+                                pagerState.animateScrollToPage(page + 1)
                             }
                         }
-                    )
-                }
+                    }
+                )
             }
         }
         
