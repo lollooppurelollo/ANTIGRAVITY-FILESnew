@@ -1,0 +1,140 @@
+// =============================================================
+// KinApto - Attività Fisica Adattata
+// Database Room principale con cifratura SQLCipher
+// =============================================================
+package com.kinapto.fitadapt.data.local.db
+
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.kinapto.fitadapt.data.local.dao.*
+import com.kinapto.fitadapt.data.local.entity.*
+
+/**
+ * Database Room principale dell'app KinApto.
+ *
+ * Contiene 11 tabelle per gestire:
+ * - Libreria esercizi
+ * - Schede di allenamento e relazione con esercizi
+ * - Sessioni e dettaglio esercizi completati
+ * - Diario libero
+ * - Scale rapide (astenia, dolore, dispnea)
+ * - Articoli/consigli
+ * - Log degli export
+ * - Profilo paziente
+ * - Obiettivi
+ *
+ * Il database Ã¨ CIFRATO con SQLCipher.
+ * La chiave di cifratura Ã¨ gestita da CryptoManager e protetta
+ * dal Keystore Android. Vedi DatabaseModule per i dettagli.
+ *
+ * Versione 3: Rimosso campo ridondante in PatientProfileEntity e allineamento schema.
+ */
+@Database(
+    entities = [
+        ExerciseEntity::class,
+        TrainingCardEntity::class,
+        CardExerciseEntity::class,
+        SessionEntity::class,
+        SessionExerciseEntity::class,
+        DiaryEntryEntity::class,
+        ScaleEntryEntity::class,
+        ArticleEntity::class,
+        ExportLogEntity::class,
+        PatientProfileEntity::class,
+        GoalEntity::class,
+        ScheduledSessionEntity::class,
+        AuditLogEntity::class
+    ],
+    version = 10,
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
+abstract class KinAptoDatabase : RoomDatabase() {
+
+    // â”€â”€ DAO per ogni tabella â”€â”€
+    abstract fun exerciseDao(): ExerciseDao
+    abstract fun trainingCardDao(): TrainingCardDao
+    abstract fun sessionDao(): SessionDao
+    abstract fun diaryDao(): DiaryDao
+    abstract fun scaleEntryDao(): ScaleEntryDao
+    abstract fun articleDao(): ArticleDao
+    abstract fun exportLogDao(): ExportLogDao
+    abstract fun patientProfileDao(): PatientProfileDao
+    abstract fun goalDao(): GoalDao
+    abstract fun scheduledSessionDao(): ScheduledSessionDao
+    abstract fun auditLogDao(): AuditLogDao
+
+    companion object {
+        /**
+         * Scaffold per le migrazioni future.
+         * Quando si cambia lo schema, aggiungere qui una nuova migrazione.
+         */
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Aggiunta campi silverValue e goldValue alla tabella goals
+                db.execSQL("ALTER TABLE goals ADD COLUMN silverValue REAL DEFAULT NULL")
+                db.execSQL("ALTER TABLE goals ADD COLUMN goldValue REAL DEFAULT NULL")
+            }
+        }
+
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE scheduled_sessions ADD COLUMN recurrenceDays TEXT")
+            }
+        }
+
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Migrazione transitoria (campi ora rimossi nella v8)
+                db.execSQL("ALTER TABLE exercises ADD COLUMN movementInstructions TEXT NOT NULL DEFAULT ''")
+                db.execSQL("ALTER TABLE exercises ADD COLUMN commonErrors TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Rimuoviamo definitivamente ogni residuo del sistema 3D/SceneView
+                try {
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS modelAssetPath")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS animationAssetPath")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS animationName")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS movementInstructions")
+                    db.execSQL("ALTER TABLE exercises DROP COLUMN IF EXISTS commonErrors")
+                } catch (e: Exception) {
+                    // Supporto per versioni SQLite che non gestiscono DROP COLUMN IF EXISTS
+                }
+            }
+        }
+
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE goals ADD COLUMN periodType TEXT NOT NULL DEFAULT 'none'")
+                db.execSQL("ALTER TABLE goals ADD COLUMN customPeriodValue INTEGER DEFAULT NULL")
+                db.execSQL("ALTER TABLE goals ADD COLUMN customPeriodUnit TEXT DEFAULT NULL")
+                db.execSQL("ALTER TABLE goals ADD COLUMN parentGoalId INTEGER DEFAULT NULL")
+            }
+        }
+
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `audit_logs` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                        `timestamp` INTEGER NOT NULL, 
+                        `action` TEXT NOT NULL, 
+                        `patientStudyCode` TEXT NOT NULL, 
+                        `exportId` TEXT, 
+                        `details` TEXT, 
+                        `success` INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+    }
+}
+

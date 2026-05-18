@@ -1,0 +1,565 @@
+// =============================================================
+// KinApto - Attività Fisica Adattata
+// Navigation graph principale
+// =============================================================
+package com.kinapto.fitadapt.ui.navigation
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.kinapto.fitadapt.security.BiometricHelper
+import com.kinapto.fitadapt.ui.articles.ArticleDetailScreen
+import com.kinapto.fitadapt.ui.articles.ArticlesScreen
+import com.kinapto.fitadapt.ui.articles.ArticlesViewModel
+import com.kinapto.fitadapt.ui.auth.AuthViewModel
+import com.kinapto.fitadapt.ui.auth.BiometricLockScreen
+import com.kinapto.fitadapt.ui.auth.SetupWizardScreen
+import com.kinapto.fitadapt.ui.card.ActiveCardScreen
+import com.kinapto.fitadapt.ui.card.CardViewModel
+import com.kinapto.fitadapt.ui.card.ExerciseDetailScreen
+import com.kinapto.fitadapt.ui.diary.DiaryScreen
+import com.kinapto.fitadapt.ui.diary.DiaryViewModel
+import com.kinapto.fitadapt.ui.export.ExportScreen
+import com.kinapto.fitadapt.ui.export.ExportViewModel
+import com.kinapto.fitadapt.ui.home.HomeScreen
+import com.kinapto.fitadapt.ui.home.HomeViewModel
+import com.kinapto.fitadapt.ui.more.MoreScreen
+import com.kinapto.fitadapt.ui.progress.ProgressScreen
+import com.kinapto.fitadapt.ui.progress.ProgressViewModel
+import com.kinapto.fitadapt.ui.protected_section.ProtectedDashboardScreen
+import com.kinapto.fitadapt.ui.protected_section.ProtectedGateScreen
+import com.kinapto.fitadapt.ui.protected_section.ProtectedViewModel
+import com.kinapto.fitadapt.ui.protected_section.management.*
+import com.kinapto.fitadapt.ui.session.SessionScreen
+import com.kinapto.fitadapt.ui.session.SessionViewModel
+import com.kinapto.fitadapt.ui.session.SessionHistoryScreen
+import com.kinapto.fitadapt.ui.session.SessionDetailScreen
+import com.kinapto.fitadapt.ui.settings.SettingsScreen
+import com.kinapto.fitadapt.ui.settings.SettingsViewModel
+import com.kinapto.fitadapt.ui.splash.SplashScreen
+
+/**
+ * Route dove la bottom navigation bar Ã¨ visibile.
+ */
+private val bottomNavRoutes = setOf(
+    Screen.Home.route,
+    Screen.ActiveCard.route,
+    Screen.Progress.route,
+    Screen.Diary.route,
+    Screen.More.route
+)
+
+/**
+ * NavGraph principale dell'app KinApto.
+ *
+ * Flusso:
+ * 1. Splash â†’ verifica primo avvio
+ * 2. Setup Wizard (se primo avvio) OPPURE BiometricLock (se giÃ  configurato)
+ * 3. Home con bottom navigation
+ * 4. Schermate dettaglio senza bottom nav
+ */
+@Composable
+fun KinAptoNavGraph(biometricHelper: BiometricHelper) {
+    val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val showBottomBar = currentRoute in bottomNavRoutes
+
+    Scaffold(
+        bottomBar = {
+            if (showBottomBar) {
+                BottomNavBar(
+                    navController = navController,
+                    currentRoute = currentRoute
+                )
+            }
+        }
+    ) { paddingValues ->
+        NavHost(
+            navController = navController,
+            startDestination = Screen.Splash.route,
+            modifier = Modifier.padding(paddingValues)
+        ) {
+
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            //  FLUSSO INIZIALE
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+            composable(Screen.Splash.route) {
+                val authViewModel: AuthViewModel = hiltViewModel()
+                SplashScreen(
+                    authViewModel = authViewModel,
+                    onNavigateToSetup = {
+                        navController.navigate(Screen.SetupWizard.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToBiometric = {
+                        navController.navigate(Screen.BiometricLock.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable(Screen.SetupWizard.route) {
+                val authViewModel: AuthViewModel = hiltViewModel()
+                SetupWizardScreen(
+                    authViewModel = authViewModel,
+                    onSetupComplete = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.SetupWizard.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable(Screen.BiometricLock.route) {
+                val authViewModel: AuthViewModel = hiltViewModel()
+                BiometricLockScreen(
+                    authViewModel = authViewModel,
+                    biometricHelper = biometricHelper,
+                    onAuthenticated = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.BiometricLock.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            //  SCHERMATE PRINCIPALI (con bottom nav)
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+            composable(Screen.Home.route) {
+                val homeViewModel: HomeViewModel = hiltViewModel()
+                HomeScreen(
+                    homeViewModel = homeViewModel,
+                    onNavigateToSession = {
+                        navController.navigate(Screen.Session.route)
+                    },
+                    onNavigateToHistory = {
+                        navController.navigate(Screen.SessionHistory.route)
+                    },
+                    onNavigateToCard = {
+                        navController.navigate(Screen.ActiveCard.route)
+                    },
+                    onNavigateToArticle = { articleId ->
+                        navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                    }
+                )
+            }
+
+            composable(Screen.ActiveCard.route) {
+                val cardViewModel: CardViewModel = hiltViewModel()
+                ActiveCardScreen(
+                    cardViewModel = cardViewModel,
+                    onExerciseClick = { exerciseId, cardExerciseId ->
+                        navController.navigate(
+                            Screen.ExerciseDetail.createRoute(exerciseId, cardExerciseId)
+                        )
+                    }
+                )
+            }
+
+            composable(Screen.Progress.route) {
+                val progressViewModel: ProgressViewModel = hiltViewModel()
+                ProgressScreen(
+                    progressViewModel = progressViewModel,
+                    onNavigateToHistory = {
+                        navController.navigate(Screen.SessionHistory.route)
+                    }
+                )
+            }
+
+            composable(Screen.More.route) {
+                MoreScreen(
+                    onNavigateToDiary = {
+                        navController.navigate(Screen.Diary.route)
+                    },
+                    onNavigateToArticles = {
+                        navController.navigate(Screen.Articles.route)
+                    },
+                    onNavigateToExport = {
+                        navController.navigate(Screen.Export.route)
+                    },
+                    onNavigateToCrfExport = {
+                        navController.navigate(Screen.CrfExport.route)
+                    },
+                    onNavigateToSettings = {
+                        navController.navigate(Screen.Settings.route)
+                    },
+                    onNavigateToProtected = {
+                        navController.navigate(Screen.ProtectedGate.route)
+                    }
+                )
+            }
+
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            //  SCHERMATE DETTAGLIO (senza bottom nav)
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+            composable(Screen.Session.route) {
+                val sessionViewModel: SessionViewModel = hiltViewModel()
+                var showCompletionDialog by remember { mutableStateOf(false) }
+
+                LaunchedEffect(Unit) {
+                    sessionViewModel.onSessionTargetReached = {
+                        showCompletionDialog = true
+                    }
+                }
+
+                if (showCompletionDialog) {
+                    androidx.compose.material3.AlertDialog(
+                        onDismissRequest = { showCompletionDialog = false },
+                        title = { Text("Obiettivo raggiunto!") },
+                        text = { Text("Hai completato tutte le sessioni previste per questa scheda. Vuoi passare alla prossima?") },
+                        confirmButton = {
+                            androidx.compose.material3.TextButton(
+                                onClick = {
+                                    showCompletionDialog = false
+                                    // La logica di avanzamento Ã¨ giÃ  gestita dal repository
+                                    // ma qui potremmo voler navigare o fare altro.
+                                    // Per ora chiudiamo solo il dialogo.
+                                }
+                            ) { Text("OK") }
+                        }
+                    )
+                }
+
+                SessionScreen(
+                    sessionViewModel = sessionViewModel,
+                    onBack = { navController.popBackStack() },
+                    onDone = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            composable(Screen.SessionHistory.route) {
+                val sessionViewModel: SessionViewModel = hiltViewModel()
+                SessionHistoryScreen(
+                    viewModel = sessionViewModel,
+                    onBack = { navController.popBackStack() },
+                    onSessionClick = { sessionId ->
+                        navController.navigate(Screen.SessionDetail.createRoute(sessionId))
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.SessionDetail.route,
+                arguments = listOf(navArgument("sessionId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val sessionId = backStackEntry.arguments?.getLong("sessionId") ?: return@composable
+                val sessionViewModel: SessionViewModel = hiltViewModel()
+                SessionDetailScreen(
+                    viewModel = sessionViewModel,
+                    sessionId = sessionId,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = Screen.ExerciseDetail.route,
+                arguments = listOf(
+                    navArgument("exerciseId") { type = NavType.LongType },
+                    navArgument("cardExerciseId") {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    }
+                )
+            ) { backStackEntry ->
+                val exerciseId = backStackEntry.arguments?.getLong("exerciseId") ?: return@composable
+                val cardExerciseId = backStackEntry.arguments?.getLong("cardExerciseId") ?: -1L
+                val cardViewModel: CardViewModel = hiltViewModel()
+                ExerciseDetailScreen(
+                    cardViewModel = cardViewModel,
+                    exerciseId = exerciseId,
+                    cardExerciseId = cardExerciseId,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            //  PLACEHOLDER per Tranche 4+
+            //  (Diary, Articles, Export, Settings, Protected)
+            // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+            composable(Screen.Diary.route) {
+                val diaryViewModel: DiaryViewModel = hiltViewModel()
+                DiaryScreen(
+                    diaryViewModel = diaryViewModel
+                )
+            }
+
+            composable(Screen.Articles.route) {
+                val articlesViewModel: ArticlesViewModel = hiltViewModel()
+                ArticlesScreen(
+                    articlesViewModel = articlesViewModel,
+                    onBack = { navController.popBackStack() },
+                    onArticleClick = { articleId ->
+                        navController.navigate(Screen.ArticleDetail.createRoute(articleId))
+                    }
+                )
+            }
+
+            composable(
+                route = Screen.ArticleDetail.route,
+                arguments = listOf(navArgument("articleId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val articleId = backStackEntry.arguments?.getLong("articleId") ?: return@composable
+                val articlesViewModel: ArticlesViewModel = hiltViewModel()
+                ArticleDetailScreen(
+                    articlesViewModel = articlesViewModel,
+                    articleId = articleId,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.Export.route) {
+                val exportViewModel: ExportViewModel = hiltViewModel()
+                ExportScreen(
+                    exportViewModel = exportViewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.Settings.route) {
+                val settingsViewModel: SettingsViewModel = hiltViewModel()
+                SettingsScreen(
+                    settingsViewModel = settingsViewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ProtectedGate.route) {
+                // Usiamo un ViewModel con scope legato a QUESTA rotta specifica,
+                // cosÃ¬ quando usciamo dalla sezione protetta, il ViewModel viene distrutto
+                // e la password verrÃ  richiesta di nuovo al prossimo accesso.
+                val protectedViewModel: ProtectedViewModel = hiltViewModel()
+                ProtectedGateScreen(
+                    protectedViewModel = protectedViewModel,
+                    onBack = { navController.popBackStack() },
+                    onAuthenticated = {
+                        navController.navigate(Screen.ProtectedDashboard.route)
+                    }
+                )
+            }
+
+            composable(Screen.ProtectedDashboard.route) {
+                // Condividiamo lo stesso ViewModel (grazie allo scope del backstack se volessimo),
+                // ma per semplicitÃ  e sicurezza qui richiediamo che l'utente arrivi dal Gate.
+                // Se usiamo hiltViewModel() senza specificare uno scope, ne viene creato uno nuovo
+                // che avrÃ  isAuthenticated = false di default, forzando il ritorno al gate.
+                val backStackEntry = remember(navBackStackEntry) {
+                    navController.getBackStackEntry(Screen.ProtectedGate.route)
+                }
+                val protectedViewModel: ProtectedViewModel = hiltViewModel(backStackEntry)
+                
+                ProtectedDashboardScreen(
+                    protectedViewModel = protectedViewModel,
+                    onBack = { 
+                        navController.popBackStack(Screen.ProtectedGate.route, inclusive = true)
+                    },
+                    onManageCards = { navController.navigate(Screen.CardManager.route) },
+                    onManageGoals = { navController.navigate(Screen.GoalManager.route) },
+                    onManageExercises = { navController.navigate(Screen.ExerciseLibraryManager.route) },
+                    onManageArticles = { navController.navigate(Screen.ArticleManager.route) },
+                    onCrfExport = { navController.navigate(Screen.CrfExport.route) },
+                    onCrfImport = { navController.navigate(Screen.CrfImport.route) }
+                )
+            }
+
+            // â”€â”€ Rotte Gestione (Area Protetta) â”€â”€
+
+            composable(Screen.CrfExport.route) {
+                CrfExportScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.CrfImport.route) {
+                CrfImportScreen(
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.CardManager.route) {
+                val viewModel: CardManagerViewModel = hiltViewModel()
+                CardManagerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddCard = { navController.navigate(Screen.CardEditor.createRoute(-1L)) },
+                    onEditCard = { id -> navController.navigate(Screen.CardEditor.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Screen.CardEditor.route,
+                arguments = listOf(navArgument("cardId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val viewModel: CardEditorViewModel = hiltViewModel()
+                CardEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onPickExercise = { navController.navigate(Screen.ExercisePicker.route) }
+                )
+            }
+
+            composable(Screen.ExercisePicker.route) {
+                val viewModel: ExerciseLibraryViewModel = hiltViewModel()
+                val backStackEntry = remember(navBackStackEntry) {
+                    navController.getBackStackEntry(Screen.CardEditor.route)
+                }
+                val editorViewModel: CardEditorViewModel = hiltViewModel(backStackEntry)
+                
+                ExercisePickerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onExerciseSelected = { exercise ->
+                        editorViewModel.addExercise(exercise)
+                        navController.popBackStack()
+                    }
+                )
+            }
+
+            composable(Screen.GoalManager.route) {
+                val viewModel: GoalManagerViewModel = hiltViewModel()
+                GoalManagerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddGoal = { navController.navigate(Screen.GoalEditor.createRoute(-1L)) },
+                    onEditGoal = { id -> navController.navigate(Screen.GoalEditor.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Screen.GoalEditor.route,
+                arguments = listOf(navArgument("goalId") { type = NavType.LongType })
+            ) { backStackEntry ->
+                val goalId = backStackEntry.arguments?.getLong("goalId") ?: -1L
+                val viewModel: GoalEditorViewModel = hiltViewModel()
+                
+                LaunchedEffect(goalId) {
+                    if (goalId != -1L) {
+                        viewModel.loadGoal(goalId)
+                    }
+                }
+
+                GoalEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ExerciseLibraryManager.route) {
+                val viewModel: ExerciseLibraryViewModel = hiltViewModel()
+                ExerciseLibraryManagerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddExercise = { navController.navigate(Screen.ExerciseEditor.createRoute(-1L)) },
+                    onEditExercise = { id -> navController.navigate(Screen.ExerciseEditor.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Screen.ExerciseEditor.route,
+                arguments = listOf(navArgument("exerciseId") { type = NavType.LongType })
+            ) {
+                val viewModel: ExerciseEditorViewModel = hiltViewModel()
+                ExerciseEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.ArticleManager.route) {
+                val viewModel: ArticleManagerViewModel = hiltViewModel()
+                ArticleManagerScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() },
+                    onAddArticle = { navController.navigate(Screen.ArticleEditor.createRoute(-1L)) },
+                    onEditArticle = { id -> navController.navigate(Screen.ArticleEditor.createRoute(id)) }
+                )
+            }
+
+            composable(
+                route = Screen.ArticleEditor.route,
+                arguments = listOf(navArgument("articleId") { type = NavType.LongType })
+            ) {
+                val viewModel: ArticleEditorViewModel = hiltViewModel()
+                ArticleEditorScreen(
+                    viewModel = viewModel,
+                    onBack = { navController.popBackStack() }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Schermata placeholder per le funzionalitÃ  da implementare nelle prossime tranche.
+ */
+@Suppress("unused") // Usata per le route non ancora implementate nella navigazione
+@Composable
+private fun PlaceholderScreen(title: String, subtitle: String) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(32.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("ðŸš§", fontSize = 48.sp)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                "In fase di sviluppo â€” sarÃ  disponibile presto",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline
+            )
+        }
+    }
+}
+
+

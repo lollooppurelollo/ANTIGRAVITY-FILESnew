@@ -1,0 +1,341 @@
+// =============================================================
+// KinApto - Attività Fisica Adattata
+// Schermata: Setup Wizard (primo avvio)
+// =============================================================
+package com.kinapto.fitadapt.ui.auth
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.kinapto.fitadapt.R
+
+/**
+ * Wizard di configurazione iniziale (3 step).
+ * Step 0: Imposta password sezione protetta
+ * Step 1: Inserisci codice paziente
+ * Step 2: Conferma e completa
+ */
+@Composable
+fun SetupWizardScreen(
+    authViewModel: AuthViewModel,
+    onSetupComplete: () -> Unit
+) {
+    val uiState by authViewModel.uiState.collectAsState()
+
+    LaunchedEffect(uiState.setupCompleted) {
+        if (uiState.setupCompleted) onSetupComplete()
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(24.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Titolo rebranding KinApto
+        Text(
+            text = stringResource(R.string.setup_welcome),
+            style = MaterialTheme.typography.headlineLarge,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = stringResource(R.string.setup_subtitle),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Indicatore step
+        StepIndicator(currentStep = uiState.setupStep)
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Contenuto dello step corrente
+        AnimatedContent(
+            targetState = uiState.setupStep,
+            label = "setupStep"
+        ) { step ->
+            when (step) {
+                0 -> PasswordStep(
+                    error = uiState.passwordError,
+                    onSetPassword = { pwd, confirm ->
+                        authViewModel.setPassword(pwd, confirm)
+                    }
+                )
+                1 -> PatientCodeStep(
+                    error = uiState.authError,
+                    onSetCode = { code -> authViewModel.setPatientCode(code) },
+                    onBack = { authViewModel.previousSetupStep() }
+                )
+                2 -> ConfirmStep(
+                    onConfirm = { authViewModel.completeSetup() },
+                    onBack = { authViewModel.previousSetupStep() }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StepIndicator(currentStep: Int) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        for (i in 0..2) {
+            val isCurrent = i == currentStep
+            val isDone = i < currentStep
+            val color = when {
+                isDone -> MaterialTheme.colorScheme.secondary
+                isCurrent -> MaterialTheme.colorScheme.primary
+                else -> MaterialTheme.colorScheme.primaryContainer
+            }
+
+            Box(
+                modifier = Modifier
+                    .size(if (isCurrent) 32.dp else 24.dp)
+                    .clip(CircleShape)
+                    .background(color),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isDone) {
+                    Icon(Icons.Default.Check, stringResource(R.string.setup_step_done), tint = MaterialTheme.colorScheme.onSecondary, modifier = Modifier.size(16.dp))
+                } else {
+                    Text("${i + 1}", color = if (isCurrent) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onPrimaryContainer, style = MaterialTheme.typography.labelMedium)
+                }
+            }
+            if (i < 2) {
+                Spacer(modifier = Modifier.width(8.dp))
+                Box(modifier = Modifier.width(32.dp).height(2.dp).background(if (isDone) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primaryContainer))
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+private fun PasswordStep(
+    error: String?,
+    onSetPassword: (String, String) -> Unit
+) {
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var showPassword by remember { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Icon(Icons.Default.Lock, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(stringResource(R.string.setup_password_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.setup_password_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text(stringResource(R.string.setup_password_label)) },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Next),
+                trailingIcon = {
+                    IconButton(onClick = { showPassword = !showPassword }) {
+                        Icon(if (showPassword) Icons.Outlined.VisibilityOff else Icons.Outlined.Visibility, stringResource(R.string.setup_password_show))
+                    }
+                },
+                singleLine = true
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text(stringResource(R.string.setup_password_confirm_label)) },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+                singleLine = true
+            )
+
+            if (error != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = { onSetPassword(password, confirmPassword) },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = password.isNotEmpty() && confirmPassword.isNotEmpty()
+            ) {
+                Text(stringResource(R.string.setup_next))
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
+            }
+        }
+    }
+}
+
+@Composable
+private fun PatientCodeStep(
+    error: String?,
+    onSetCode: (String) -> Unit,
+    onBack: () -> Unit
+) {
+    var code by remember { mutableStateOf("") }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(modifier = Modifier.padding(24.dp)) {
+            Icon(Icons.Default.Person, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(40.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(stringResource(R.string.setup_patient_code_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.setup_patient_code_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(20.dp))
+
+            OutlinedTextField(
+                value = code,
+                onValueChange = { code = it },
+                label = { Text(stringResource(R.string.setup_patient_code_label)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                isError = error != null
+            )
+
+            if (error != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(error, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                TextButton(onClick = onBack) { Text(stringResource(R.string.setup_back)) }
+                Button(onClick = { onSetCode(code) }, enabled = code.isNotBlank()) {
+                    Text(stringResource(R.string.setup_next))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Icon(Icons.AutoMirrored.Filled.ArrowForward, null)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ConfirmStep(
+    onConfirm: () -> Unit,
+    onBack: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier.size(64.dp).clip(CircleShape).background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(32.dp))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(stringResource(R.string.setup_ready_title), style = MaterialTheme.typography.titleLarge, color = MaterialTheme.colorScheme.onSurface)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                stringResource(R.string.setup_ready_desc),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = onConfirm,
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(stringResource(R.string.setup_enter_app))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            TextButton(onClick = onBack) { Text(stringResource(R.string.setup_back)) }
+        }
+    }
+}
