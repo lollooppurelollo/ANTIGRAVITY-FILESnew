@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    AFA - Attività Fisica Adattata
+    KinApto - Attività Fisica Adattata
     AndroidManifest.xml
     Manifesto dell'app: permessi, activity, provider
 -->
@@ -28,7 +28,7 @@
         tools:node="remove" />
 
     <application
-        android:name=".AfaApplication"
+        android:name=".KinAptoApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="false"
@@ -36,14 +36,14 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AFA"
+        android:theme="@style/Theme.KinApto"
         tools:targetApi="35">
 
         <!-- Activity principale — unico punto di ingresso (Single Activity pattern) -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.AFA">
+            android:theme="@style/Theme.KinApto">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -53,7 +53,7 @@
         <!--
             Disabilitiamo l'inizializzazione automatica di WorkManager
             perché usiamo Hilt per iniettare la HiltWorkerFactory.
-            L'inizializzazione avviene in AfaApplication.
+            L'inizializzazione avviene in KinAptoApplication.
         -->
         <provider
             android:name="androidx.startup.InitializationProvider"

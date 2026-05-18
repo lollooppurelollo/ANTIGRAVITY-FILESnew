@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- AFA - Colori base per risorse XML (il tema Compose usa i propri) -->
+<!-- KinApto - Colori base per risorse XML (il tema Compose usa i propri) -->
 <resources>
     <color name="primary">#00A3FF</color>
     <color name="primary_container">#E0F3FF</color>

@@ -1,5 +1,5 @@
 # =============================================================
-# AFA - Regole ProGuard per la build release
+# KinApto - Regole ProGuard per la build release
 # =============================================================
 
 # ── SQLCipher ──
@@ -20,11 +20,11 @@
 -keepclasseswithmembers class kotlinx.serialization.json.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
--keep,includedescriptorclasses class com.afa.fitadapt.**$$serializer { *; }
--keepclassmembers class com.afa.fitadapt.** {
+-keep,includedescriptorclasses class com.kinapto.fitadapt.**$$serializer { *; }
+-keepclassmembers class com.kinapto.fitadapt.** {
     *** Companion;
 }
--keepclasseswithmembers class com.afa.fitadapt.** {
+-keepclasseswithmembers class com.kinapto.fitadapt.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
 

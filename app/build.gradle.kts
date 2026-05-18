@@ -1,5 +1,5 @@
 // =============================================================
-// AFA - Attività Fisica Adattata
+// KinApto - Attività Fisica Adattata
 // File: app/build.gradle.kts
 // Configurazione del modulo app con tutte le dipendenze
 // =============================================================
@@ -14,11 +14,11 @@ plugins {
 }
 
 android {
-    namespace = "com.afa.fitadapt"
+    namespace = "com.kinapto.fitadapt"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.afa.fitadapt"
+        applicationId = "com.kinapto.fitadapt"
         minSdk = 26          // Android 8.0 — supporta BiometricPrompt e Keystore AES
         targetSdk = 35
         versionCode = 1
@@ -152,5 +152,13 @@ dependencies {
     // ══════════════════════════════════════════════════════════
     implementation("androidx.core:core-ktx:1.16.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
+
+    // ══════════════════════════════════════════════════════════
+    // TESTING
+    // ══════════════════════════════════════════════════════════
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.9")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("app.cash.turbine:turbine:1.1.0")
 }
 

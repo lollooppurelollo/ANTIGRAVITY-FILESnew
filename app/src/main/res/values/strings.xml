@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    AFA - Attività Fisica Adattata
+    KinApto - Attività Fisica Adattata
     Stringhe dell'app (italiano)
 -->
 <resources>
@@ -8,4 +8,447 @@
     <string name="app_full_name">KinApto - Attività Fisica Adattata</string>
     <string name="app_description">KinApto: Il tuo percorso di attività fisica personalizzato</string>
     <string name="app_slogan">Sempre in movimento</string>
+
+    <!-- Setup Wizard -->
+    <string name="setup_welcome">Benvenuta in KinApto</string>
+    <string name="setup_subtitle">Personalizziamo la tua esperienza</string>
+    <string name="setup_step_done">Completato</string>
+    <string name="setup_password_title">Crea una password</string>
+    <string name="setup_password_desc">Questa password protegge la sezione di configurazione dell\'app.</string>
+    <string name="setup_password_label">Password</string>
+    <string name="setup_password_confirm_label">Conferma password</string>
+    <string name="setup_password_show">Mostra password</string>
+    <string name="setup_next">Avanti</string>
+    <string name="setup_patient_code_title">Codice paziente</string>
+    <string name="setup_patient_code_desc">Inserisci il codice assegnato dal tuo operatore sanitario. Questo codice identifica i tuoi dati in modo anonimo.</string>
+    <string name="setup_patient_code_label">Codice (es. KAP-0001)</string>
+    <string name="setup_back">Indietro</string>
+    <string name="setup_ready_title">Tutto pronto!</string>
+    <string name="setup_ready_desc">La configurazione di KinApto è terminata. Inizia subito il tuo percorso!</string>
+    <string name="setup_enter_app">Entra in KinApto</string>
+
+    <!-- Auth Errors -->
+    <string name="error_init">Errore durante l\'inizializzazione: %s</string>
+    <string name="error_password_short">La password deve avere almeno 4 caratteri</string>
+    <string name="error_password_mismatch">Le password non corrispondono</string>
+    <string name="error_save_code">Errore salvataggio codice: %s</string>
+    <string name="error_complete_setup">Errore completamento setup: %s</string>
+
+    <!-- Session Recording -->
+    <string name="session_title">Registra sessione</string>
+    <string name="session_back">Indietro</string>
+    <string name="session_ok">OK</string>
+    <string name="session_cancel">Annulla</string>
+    <string name="session_today">Oggi</string>
+    <string name="session_question">Hai fatto l\'allenamento\noggi?</string>
+    <string name="session_question_desc">Registra la tua sessione per monitorare i tuoi progressi di salute</string>
+    <string name="session_yes">Sì, completato!</string>
+    <string name="session_partial">Sì, ma solo in parte</string>
+    <string name="session_no">No, oggi no</string>
+    <string name="session_partial_title">Sessione parziale</string>
+    <string name="session_success_title">Ottimo lavoro! 🎉</string>
+    <string name="session_details_desc">Aggiungi qualche dettaglio sulla tua attività</string>
+    <string name="session_duration">Durata (minuti)</string>
+    <string name="session_effort">Fatica percepita</string>
+    <string name="session_asthenia">Astenia (stanchezza generale)</string>
+    <string name="session_pain">Dolore osteoarticolare</string>
+    <string name="session_rest_dyspnea">Fiato corto (a riposo)</string>
+    <string name="session_exertion_dyspnea">Fiato corto (sotto sforzo)</string>
+    <string name="session_nausea">Nausea</string>
+    <string name="session_mood">Umore</string>
+    <string name="session_anxiety">Stato di ansia / stress</string>
+    <string name="session_sleep">Qualità del sonno</string>
+    <string name="session_appetite">Appetito</string>
+    <string name="session_scale_worst">Pessimo</string>
+    <string name="session_scale_best">Ottimo</string>
+    <string name="session_exercises_completed">Esercizi completati</string>
+    <string name="session_exercise_prefix">Esercizio #%s</string>
+    <string name="session_notes_label">Note (opzionale)</string>
+    <string name="session_saving">Salvataggio...</string>
+    <string name="session_save_button">Salva sessione</string>
+    <string name="session_submitted_title">Sessione registrata!</string>
+    <string name="session_submitted_desc">Ottimo lavoro. Ogni passo conta per il tuo benessere! 💪</string>
+    <string name="session_go_home">Torna alla Home</string>
+    <string name="session_record_another">Registra un altro allenamento</string>
+
+    <!-- Home Screen -->
+    <string name="home_greeting">Buongiorno!</string>
+    <string name="home_patient_code">Codice: %s</string>
+    <string name="home_streak_label">Giorni consecutivi</string>
+    <string name="home_adherence_label">Aderenza</string>
+    <string name="home_calendar_monthly">Calendario Mensile</string>
+    <string name="home_calendar_weekly">Calendario Settimanale</string>
+    <string name="home_add_scheduled">Aggiungi programmato</string>
+    <string name="home_change_view">Cambia vista</string>
+    <string name="home_recorded_title">Allenamento registrato</string>
+    <string name="home_recorded_subtitle">Ottimo lavoro per oggi!</string>
+    <string name="home_record_button_desc">Registra</string>
+    <string name="home_record_now">Registra allenamento</string>
+    <string name="home_active_plan">Piano attivo</string>
+    <string name="home_card_icon_desc">Scheda</string>
+    <string name="home_optimized_tag">OTTIMIZZATA</string>
+    <string name="home_target_sessions">%d sessioni obiettivo</string>
+    <string name="home_your_card_title">La tua scheda</string>
+    <string name="home_featured_article">Consiglio della settimana</string>
+    <string name="home_article_icon_desc">Articolo</string>
+    <string name="home_goals_title">I tuoi obiettivi</string>
+    <string name="home_milestones_prefix">Traguardi: </string>
+    <string name="home_milestones_bronze">🥉</string>
+    <string name="home_milestones_silver">🥉 🥈</string>
+    <string name="home_milestones_gold">🥉 🥈 🥇</string>
+
+    <!-- Home Calendar / Dialogs -->
+    <string name="home_dialog_title">Programma Allenamento</string>
+    <string name="home_dialog_title_label">Titolo</string>
+    <string name="home_dialog_default_title">Allenamento</string>
+    <string name="home_dialog_start_date">Data di inizio</string>
+    <string name="home_dialog_select_date_desc">Seleziona data</string>
+    <string name="home_dialog_time">Orario (HH:mm)</string>
+    <string name="home_dialog_recurrence">Ripetizione</string>
+    <string name="home_dialog_recurrence_none">Singola</string>
+    <string name="home_dialog_recurrence_weekly">Settimanale</string>
+    <string name="home_dialog_recurrence_x_days">Ogni X gg</string>
+    <string name="home_dialog_weekly_days">Giorni della settimana</string>
+    <string name="home_dialog_every_x_days_label">Ogni quanti giorni?</string>
+    <string name="home_dialog_notification_label">Notifica promemoria</string>
+    <string name="home_dialog_save">Salva</string>
+    <string name="home_dialog_cancel">Annulla</string>
+    <string name="home_dialog_ok">OK</string>
+    <string name="home_calendar_prev_month">Mese precedente</string>
+    <string name="home_calendar_next_month">Mese successivo</string>
+    <string name="home_scheduled_sessions_title">Allenamenti programmati</string>
+    <string name="home_scheduled_add_desc">Aggiungi</string>
+    <string name="home_scheduled_delete_desc">Elimina</string>
+
+    <!-- History Screen -->
+    <string name="history_title">Storico Sessioni</string>
+    <string name="history_empty">Nessuna sessione registrata</string>
+    <string name="history_status_completed">Completata</string>
+    <string name="history_status_partial">Completata parzialmente</string>
+    <string name="history_status_missed">Non eseguita</string>
+    <string name="history_duration_min">%d min</string>
+
+    <!-- Articles Screen -->
+    <string name="articles_title">Consigli</string>
+    <string name="articles_all">Tutti</string>
+    <string name="articles_detail_title">Articolo</string>
+
+    <!-- Progress Screen -->
+    <string name="progress_title">I tuoi Progressi</string>
+    <string name="progress_subtitle">Monitora il tuo percorso di salute</string>
+    <string name="progress_adherence">Aderenza al piano</string>
+    <string name="progress_sessions_summary">%1$d di %2$d sessioni completate</string>
+    <string name="progress_weekly_target">Obiettivo settimanale</string>
+    <string name="progress_weekly_sessions">%1$d di %2$d sessioni</string>
+    <string name="progress_streak">Giorni Consecutivi</string>
+    <string name="progress_record">Record personale</string>
+    <string name="progress_total_activity">Attività totale</string>
+    <string name="progress_full_sessions">Sess. Intere</string>
+    <string name="progress_partial_sessions">Sess. Parziali</string>
+    <string name="progress_total_minutes">Minuti totali</string>
+    <string name="progress_trends_title">Andamento parametri</string>
+    <string name="progress_trends_card_title">Dati biometrici e percezione</string>
+    <string name="progress_insufficient_data">Dati insufficienti per il trend</string>
+    <string name="progress_goals_title">Obiettivi</string>
+    <string name="progress_goal_target_bronze">Target: Bronzo</string>
+    <string name="progress_goal_target_silver">Target: Argento</string>
+    <string name="progress_goal_target_gold">Target: Oro</string>
+    <string name="progress_goal_completed">Obiettivo completato! 🏆</string>
+    <string name="progress_goal_milestones">Traguardi: %s</string>
+
+    <!-- Active Card Screen -->
+    <string name="active_card_no_card">Nessuna scheda attiva</string>
+    <string name="active_card_no_card_desc">Chiedi al tuo operatore di attivare una scheda dalla sezione protetta.</string>
+    <string name="active_card_guided_mode">Allenamento Guidato</string>
+    <string name="active_card_list_mode">Scheda Attiva</string>
+    <string name="active_card_sessions_count">%1$d/%2$d sessioni</string>
+    <string name="active_card_weeks_count">%d settimane</string>
+    <string name="active_card_exercises_count">%d esercizi in programma</string>
+    <string name="active_card_exercises_section">Esercizi</string>
+    <string name="active_card_step_count">Esercizio %1$d di %2$d</string>
+    <string name="active_card_prev">Precedente</string>
+    <string name="active_card_next">Successivo</string>
+    <string name="active_card_reps_count">%d ripetizioni</string>
+    <string name="active_card_intensity">Intensità: %s</string>
+    <string name="active_card_instructions">Istruzioni</string>
+    <string name="active_card_start">Inizia</string>
+    <string name="active_card_done">Completato</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_reminder">Promemoria allenamento</string>
+    <string name="notif_channel_reminder_desc">Ricorda di fare l\'allenamento quotidiano</string>
+    <string name="notif_channel_missed">Sessione saltata</string>
+    <string name="notif_channel_missed_desc">Avviso quando una sessione non viene registrata</string>
+    <string name="notif_channel_motivational">Messaggi motivazionali</string>
+    <string name="notif_channel_motivational_desc">Messaggi di incoraggiamento periodici</string>
+    <string name="notif_channel_scheduled">Allenamenti programmati</string>
+    <string name="notif_channel_scheduled_desc">Notifiche per gli allenamenti che hai programmato</string>
+    <string name="notif_channel_adaptation">Ottimizzazione scheda</string>
+    <string name="notif_channel_adaptation_desc">Notifiche quando l\'app adatta il tuo allenamento in base ai tuoi feedback</string>
+
+    <string name="notif_reminder_title">È ora di muoversi! 🏃‍♀️</string>
+    <string name="notif_reminder_body">Hai un allenamento in programma oggi. Anche pochi minuti fanno la differenza!</string>
+    <string name="notif_missed_title">Sessione non registrata</string>
+    <string name="notif_missed_body">Ieri non hai registrato l\'allenamento. Ricorda di segnare le tue attività!</string>
+    <string name="notif_motivational_title">💪 Il tuo coach KinApto</string>
+    <string name="notif_scheduled_title">È ora di: %s 🏋️</string>
+    <string name="notif_scheduled_body">La tua sessione programmata inizia ora. Sei pronto?</string>
+
+    <!-- Generic Labels -->
+    <string name="label_asthenia">Astenia</string>
+    <string name="label_pain">Dolore</string>
+    <string name="label_rest_dyspnea">Dispnea Riposo</string>
+    <string name="label_exertion_dyspnea">Dispnea Sforzo</string>
+    <string name="label_nausea">Nausea</string>
+    <string name="label_appetite">Appetito</string>
+    <string name="label_anxiety">Ansia</string>
+    <string name="label_effort">Fatica</string>
+    <string name="label_mood">Umore</string>
+    <string name="label_sleep">Sonno</string>
+    <string name="label_back">Indietro</string>
+    <string name="label_cancel">Annulla</string>
+    <string name="label_ok">OK</string>
+    <string name="label_save">Salva</string>
+    <string name="label_error">Errore: %s</string>
+    <string name="label_version">Versione</string>
+
+    <!-- Export Screen -->
+    <string name="export_title">Export dati</string>
+    <string name="export_header">Esporta i tuoi dati</string>
+    <string name="export_disclaimer">I dati esportati contengono solo il codice paziente.\nNessun dato personale viene incluso.</string>
+    <string name="export_button">Esporta ora</string>
+    <string name="export_in_progress">Esportazione...</string>
+    <string name="export_qr_success">QR Code generato ✅</string>
+    <string name="export_qr_desc">Inquadra il QR code per importare i dati</string>
+    <string name="export_file_success">File salvato ✅</string>
+    <string name="export_file_desc">Il payload era troppo grande per un QR code. Il file JSON è stato salvato in:</string>
+    <string name="export_last_log">Ultimo export: %1$s (%2$s, %3$d record)</string>
+    <string name="export_error_generic">Errore durante l\'esportazione</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_theme_section">Tema colore</string>
+    <string name="settings_theme_desc">Personalizza l\'aspetto dell\'app</string>
+    <string name="settings_appearance_section">Aspetto</string>
+    <string name="settings_original_colors">Colori originali (icone e schede)</string>
+    <string name="settings_original_colors_desc">Usa i colori originali per le icone e i riquadri di allenamento invece del colore del tema scelto.</string>
+    <string name="settings_guided_mode">Modalità allenamento guidato</string>
+    <string name="settings_guided_mode_desc">Mostra gli esercizi uno sotto l\'altro con timer integrato invece della visualizzazione a schede singole.</string>
+    <string name="settings_notifications_section">Notifiche</string>
+    <string name="settings_reminder_time">Orario promemoria</string>
+    <string name="settings_security_section">Sicurezza</string>
+    <string name="settings_biometric">Accesso biometrico</string>
+    <string name="settings_info_section">Info app</string>
+    <string name="settings_database">Database</string>
+    <string name="settings_database_val">Cifrato (SQLCipher)</string>
+    <string name="settings_connection">Connessione</string>
+    <string name="settings_connection_val">Offline (nessun dato inviato)</string>
+
+    <!-- Diary Screen -->
+    <string name="diary_title">Il tuo diario</string>
+    <string name="diary_add_entry">Aggiungi</string>
+    <string name="diary_edit_title">Modifica diario del %s</string>
+    <string name="diary_edit_scale_title">Modifica scale del %s</string>
+    <string name="diary_new_entry">Nuova rilevazione</string>
+    <string name="diary_scales_title">Scale rapide (0-10)</string>
+    <string name="diary_free_text_title">Diario libero</string>
+    <string name="diary_placeholder">Come ti senti? Note libere...</string>
+    <string name="diary_save_all">Salva tutto</string>
+    <string name="diary_history">Storico</string>
+    <string name="diary_label_fatigue">Fatica</string>
+    <string name="diary_label_dyspnea_r">Dispnea R</string>
+    <string name="diary_label_dyspnea_s">Dispnea S</string>
+    <string name="diary_label_ansia">Ansia</string>
+    <!-- Protected Section -->
+    <string name="protected_gate_title">Area protetta</string>
+    <string name="protected_gate_setup_title">Configura Area Protetta</string>
+    <string name="protected_gate_enter_pass">Inserisci la password</string>
+    <string name="protected_gate_create_pass">Crea una password</string>
+    <string name="protected_gate_desc">Questa sezione è riservata all\'operatore</string>
+    <string name="protected_gate_setup_desc">Imposta una password per proteggere questa sezione in futuro</string>
+    <string name="protected_gate_error_pass">Password non corretta</string>
+    <string name="protected_gate_login">Accedi</string>
+    <string name="protected_gate_save_login">Salva e Accedi</string>
+    <string name="protected_dash_title">Configurazione</string>
+    <string name="protected_dash_patient_code">Codice attuale</string>
+    <string name="protected_dash_not_set">Non impostato</string>
+    <string name="protected_dash_edit">Modifica</string>
+    <string name="protected_dash_management">Gestione</string>
+    <string name="protected_dash_cards">Schede di allenamento</string>
+    <string name="protected_dash_cards_desc">Crea, modifica e gestisci le schede</string>
+    <string name="protected_dash_goals">Obiettivi</string>
+    <string name="protected_dash_goals_desc">Configura gli obiettivi della paziente</string>
+    <string name="protected_dash_exercises">Libreria esercizi</string>
+    <string name="protected_dash_exercises_desc">Aggiungi e gestisci gli esercizi</string>
+    <string name="protected_dash_articles">Articoli</string>
+    <string name="protected_dash_articles_desc">Aggiungi e gestisci i consigli</string>
+    <string name="protected_dash_crf_title">CRF (Case Report Form)</string>
+    <string name="protected_dash_crf_export">Esporta CRF</string>
+    <string name="protected_dash_crf_export_desc">Genera QR code per l\'operatore</string>
+    <string name="protected_dash_crf_import">Importa CRF</string>
+    <string name="protected_dash_crf_import_desc">Acquisisci dati da un altro dispositivo</string>
+
+    <!-- Management: Cards -->
+    <string name="manager_cards_title">Gestione Schede</string>
+    <string name="manager_cards_add">Aggiungi Scheda</string>
+    <string name="manager_cards_empty">Nessuna scheda presente</string>
+    <string name="manager_cards_activate">Attiva ora</string>
+    <string name="manager_cards_duplicate">Duplica</string>
+    <string name="manager_cards_info_format">Durata: %1$s settimane | Obiettivo: %2$s sedute</string>
+    <string name="manager_cards_autoadvance">Avanzamento automatico attivo</string>
+    <!-- Management: Goals -->
+    <string name="manager_goals_title">Obiettivi paziente</string>
+    <string name="manager_goals_add">Aggiungi obiettivo</string>
+    <string name="manager_goals_empty">Nessun obiettivo impostato</string>
+    <string name="manager_goals_subtitle">Imposta traguardi Bronze, Silver e Gold per motivare la paziente.</string>
+    <string name="manager_goals_delete_title">Elimina obiettivo</string>
+    <string name="manager_goals_delete_confirm">Sei sicuro di voler eliminare l\'obiettivo \'%s\'?</string>
+
+    <!-- Management: Exercises -->
+    <string name="manager_exercises_title">Libreria esercizi</string>
+    <string name="manager_exercises_add">Aggiungi esercizio</string>
+    <string name="manager_exercises_search_placeholder">Cerca esercizio...</string>
+    <string name="manager_exercises_empty">Nessun esercizio trovato</string>
+    <string name="manager_exercises_filter_all">Tutti</string>
+    <string name="manager_exercises_video_present">Video presente</string>
+    <string name="manager_exercises_delete_title">Elimina esercizio</string>
+    <string name="manager_exercises_delete_confirm">Sei sicuro di voler eliminare questo esercizio? Questa azione non può essere annullata.</string>
+
+    <!-- Management: Articles -->
+    <string name="manager_articles_title">Gestione articoli</string>
+    <string name="manager_articles_add">Aggiungi articolo</string>
+    <string name="manager_articles_empty">Nessun articolo presente</string>
+    <string name="manager_articles_featured">In evidenza</string>
+    <string name="manager_articles_delete_title">Elimina articolo</string>
+    <string name="manager_articles_delete_confirm">Sei sicuro di voler eliminare l\'articolo \'%s\'?</string>
+
+    <!-- Editor: Card -->
+    <string name="editor_card_title">Editor Scheda</string>
+    <string name="editor_card_info_header">Informazioni Generali</string>
+    <string name="editor_card_label_title">Titolo Scheda</string>
+    <string name="editor_card_label_weeks">Settimane</string>
+    <string name="editor_card_label_sessions">Sedute target</string>
+    <string name="editor_card_label_sessions_week">Allenamenti previsti a settimana</string>
+    <string name="editor_card_autoadvance">Avanzamento automatico al termine</string>
+    <string name="editor_card_biofeedback_header">Adattamento Bio-feedback</string>
+    <string name="editor_card_label_bio_param">Parametro Bio-feedback</string>
+    <string name="editor_card_bio_none">Nessuno</string>
+    <string name="editor_card_label_threshold">Soglia (0-10)</string>
+    <string name="editor_card_label_window">Finestra (giorni)</string>
+    <string name="editor_card_label_action">Azione al superamento soglia</string>
+    <string name="editor_card_action_select">Seleziona Azione</string>
+    <string name="editor_card_action_downregulate">Ridurre Intensità</string>
+    <string name="editor_card_action_switch">Passa a Scheda Successiva</string>
+    <string name="editor_card_exercises_header">Esercizi in Scheda</string>
+    <string name="editor_card_exercises_empty">Nessun esercizio aggiunto. Clicca su \'Aggiungi\' per iniziare.</string>
+    <string name="editor_card_label_sec">Sec</string>
+    <string name="editor_card_label_reps">Reps</string>
+    <string name="editor_card_label_intensity">Intensità</string>
+    <string name="editor_card_label_notes">Note specifiche</string>
+    <string name="editor_card_label_add">Aggiungi</string>
+
+    <!-- Editor: Goal -->
+    <string name="editor_goal_title_new">Nuovo obiettivo</string>
+    <string name="editor_goal_title_edit">Modifica obiettivo</string>
+    <string name="editor_goal_label_title">Titolo (es. Obiettivo Gold)</string>
+    <string name="editor_goal_placeholder_title">es. Gold: 4 allenamenti/settimana</string>
+    <string name="editor_goal_label_type">Tipo di traguardo</string>
+    <string name="editor_goal_type_sessions_week">Sedute alla settimana</string>
+    <string name="editor_goal_type_minutes_week">Minuti totali settimana</string>
+    <string name="editor_goal_type_streak">Giorni consecutivi</string>
+    <string name="editor_goal_type_total_sessions">Sessioni totali</string>
+    <string name="editor_goal_header_thresholds">Soglie traguardi</string>
+    <string name="editor_goal_label_bronze">Bronze</string>
+    <string name="editor_goal_label_silver">Silver</string>
+    <string name="editor_goal_label_gold">Gold</string>
+    <string name="editor_goal_header_expiry">Scadenza temporale</string>
+    <string name="editor_goal_label_reset">Frequenza reset</string>
+    <string name="editor_goal_reset_none">Nessuna</string>
+    <string name="editor_goal_reset_weekly">Settimanale</string>
+    <string name="editor_goal_reset_monthly">Mensile</string>
+    <string name="editor_goal_reset_bimonthly">Bimensile</string>
+    <string name="editor_goal_reset_yearly">Annuale</string>
+    <string name="editor_goal_reset_custom">Personalizzata</string>
+    <string name="editor_goal_label_every">Ogni...</string>
+    <string name="editor_goal_label_unit">Unità</string>
+    <string name="editor_goal_unit_days">Giorni</string>
+    <string name="editor_goal_unit_weeks">Settimane</string>
+    <string name="editor_goal_unit_months">Mesi</string>
+    <string name="editor_goal_header_sequential">Sblocco sequenziale (Goal Scalabili)</string>
+    <string name="editor_goal_label_parent">Attiva dopo il raggiungimento di:</string>
+    <string name="editor_goal_parent_none">Attiva subito (nessun requisito)</string>
+    <string name="editor_goal_save">Salva obiettivo</string>
+
+    <!-- Editor: Article -->
+    <string name="editor_article_title_new">Nuovo articolo</string>
+    <string name="editor_article_title_edit">Modifica articolo</string>
+    <string name="editor_article_label_title">Titolo articolo</string>
+    <string name="editor_article_label_category">Categoria</string>
+    <string name="editor_article_category_physical_activity">Attività Fisica</string>
+    <string name="editor_article_category_nutrition">Alimentazione</string>
+    <string name="editor_article_category_sleep">Sonno</string>
+    <string name="editor_article_category_fatigue">Fatigue</string>
+    <string name="editor_article_category_pain">Dolore</string>
+    <string name="editor_article_category_wellbeing">Benessere</string>
+    <string name="editor_article_category_lymphedema">Linfedema</string>
+    <string name="editor_article_label_summary">Riassunto (breve)</string>
+    <string name="editor_article_label_body">Contenuto articolo</string>
+    <string name="editor_article_save">Salva articolo</string>
+
+    <!-- Editor: Exercise -->
+    <string name="editor_exercise_title_new">Nuovo esercizio</string>
+    <string name="editor_exercise_title_edit">Modifica esercizio</string>
+    <string name="editor_exercise_label_name">Nome esercizio</string>
+    <string name="editor_exercise_label_category">Categoria</string>
+    <string name="editor_exercise_label_description">Descrizione / Istruzioni</string>
+    <string name="editor_exercise_label_video_uri">Video URI (es. asset:///videos/nome.mp4)</string>
+    <string name="editor_exercise_placeholder_video_uri">asset:///videos/...</string>
+    <string name="editor_exercise_header_params">Parametri predefiniti</string>
+    <string name="editor_exercise_label_seconds">Secondi</string>
+    <string name="editor_exercise_label_reps">Ripetizioni</string>
+    <string name="editor_exercise_header_intensity">Intensità predefinita</string>
+    <string name="editor_exercise_intensity_low">Bassa</string>
+    <string name="editor_exercise_intensity_moderate">Moderata</string>
+    <string name="editor_exercise_intensity_high">Alta</string>
+    <string name="editor_exercise_label_notes">Note aggiuntive</string>
+    <string name="editor_exercise_save">Salva esercizio</string>
+
+    <!-- CRF Management -->
+    <string name="crf_export_title">Esporta CRF</string>
+    <string name="crf_export_header">Generazione CRF</string>
+    <string name="crf_export_description">Raccoglie tutti i dati della paziente, li cifra e genera una sequenza di QR code per l\'importazione ospedaliera.</string>
+    <string name="crf_export_start">Inizia Esportazione</string>
+    <string name="crf_export_loading">Elaborazione dati...</string>
+    <string name="crf_export_scan_instruction">Scansiona i QR code</string>
+    <string name="crf_export_chunk_info">QR %1$d di %2$d</string>
+    <string name="crf_export_next">Avanti</string>
+    <string name="crf_export_regenerate">Rigenera export</string>
+    <string name="crf_export_footer_note">Scansionare tutti i QR con KinApto in modalità \'Importa CRF\' sul dispositivo ospedaliero.</string>
+
+    <string name="crf_import_title">Importa CRF</string>
+    <string name="crf_import_patient">Paziente: %s</string>
+    <string name="crf_import_progress">Avanzamento: %1$d/%2$d QR acquisiti</string>
+    <string name="crf_import_missing">Mancano i QR: %s</string>
+    <string name="crf_import_no_session">Nessuna acquisizione in corso</string>
+    <string name="crf_import_scan_button">Scansiona QR</string>
+    <string name="crf_import_success_title">CRF Ricostruita</string>
+    <string name="crf_import_summary_sessions">Sessioni eseguite: %d</string>
+    <string name="crf_import_summary_goals">Obiettivi: %d</string>
+    <string name="crf_import_summary_diary">Voci diario: %d</string>
+    <string name="crf_import_redcap_success">Esportazione REDCap completata!</string>
+    <string name="crf_import_save_path">File salvato in: %s</string>
+    <string name="crf_import_export_button">Esporta file REDCap</string>
+    <string name="crf_import_delete_button">Elimina dati importati</string>
+    <string name="crf_import_reset_button">Annulla e resetta</string>
+
+    <string name="crf_camera_permission_title">Permesso Fotocamera</string>
+    <string name="crf_camera_permission_desc">KinApto richiede l\'accesso alla fotocamera per scansionare i QR code della CRF.</string>
+
+    <string name="label_delete">Elimina</string>
+
+    <string name="label_edit">Modifica</string>
+    <string name="label_close">Chiudi</string>
+
 </resources>
+
+

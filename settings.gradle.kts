@@ -1,5 +1,5 @@
 // =============================================================
-// AFA - Attività Fisica Adattata
+// KinApto - Attività Fisica Adattata
 // File: settings.gradle.kts
 // Configurazione dei repository e dei moduli del progetto
 // =============================================================
@@ -26,8 +26,8 @@ dependencyResolutionManagement {
     }
 }
 
-// Nome del progetto
-rootProject.name = "AFA"
+// Nome del progetto rebranding KinApto
+rootProject.name = "KinApto"
 
 // Modulo principale dell'app
 include(":app")

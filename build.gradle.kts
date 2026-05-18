@@ -1,5 +1,5 @@
 // =============================================================
-// AFA - Attività Fisica Adattata
+// KinApto - Attività Fisica Adattata
 // File: build.gradle.kts (root)
 // Plugin principali del progetto — dichiarati qui, applicati nei moduli
 // =============================================================
