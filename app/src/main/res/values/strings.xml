@@ -102,6 +102,7 @@
     <string name="home_dialog_title_label">Titolo</string>
     <string name="home_dialog_default_title">Allenamento</string>
     <string name="home_dialog_start_date">Data di inizio</string>
+    <string name="home_dialog_end_date">Data di fine</string>
     <string name="home_dialog_select_date_desc">Seleziona data</string>
     <string name="home_dialog_time">Orario (HH:mm)</string>
     <string name="home_dialog_recurrence">Ripetizione</string>
@@ -202,6 +203,11 @@
     <string name="label_nausea">Nausea</string>
     <string name="label_appetite">Appetito</string>
     <string name="label_anxiety">Ansia</string>
+    <string name="label_lymphoedema">Linfedema</string>
+    <string name="label_quality_of_life">Qualità della vita</string>
+    <string name="label_well_being">Benessere generale</string>
+    <string name="label_spo2">Saturazione (SpO2 %)</string>
+    <string name="label_heart_rate">Frequenza cardiaca (bpm)</string>
     <string name="label_effort">Fatica</string>
     <string name="label_mood">Umore</string>
     <string name="label_sleep">Sonno</string>
@@ -333,8 +339,10 @@
     <string name="editor_card_biofeedback_header">Adattamento Bio-feedback</string>
     <string name="editor_card_label_bio_param">Parametro Bio-feedback</string>
     <string name="editor_card_bio_none">Nessuno</string>
-    <string name="editor_card_label_threshold">Soglia (0-10)</string>
-    <string name="editor_card_label_window">Finestra (giorni)</string>
+    <string name="editor_card_label_threshold">Soglia Parametro (0.0-10.0)</string>
+    <string name="editor_card_label_window">Finestra temporale (giorni)</string>
+    <string name="editor_card_label_consecutive_misses">Sessioni saltate consecutive</string>
+    <string name="editor_card_label_min_difficulty">Soglia fatica/difficoltà (0-10)</string>
     <string name="editor_card_label_action">Azione al superamento soglia</string>
     <string name="editor_card_action_select">Seleziona Azione</string>
     <string name="editor_card_action_downregulate">Ridurre Intensità</string>

@@ -123,7 +123,8 @@ class HomeViewModel @Inject constructor(
         // Calendario
         viewModelScope.launch {
             calendarRepository.getAllScheduled().collect { scheduled ->
-                _uiState.update { it.copy(scheduledSessions = scheduled) }
+                val projected = projectRecurringSessions(scheduled)
+                _uiState.update { it.copy(scheduledSessions = projected) }
             }
         }
 
@@ -239,5 +240,63 @@ class HomeViewModel @Inject constructor(
             calendarRepository.deleteScheduledSession(session)
             workScheduler.cancelScheduledSession(session.id)
         }
+    }
+
+    /**
+     * Proietta le sessioni ricorrenti nel futuro fino a 3 mesi o alla data di fine.
+     */
+    private fun projectRecurringSessions(scheduled: List<ScheduledSessionEntity>): List<ScheduledSessionEntity> {
+        val result = mutableListOf<ScheduledSessionEntity>()
+        val now = Calendar.getInstance()
+        val limit = Calendar.getInstance().apply { add(Calendar.MONTH, 3) }
+
+        scheduled.forEach { session ->
+            // Aggiunge la sessione originale (o la proietta se è nel futuro)
+            result.add(session)
+
+            if (session.recurrenceType == "NONE") return@forEach
+
+            val sessionStart = Calendar.getInstance().apply { timeInMillis = session.date }
+            val endDate = session.endDate?.let {
+                Calendar.getInstance().apply { timeInMillis = it }
+            } ?: limit
+
+            val current = sessionStart.clone() as Calendar
+            
+            while (true) {
+                // Incrementa in base alla ricorrenza
+                when (session.recurrenceType) {
+                    "WEEKLY" -> {
+                        current.add(Calendar.DAY_OF_YEAR, 1)
+                    }
+                    "EVERY_X_DAYS" -> {
+                        val days = if (session.recurrenceValue > 0) session.recurrenceValue else 1
+                        current.add(Calendar.DAY_OF_YEAR, days)
+                    }
+                    else -> break
+                }
+
+                if (current.after(endDate) || current.after(limit)) break
+
+                // Se WEEKLY, controlla se il giorno della settimana è tra quelli selezionati
+                if (session.recurrenceType == "WEEKLY") {
+                    val dow = current.get(Calendar.DAY_OF_WEEK)
+                    val mapped = if (dow == Calendar.SUNDAY) 7 else dow - 1
+                    val allowedDays = session.recurrenceDays?.split(",")?.mapNotNull { it.toIntOrNull() } ?: emptyList()
+                    
+                    if (!allowedDays.contains(mapped)) continue
+                }
+
+                // Crea una sessione proiettata (con ID negativo per distinguerla o gestirla come virtuale)
+                // Nota: In un'app reale, le proiezioni non dovrebbero essere salvate nel DB ma calcolate al volo
+                result.add(
+                    session.copy(
+                        id = -Math.abs(session.id + current.timeInMillis), // ID virtuale
+                        date = current.timeInMillis
+                    )
+                )
+            }
+        }
+        return result.distinctBy { it.date.toString() + it.startTime + it.title }.sortedBy { it.date }
     }
 }

@@ -241,7 +241,7 @@ fun CardEditorScreen(
                                 onValueChange = { viewModel.onAdaptationThresholdChange(it) },
                                 label = { Text(stringResource(R.string.editor_card_label_threshold)) },
                                 modifier = Modifier.weight(1f),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                 singleLine = true
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -254,7 +254,30 @@ fun CardEditorScreen(
                                 singleLine = true
                             )
                         }
+                    }
 
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = uiState.adaptationConsecutiveMisses,
+                            onValueChange = { viewModel.onAdaptationConsecutiveMissesChange(it) },
+                            label = { Text(stringResource(R.string.editor_card_label_consecutive_misses)) },
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        OutlinedTextField(
+                            value = uiState.adaptationMinDifficulty,
+                            onValueChange = { viewModel.onAdaptationMinDifficultyChange(it) },
+                            label = { Text(stringResource(R.string.editor_card_label_min_difficulty)) },
+                            modifier = Modifier.weight(1f),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            singleLine = true
+                        )
+                    }
+
+                    if (uiState.adaptationBiometricType != null || uiState.adaptationConsecutiveMisses.isNotBlank() || uiState.adaptationMinDifficulty.isNotBlank()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         var showActionMenu by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(

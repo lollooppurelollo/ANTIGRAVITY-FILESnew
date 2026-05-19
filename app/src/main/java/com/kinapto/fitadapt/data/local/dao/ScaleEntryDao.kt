@@ -72,6 +72,30 @@ interface ScaleEntryDao {
     @Query("SELECT AVG(nausea) FROM scale_entries WHERE date >= :sinceDate AND nausea IS NOT NULL")
     suspend fun averageNauseaSince(sinceDate: Long): Float?
 
+    // Media sforzo percepito nell'ultimo periodo
+    @Query("SELECT AVG(perceivedEffort) FROM scale_entries WHERE date >= :sinceDate AND perceivedEffort IS NOT NULL")
+    suspend fun averageEffortSince(sinceDate: Long): Float?
+
+    // Media linfedema nell'ultimo periodo
+    @Query("SELECT AVG(lymphoedema) FROM scale_entries WHERE date >= :sinceDate AND lymphoedema IS NOT NULL")
+    suspend fun averageLymphoedemaSince(sinceDate: Long): Float?
+
+    // Media qualità della vita nell'ultimo periodo
+    @Query("SELECT AVG(qualityOfLife) FROM scale_entries WHERE date >= :sinceDate AND qualityOfLife IS NOT NULL")
+    suspend fun averageQolSince(sinceDate: Long): Float?
+
+    // Media benessere nell'ultimo periodo
+    @Query("SELECT AVG(wellBeing) FROM scale_entries WHERE date >= :sinceDate AND wellBeing IS NOT NULL")
+    suspend fun averageWellBeingSince(sinceDate: Long): Float?
+
+    // Media saturazione nell'ultimo periodo
+    @Query("SELECT AVG(spo2) FROM scale_entries WHERE date >= :sinceDate AND spo2 IS NOT NULL")
+    suspend fun averageSpo2Since(sinceDate: Long): Float?
+
+    // Media frequenza cardiaca nell'ultimo periodo
+    @Query("SELECT AVG(heartRate) FROM scale_entries WHERE date >= :sinceDate AND heartRate IS NOT NULL")
+    suspend fun averageHeartRateSince(sinceDate: Long): Float?
+
     // Media appetito nell'ultimo periodo
     @Query("SELECT AVG(appetite) FROM scale_entries WHERE date >= :sinceDate AND appetite IS NOT NULL")
     suspend fun averageAppetiteSince(sinceDate: Long): Float?

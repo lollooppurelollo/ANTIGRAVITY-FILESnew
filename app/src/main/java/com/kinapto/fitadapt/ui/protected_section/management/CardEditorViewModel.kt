@@ -34,6 +34,8 @@ data class CardEditorUiState(
     val adaptationBiometricType: String? = null,
     val adaptationThreshold: String = "",
     val adaptationWindowDays: String = "15",
+    val adaptationConsecutiveMisses: String = "",
+    val adaptationMinDifficulty: String = "",
     val adaptationAction: String? = null,
     val exercises: List<CardExerciseWithDetails> = emptyList(),
     val isLoading: Boolean = false,
@@ -85,6 +87,8 @@ class CardEditorViewModel @Inject constructor(
                         adaptationBiometricType = card.adaptationBiometricType,
                         adaptationThreshold = card.adaptationThreshold?.toString() ?: "",
                         adaptationWindowDays = card.adaptationWindowDays?.toString() ?: "15",
+                        adaptationConsecutiveMisses = card.adaptationConsecutiveMisses?.toString() ?: "",
+                        adaptationMinDifficulty = card.adaptationMinDifficulty?.toString() ?: "",
                         adaptationAction = card.adaptationAction,
                         exercises = exercisesWithDetails,
                         isLoading = false
@@ -124,6 +128,14 @@ class CardEditorViewModel @Inject constructor(
 
     fun onAdaptationWindowDaysChange(days: String) {
         _uiState.value = _uiState.value.copy(adaptationWindowDays = days)
+    }
+
+    fun onAdaptationConsecutiveMissesChange(value: String) {
+        _uiState.value = _uiState.value.copy(adaptationConsecutiveMisses = value)
+    }
+
+    fun onAdaptationMinDifficultyChange(value: String) {
+        _uiState.value = _uiState.value.copy(adaptationMinDifficulty = value)
     }
 
     fun onAdaptationActionChange(action: String?) {
@@ -195,8 +207,10 @@ class CardEditorViewModel @Inject constructor(
                 status = state.status,
                 autoAdvance = state.autoAdvance,
                 adaptationBiometricType = state.adaptationBiometricType,
-                adaptationThreshold = state.adaptationThreshold.toIntOrNull(),
+                adaptationThreshold = state.adaptationThreshold.toFloatOrNull(),
                 adaptationWindowDays = state.adaptationWindowDays.toIntOrNull(),
+                adaptationConsecutiveMisses = state.adaptationConsecutiveMisses.toIntOrNull(),
+                adaptationMinDifficulty = state.adaptationMinDifficulty.toIntOrNull(),
                 adaptationAction = state.adaptationAction,
                 orderIndex = nextOrderIndex
             )

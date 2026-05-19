@@ -49,5 +49,12 @@ data class ScaleEntryEntity(
 
     val anxiety: Int? = null,
 
+    // Nuovi parametri richiesti per unificazione e monitoraggio clinico
+    val lymphoedema: Int? = null,    // Percezione di gonfiore/tensione (0-10)
+    val qualityOfLife: Int? = null, // Qualità della vita generale (0-10)
+    val wellBeing: Int? = null,    // Benessere soggettivo (0-10)
+    val spo2: Int? = null,         // Saturazione ossigeno (valore percentuale 70-100)
+    val heartRate: Int? = null,    // Frequenza cardiaca (bpm)
+
     val createdAt: Long = System.currentTimeMillis()
 )

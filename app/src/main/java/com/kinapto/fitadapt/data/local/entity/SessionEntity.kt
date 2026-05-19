@@ -73,6 +73,13 @@ data class SessionEntity(
 
     val anxiety: Int? = null,
 
+    // Nuovi parametri richiesti per unificazione e monitoraggio clinico
+    val lymphoedema: Int? = null,
+    val qualityOfLife: Int? = null,
+    val wellBeing: Int? = null,
+    val spo2: Int? = null,
+    val heartRate: Int? = null,
+
     val notes: String? = null,
 
     val createdAt: Long = System.currentTimeMillis()

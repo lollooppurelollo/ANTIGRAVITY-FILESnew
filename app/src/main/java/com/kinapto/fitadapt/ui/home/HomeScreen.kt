@@ -725,6 +725,12 @@ fun AddScheduledSessionDialog(
     var recurrenceType by remember { mutableStateOf("NONE") } // NONE, WEEKLY, EVERY_X_DAYS
     var recurrenceValue by remember { mutableStateOf(1) } // Default 1 for Every X Days
     var showDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
+    
+    // Imposta un endDate predefinito a 4 settimane dopo se è una ricorrenza
+    var endDateMillis by remember { 
+        mutableStateOf(initialDate + 28L * 24 * 60 * 60 * 1000) 
+    }
 
     // State for weekly days
     var selectedDays by remember {
@@ -742,6 +748,7 @@ fun AddScheduledSessionDialog(
     }
 
     val dateStr = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(Date(selectedDateMillis))
+    val endDateStr = SimpleDateFormat("dd/MM/yyyy", Locale.ITALY).format(Date(endDateMillis))
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -792,6 +799,22 @@ fun AddScheduledSessionDialog(
                     Box(modifier = Modifier.weight(1.4f)) {
                         RecurrenceChip(selected = recurrenceType == "EVERY_X_DAYS", label = stringResource(R.string.home_dialog_recurrence_x_days), onClick = { recurrenceType = "EVERY_X_DAYS" })
                     }
+                }
+
+                if (recurrenceType != "NONE") {
+                    OutlinedTextField(
+                        value = endDateStr,
+                        onValueChange = { },
+                        label = { Text(stringResource(R.string.home_dialog_end_date)) },
+                        readOnly = true,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        trailingIcon = {
+                            IconButton(onClick = { showEndDatePicker = true }) {
+                                Icon(Icons.Outlined.CalendarMonth, stringResource(R.string.home_dialog_select_date_desc), tint = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    )
                 }
 
                 if (recurrenceType == "WEEKLY") {
@@ -862,6 +885,7 @@ fun AddScheduledSessionDialog(
                             recurrenceDays = if (recurrenceType == "WEEKLY") {
                                 selectedDays.sorted().joinToString(",")
                             } else null,
+                            endDate = if (recurrenceType != "NONE") endDateMillis else null,
                             cardId = activeCard?.id
                         )
                     )
@@ -896,6 +920,30 @@ fun AddScheduledSessionDialog(
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.home_dialog_cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
+    if (showEndDatePicker) {
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = endDateMillis)
+        DatePickerDialog(
+            onDismissRequest = { showEndDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        endDateMillis = it
+                    }
+                    showEndDatePicker = false
+                }) {
+                    Text(stringResource(R.string.home_dialog_ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEndDatePicker = false }) {
                     Text(stringResource(R.string.home_dialog_cancel))
                 }
             }

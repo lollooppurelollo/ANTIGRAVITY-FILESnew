@@ -51,6 +51,11 @@ data class SessionUiState(
     val nausea: Int? = null,
     val appetite: Int? = null,
     val anxiety: Int? = null,
+    val lymphoedema: Int? = null,
+    val qualityOfLife: Int? = null,
+    val wellBeing: Int? = null,
+    val spo2: String = "",
+    val heartRate: String = "",
     val notes: String = "",
 
     // Checklist esercizi (per sessioni parziali)
@@ -190,6 +195,26 @@ class SessionViewModel @Inject constructor(
         _uiState.update { it.copy(anxiety = value) }
     }
 
+    fun updateLymphoedema(value: Int?) {
+        _uiState.update { it.copy(lymphoedema = value) }
+    }
+
+    fun updateQualityOfLife(value: Int?) {
+        _uiState.update { it.copy(qualityOfLife = value) }
+    }
+
+    fun updateWellBeing(value: Int?) {
+        _uiState.update { it.copy(wellBeing = value) }
+    }
+
+    fun updateSpo2(value: String) {
+        _uiState.update { it.copy(spo2 = value) }
+    }
+
+    fun updateHeartRate(value: String) {
+        _uiState.update { it.copy(heartRate = value) }
+    }
+
     fun updateNotes(text: String) {
         _uiState.update { it.copy(notes = text) }
     }
@@ -231,6 +256,11 @@ class SessionViewModel @Inject constructor(
                 nausea = state.nausea,
                 appetite = state.appetite,
                 anxiety = state.anxiety,
+                lymphoedema = state.lymphoedema,
+                qualityOfLife = state.qualityOfLife,
+                wellBeing = state.wellBeing,
+                spo2 = state.spo2.toIntOrNull(),
+                heartRate = state.heartRate.toIntOrNull(),
                 notes = state.notes.ifBlank { null }
             )
 
@@ -296,6 +326,11 @@ class SessionViewModel @Inject constructor(
                 nausea = null,
                 appetite = null,
                 anxiety = null,
+                lymphoedema = null,
+                qualityOfLife = null,
+                wellBeing = null,
+                spo2 = "",
+                heartRate = "",
                 notes = "",
                 selectedDate = System.currentTimeMillis(),
                 isSubmitting = false

@@ -102,6 +102,18 @@ interface SessionDao {
     @Query("SELECT * FROM sessions WHERE completed = 1 ORDER BY date ASC")
     suspend fun getAllCompletedSessionsOrdered(): List<SessionEntity>
 
+    // Ottieni lo stato di completamento delle ultime N sessioni registrate per una scheda
+    @Query("SELECT completed FROM sessions WHERE cardId = :cardId ORDER BY date DESC LIMIT :limit")
+    suspend fun getLastCompletionStatuses(cardId: Long, limit: Int): List<Boolean>
+
+    // Media dello sforzo percepito per una scheda nell'ultimo periodo
+    @Query("SELECT AVG(perceivedEffort) FROM sessions WHERE cardId = :cardId AND date >= :sinceDate AND perceivedEffort IS NOT NULL")
+    suspend fun getAverageEffortSince(cardId: Long, sinceDate: Long): Float?
+
+    // Ottiene la data dell'ultima sessione completata per una scheda
+    @Query("SELECT MAX(date) FROM sessions WHERE cardId = :cardId AND completed = 1")
+    suspend fun getLastCompletedSessionDate(cardId: Long): Long?
+
     // Ottieni le sessioni in un intervallo di date (per grafici progressi)
     @Query("SELECT * FROM sessions WHERE date >= :fromDate AND date <= :toDate ORDER BY date ASC")
     fun getSessionsInRange(fromDate: Long, toDate: Long): Flow<List<SessionEntity>>

@@ -58,6 +58,11 @@ data class DiaryUiState(
     val scaleNausea: Float = 0f,
     val scaleAppetite: Float = 5f,
     val scaleAnxiety: Float = 0f,
+    val scaleLymphoedema: Float = 0f,
+    val scaleQualityOfLife: Float = 5f,
+    val scaleWellBeing: Float = 5f,
+    val spo2: String = "",
+    val heartRate: String = "",
     val selectedTab: Int = 0,
     val editingDiaryEntry: DiaryEntryEntity? = null,
     val editingScaleEntry: ScaleEntryEntity? = null,
@@ -116,6 +121,11 @@ class DiaryViewModel @Inject constructor(
     fun updateScaleNausea(v: Float) { _uiState.update { it.copy(scaleNausea = v) } }
     fun updateScaleAppetite(v: Float) { _uiState.update { it.copy(scaleAppetite = v) } }
     fun updateScaleAnxiety(v: Float) { _uiState.update { it.copy(scaleAnxiety = v) } }
+    fun updateScaleLymphoedema(v: Float) { _uiState.update { it.copy(scaleLymphoedema = v) } }
+    fun updateScaleQualityOfLife(v: Float) { _uiState.update { it.copy(scaleQualityOfLife = v) } }
+    fun updateScaleWellBeing(v: Float) { _uiState.update { it.copy(scaleWellBeing = v) } }
+    fun updateSpo2(v: String) { _uiState.update { it.copy(spo2 = v) } }
+    fun updateHeartRate(v: String) { _uiState.update { it.copy(heartRate = v) } }
     fun updateSelectedDate(date: Long) { _uiState.update { it.copy(selectedDate = date) } }
 
     fun startEditingDiary(entry: DiaryEntryEntity) {
@@ -134,6 +144,11 @@ class DiaryViewModel @Inject constructor(
             scaleNausea = scale?.nausea?.toFloat() ?: 0f,
             scaleAppetite = scale?.appetite?.toFloat() ?: 5f,
             scaleAnxiety = scale?.anxiety?.toFloat() ?: 0f,
+            scaleLymphoedema = scale?.lymphoedema?.toFloat() ?: 0f,
+            scaleQualityOfLife = scale?.qualityOfLife?.toFloat() ?: 5f,
+            scaleWellBeing = scale?.wellBeing?.toFloat() ?: 5f,
+            spo2 = scale?.spo2?.toString() ?: "",
+            heartRate = scale?.heartRate?.toString() ?: "",
             selectedDate = entry.date,
             showAddDiary = true,
             showAddScale = true
@@ -155,6 +170,11 @@ class DiaryViewModel @Inject constructor(
             scaleNausea = scale.nausea?.toFloat() ?: 0f,
             scaleAppetite = scale.appetite?.toFloat() ?: 5f,
             scaleAnxiety = scale.anxiety?.toFloat() ?: 0f,
+            scaleLymphoedema = scale.lymphoedema?.toFloat() ?: 0f,
+            scaleQualityOfLife = scale.qualityOfLife?.toFloat() ?: 5f,
+            scaleWellBeing = scale.wellBeing?.toFloat() ?: 5f,
+            spo2 = scale.spo2?.toString() ?: "",
+            heartRate = scale.heartRate?.toString() ?: "",
             selectedDate = scale.date,
             showAddDiary = true,
             showAddScale = true
@@ -183,7 +203,12 @@ class DiaryViewModel @Inject constructor(
                 sleepQuality = s.scaleSleep.toInt(),
                 nausea = s.scaleNausea.toInt().takeIf { it > 0 },
                 appetite = s.scaleAppetite.toInt(),
-                anxiety = s.scaleAnxiety.toInt().takeIf { it > 0 }
+                anxiety = s.scaleAnxiety.toInt().takeIf { it > 0 },
+                lymphoedema = s.scaleLymphoedema.toInt().takeIf { it > 0 },
+                qualityOfLife = s.scaleQualityOfLife.toInt(),
+                wellBeing = s.scaleWellBeing.toInt(),
+                spo2 = s.spo2.toIntOrNull(),
+                heartRate = s.heartRate.toIntOrNull()
             )
             
             if (scaleEntry.id != 0L) {
@@ -191,7 +216,8 @@ class DiaryViewModel @Inject constructor(
             } else if (scaleEntry.asthenia != null || scaleEntry.osteoarticularPain != null || 
                        scaleEntry.restDyspnea != null || scaleEntry.exertionDyspnea != null ||
                        scaleEntry.nausea != null || scaleEntry.anxiety != null ||
-                       scaleEntry.perceivedEffort != null) {
+                       scaleEntry.perceivedEffort != null || scaleEntry.lymphoedema != null ||
+                       scaleEntry.spo2 != null || scaleEntry.heartRate != null) {
                 diaryRepository.addScaleEntry(scaleEntry)
             }
 
@@ -221,6 +247,11 @@ class DiaryViewModel @Inject constructor(
                 scaleNausea = 0f,
                 scaleAppetite = 5f,
                 scaleAnxiety = 0f,
+                scaleLymphoedema = 0f,
+                scaleQualityOfLife = 5f,
+                scaleWellBeing = 5f,
+                spo2 = "",
+                heartRate = "",
                 editingDiaryEntry = null,
                 editingScaleEntry = null,
                 selectedDate = System.currentTimeMillis()
@@ -348,6 +379,28 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                             ScaleSlider(stringResource(R.string.diary_label_ansia), uiState.scaleAnxiety) { diaryViewModel.updateScaleAnxiety(it) }
                             ScaleSlider(stringResource(R.string.label_sleep), uiState.scaleSleep) { diaryViewModel.updateScaleSleep(it) }
                             ScaleSlider(stringResource(R.string.label_appetite), uiState.scaleAppetite) { diaryViewModel.updateScaleAppetite(it) }
+                            ScaleSlider(stringResource(R.string.label_lymphoedema), uiState.scaleLymphoedema) { diaryViewModel.updateScaleLymphoedema(it) }
+                            ScaleSlider(stringResource(R.string.label_quality_of_life), uiState.scaleQualityOfLife) { diaryViewModel.updateScaleQualityOfLife(it) }
+                            ScaleSlider(stringResource(R.string.label_well_being), uiState.scaleWellBeing) { diaryViewModel.updateScaleWellBeing(it) }
+                            
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Row(modifier = Modifier.fillMaxWidth()) {
+                                OutlinedTextField(
+                                    value = uiState.spo2,
+                                    onValueChange = { diaryViewModel.updateSpo2(it) },
+                                    label = { Text(stringResource(R.string.label_spo2)) },
+                                    modifier = Modifier.weight(1f),
+                                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                OutlinedTextField(
+                                    value = uiState.heartRate,
+                                    onValueChange = { diaryViewModel.updateHeartRate(it) },
+                                    label = { Text(stringResource(R.string.label_heart_rate)) },
+                                    modifier = Modifier.weight(1f),
+                                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+                                )
+                            }
                             
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(stringResource(R.string.diary_free_text_title), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)

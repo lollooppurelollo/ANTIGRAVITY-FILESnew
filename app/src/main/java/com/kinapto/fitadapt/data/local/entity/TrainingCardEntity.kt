@@ -49,8 +49,10 @@ data class TrainingCardEntity(
     val autoAdvance: Boolean = false,
 
     val adaptationBiometricType: String? = null,
-    val adaptationThreshold: Int? = null,
+    val adaptationThreshold: Float? = null, // Cambiato in Float per supportare soglie decimali
     val adaptationWindowDays: Int? = null,
+    val adaptationConsecutiveMisses: Int? = null, // Nuova regola: X sessioni consecutive saltate
+    val adaptationMinDifficulty: Int? = null, // Nuova regola: percezione fatica/difficoltà >= X
     val adaptationAction: String? = null,
 
     val isAdapted: Boolean = false,

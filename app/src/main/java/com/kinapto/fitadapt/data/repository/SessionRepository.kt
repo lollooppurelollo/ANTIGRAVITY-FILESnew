@@ -156,6 +156,14 @@ class SessionRepository @Inject constructor(
         return sessionDao.hasSessionToday(startOfYesterday, endOfYesterday) > 0
     }
 
+    /** Ottiene lo stato di completamento delle ultime N sessioni registrate per una scheda */
+    suspend fun getLastCompletionStatuses(cardId: Long, limit: Int): List<Boolean> =
+        sessionDao.getLastCompletionStatuses(cardId, limit)
+
+    /** Media dello sforzo percepito per una scheda nell'ultimo periodo */
+    suspend fun getAverageEffortSince(cardId: Long, sinceDate: Long): Float? =
+        sessionDao.getAverageEffortSince(cardId, sinceDate)
+
     /**
      * Calcola lo streak attuale (giorni consecutivi di allenamento).
      * Conta all'indietro da oggi quanti giorni consecutivi hanno una sessione.

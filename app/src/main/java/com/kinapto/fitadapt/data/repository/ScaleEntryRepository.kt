@@ -37,4 +37,16 @@ class ScaleEntryRepository @Inject constructor(
     suspend fun getAverageMoodSince(sinceDate: Long): Float? = scaleEntryDao.averageMoodSince(sinceDate)
 
     suspend fun getAverageSleepQualitySince(sinceDate: Long): Float? = scaleEntryDao.averageSleepQualitySince(sinceDate)
+
+    suspend fun getAverageEffortSince(sinceDate: Long): Float? = scaleEntryDao.averageEffortSince(sinceDate)
+
+    suspend fun getAverageLymphoedemaSince(sinceDate: Long): Float? = scaleEntryDao.averageLymphoedemaSince(sinceDate)
+
+    suspend fun getAverageQolSince(sinceDate: Long): Float? = scaleEntryDao.averageQolSince(sinceDate)
+
+    suspend fun getAverageWellBeingSince(sinceDate: Long): Float? = scaleEntryDao.averageWellBeingSince(sinceDate)
+
+    suspend fun getAverageSpo2Since(sinceDate: Long): Float? = scaleEntryDao.averageSpo2Since(sinceDate)
+
+    suspend fun getAverageHeartRateSince(sinceDate: Long): Float? = scaleEntryDao.averageHeartRateSince(sinceDate)
 }

@@ -404,6 +404,76 @@ private fun DetailsPhase(
             onValueChange = { viewModel.updateAnxiety(it.toInt().takeIf { v -> v > 0 }) }
         )
 
+        // Linfedema
+        OptionalSlider(
+            label = stringResource(R.string.label_lymphoedema),
+            value = uiState.lymphoedema?.toFloat() ?: 0f,
+            range = 0f..10f,
+            steps = 9,
+            displayValue = "${uiState.lymphoedema ?: 0}/10",
+            accentColor = accentColor,
+            onValueChange = { viewModel.updateLymphoedema(it.toInt().takeIf { v -> v > 0 }) }
+        )
+
+        // Qualità della vita
+        OptionalSlider(
+            label = stringResource(R.string.label_quality_of_life),
+            value = uiState.qualityOfLife?.toFloat() ?: 5f,
+            range = 0f..10f,
+            steps = 9,
+            displayValue = "${uiState.qualityOfLife ?: 5}/10",
+            minLabel = stringResource(R.string.session_scale_worst),
+            maxLabel = stringResource(R.string.session_scale_best),
+            accentColor = accentColor,
+            onValueChange = { viewModel.updateQualityOfLife(it.toInt()) }
+        )
+
+        // Benessere
+        OptionalSlider(
+            label = stringResource(R.string.label_well_being),
+            value = uiState.wellBeing?.toFloat() ?: 5f,
+            range = 0f..10f,
+            steps = 9,
+            displayValue = "${uiState.wellBeing ?: 5}/10",
+            minLabel = stringResource(R.string.session_scale_worst),
+            maxLabel = stringResource(R.string.session_scale_best),
+            accentColor = accentColor,
+            onValueChange = { viewModel.updateWellBeing(it.toInt()) }
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(modifier = Modifier.fillMaxWidth()) {
+            OutlinedTextField(
+                value = uiState.spo2,
+                onValueChange = { viewModel.updateSpo2(it) },
+                label = { Text(stringResource(R.string.label_spo2)) },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                shape = RoundedCornerShape(16.dp),
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                    focusedLabelColor = accentColor,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            OutlinedTextField(
+                value = uiState.heartRate,
+                onValueChange = { viewModel.updateHeartRate(it) },
+                label = { Text(stringResource(R.string.label_heart_rate)) },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number),
+                shape = RoundedCornerShape(16.dp),
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = accentColor,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                    focusedLabelColor = accentColor,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            )
+        }
+
         // Qualità sonno
         OptionalSlider(
             label = stringResource(R.string.session_sleep),
