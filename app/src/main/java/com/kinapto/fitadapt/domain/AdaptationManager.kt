@@ -10,15 +10,17 @@ import com.kinapto.fitadapt.data.repository.TrainingCardRepository
 import com.kinapto.fitadapt.notification.NotificationHelper
 import java.util.Calendar
 import javax.inject.Inject
+import javax.inject.Provider
 import javax.inject.Singleton
 
 @Singleton
 class AdaptationManager @Inject constructor(
     private val cardRepository: TrainingCardRepository,
     private val scaleRepository: ScaleEntryRepository,
-    private val sessionRepository: com.kinapto.fitadapt.data.repository.SessionRepository, // Aggiunto per misses e difficulty
+    private val sessionRepositoryProvider: Provider<com.kinapto.fitadapt.data.repository.SessionRepository>, // Usiamo Provider per evitare cicli di dipendenza
     private val notificationHelper: NotificationHelper
 ) {
+    private val sessionRepository get() = sessionRepositoryProvider.get()
     /**
      * Verifica se la scheda attiva necessita di un adattamento basato sui bio-feedback o regole cliniche.
      * Viene chiamata dopo la registrazione di una sessione o una rilevazione nel diario.
