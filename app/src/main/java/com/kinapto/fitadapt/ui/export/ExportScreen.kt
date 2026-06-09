@@ -99,13 +99,27 @@ class ExportViewModel @Inject constructor(
                                 ExportSession(
                                     date = DateUtils.toIsoString(s.date), completed = s.completed, partial = s.partial,
                                     durationMin = s.actualDurationMin, perceivedEffort = s.perceivedEffort,
-                                    mood = s.mood, sleepQuality = s.sleepQuality
+                                    asthenia = s.asthenia, osteoarticularPain = s.osteoarticularPain,
+                                    restDyspnea = s.restDyspnea, exertionDyspnea = s.exertionDyspnea,
+                                    mood = s.mood, sleepQuality = s.sleepQuality,
+                                    nausea = s.nausea, appetite = s.appetite, anxiety = s.anxiety,
+                                    lymphoedema = s.lymphoedema, qualityOfLife = s.qualityOfLife,
+                                    wellBeing = s.wellBeing, spo2 = s.spo2, heartRate = s.heartRate
                                 )
                             }
                         )
                     },
                     scaleEntries = scaleEntries.map { s ->
-                        ExportScaleEntry(date = DateUtils.toIsoString(s.date), asthenia = s.asthenia, osteoarticularPain = s.osteoarticularPain, restDyspnea = s.restDyspnea, exertionDyspnea = s.exertionDyspnea)
+                        ExportScaleEntry(
+                            date = DateUtils.toIsoString(s.date), 
+                            perceivedEffort = s.perceivedEffort,
+                            asthenia = s.asthenia, osteoarticularPain = s.osteoarticularPain, 
+                            restDyspnea = s.restDyspnea, exertionDyspnea = s.exertionDyspnea,
+                            mood = s.mood, sleepQuality = s.sleepQuality,
+                            nausea = s.nausea, appetite = s.appetite, anxiety = s.anxiety,
+                            lymphoedema = s.lymphoedema, qualityOfLife = s.qualityOfLife,
+                            wellBeing = s.wellBeing, spo2 = s.spo2, heartRate = s.heartRate
+                        )
                     },
                     diaryEntries = diaryEntries.map { d -> ExportDiaryEntry(date = DateUtils.toIsoString(d.date), text = d.text) },
                     goals = goals.map { g -> ExportGoal(title = g.title, targetType = g.targetType, targetValue = g.targetValue, currentValue = g.currentValue, isActive = g.isActive) },

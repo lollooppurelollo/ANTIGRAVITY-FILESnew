@@ -58,9 +58,12 @@ object RedCapExportUtils {
 
     private fun generateCsv(crf: KinAptoCRF): String {
         val sb = StringBuilder()
-        // Header esteso per coprire diversi strumenti
+        // Header esteso per coprire tutti i parametri clinici e biometrici
+        // record_id, event, instrument, instance, date, time, ... params
         sb.append("record_id,redcap_event_name,redcap_repeat_instrument,redcap_repeat_instance,")
-        sb.append("date,time,value_1,value_2,value_3,value_4,text_content,completed_flag,notes\n")
+        sb.append("date,time,actual_duration,perceived_effort,asthenia,pain,rest_dyspnea,exertion_dyspnea,")
+        sb.append("mood,sleep,nausea,appetite,anxiety,lymphoedema,qol,well_being,spo2,heart_rate,")
+        sb.append("text_content,completed_flag,notes\n")
         
         val patientId = crf.metadata.patientStudyCode
         val dfDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -69,7 +72,7 @@ object RedCapExportUtils {
         // 1. Evento Baseline (Metadata e Profilo)
         sb.append("$patientId,baseline,,,")
         sb.append("${dfDate.format(Date(crf.metadata.exportTimestamp))},${dfTime.format(Date(crf.metadata.exportTimestamp))},")
-        sb.append(",,,,KinApto Export ${crf.metadata.appVersion},1,\n")
+        sb.append(",,,,,,,,,,,,,,,,,KinApto Export ${crf.metadata.appVersion},1,\n")
 
         // 2. Sessioni di allenamento (Instrument: exercise_session)
         crf.performedSessions.forEachIndexed { index, session ->
@@ -77,14 +80,22 @@ object RedCapExportUtils {
             val time = dfTime.format(Date(session.date))
             val notes = (session.notes ?: "").replace("\n", " ").replace(",", ";")
             sb.append("$patientId,exercise_session,exercise_session,${index + 1},")
-            sb.append("$date,$time,${session.actualDurationMin ?: ""},${session.perceivedEffort ?: ""},${session.mood ?: ""},${session.sleepQuality ?: ""},,${if (session.completed) 1 else 0},$notes\n")
+            sb.append("$date,$time,${session.actualDurationMin ?: ""},${session.perceivedEffort ?: ""},")
+            sb.append("${session.asthenia ?: ""},${session.osteoarticularPain ?: ""},${session.restDyspnea ?: ""},${session.exertionDyspnea ?: ""},")
+            sb.append("${session.mood ?: ""},${session.sleepQuality ?: ""},${session.nausea ?: ""},${session.appetite ?: ""},")
+            sb.append("${session.anxiety ?: ""},${session.lymphoedema ?: ""},${session.qualityOfLife ?: ""},${session.wellBeing ?: ""},")
+            sb.append("${session.spo2 ?: ""},${session.heartRate ?: ""},,${if (session.completed) 1 else 0},$notes\n")
         }
 
         // 3. Scale Rapide (Instrument: daily_scales)
         crf.scaleEntries.forEachIndexed { index, scale ->
             val date = dfDate.format(Date(scale.date))
             sb.append("$patientId,daily_scales,daily_scales,${index + 1},")
-            sb.append("$date,,${scale.asthenia ?: ""},${scale.osteoarticularPain ?: ""},${scale.restDyspnea ?: ""},${scale.exertionDyspnea ?: ""},,, \n")
+            sb.append("$date,,${""},${scale.perceivedEffort ?: ""},")
+            sb.append("${scale.asthenia ?: ""},${scale.osteoarticularPain ?: ""},${scale.restDyspnea ?: ""},${scale.exertionDyspnea ?: ""},")
+            sb.append("${scale.mood ?: ""},${scale.sleepQuality ?: ""},${scale.nausea ?: ""},${scale.appetite ?: ""},")
+            sb.append("${scale.anxiety ?: ""},${scale.lymphoedema ?: ""},${scale.qualityOfLife ?: ""},${scale.wellBeing ?: ""},")
+            sb.append("${scale.spo2 ?: ""},${scale.heartRate ?: ""},,, \n")
         }
 
         // 4. Diario Libero (Instrument: diary_entry)
@@ -92,7 +103,7 @@ object RedCapExportUtils {
             val date = dfDate.format(Date(entry.date))
             val text = entry.text.replace("\n", " ").replace(",", ";")
             sb.append("$patientId,diary_entry,diary_entry,${index + 1},")
-            sb.append("$date,,,,,,$text,, \n")
+            sb.append("$date,,,,,,,,,,,,,,,,,,$text,, \n")
         }
 
         // 5. Audit Log (Instrument: audit_trail)

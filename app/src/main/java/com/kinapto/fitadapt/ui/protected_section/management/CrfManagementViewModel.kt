@@ -57,6 +57,7 @@ class CrfManagementViewModel @Inject constructor(
     private val sessionDao: SessionDao,
     private val diaryDao: DiaryDao,
     private val scaleDao: ScaleEntryDao,
+    private val adaptationLogDao: AdaptationLogDao,
     private val exportLogDao: ExportLogDao,
     private val scheduledSessionDao: ScheduledSessionDao,
     private val auditLogDao: AuditLogDao
@@ -84,6 +85,7 @@ class CrfManagementViewModel @Inject constructor(
                 val scales = scaleDao.getAll().first()
                 val scheduled = scheduledSessionDao.getAllScheduled().first()
                 val auditLogs = auditLogDao.getByPatient(profile.patientCode).first()
+                val adaptationLogs = adaptationLogDao.getAllLogs().first()
 
                 // Costruisci oggetto CRF
                 val crf = KinAptoCRF(
@@ -132,8 +134,20 @@ class CrfManagementViewModel @Inject constructor(
                              partial = session.partial, 
                              actualDurationMin = session.actualDurationMin, 
                              perceivedEffort = session.perceivedEffort, 
+                             asthenia = session.asthenia,
+                             osteoarticularPain = session.osteoarticularPain,
+                             restDyspnea = session.restDyspnea,
+                             exertionDyspnea = session.exertionDyspnea,
                              mood = session.mood, 
                              sleepQuality = session.sleepQuality, 
+                             nausea = session.nausea,
+                             appetite = session.appetite,
+                             anxiety = session.anxiety,
+                             lymphoedema = session.lymphoedema,
+                             qualityOfLife = session.qualityOfLife,
+                             wellBeing = session.wellBeing,
+                             spo2 = session.spo2,
+                             heartRate = session.heartRate,
                              notes = session.notes, 
                              exercises = sessWithEx?.exerciseCompletions?.map { 
                                  CrfPerformedExercise(
@@ -144,8 +158,18 @@ class CrfManagementViewModel @Inject constructor(
                              } ?: emptyList()
                          )
                     },
-                    scaleEntries = scales.map { CrfScaleEntry(it.id, it.date, it.asthenia, it.osteoarticularPain, it.restDyspnea, it.exertionDyspnea, it.createdAt) },
+                    scaleEntries = scales.map { 
+                        CrfScaleEntry(
+                            it.id, it.date, it.perceivedEffort, it.asthenia, it.osteoarticularPain, 
+                            it.restDyspnea, it.exertionDyspnea, it.mood, it.sleepQuality, it.nausea, 
+                            it.appetite, it.anxiety, it.lymphoedema, it.qualityOfLife, it.wellBeing, 
+                            it.spo2, it.heartRate, it.createdAt
+                        ) 
+                    },
                     diaryEntries = diary.map { CrfDiaryEntry(it.id, it.date, it.text, it.createdAt) },
+                    adaptationLogs = adaptationLogs.map {
+                        CrfAdaptationLog(it.timestamp, it.originalCardId, it.newCardId, it.triggerDescription, it.actionTaken, it.notified)
+                    },
                     auditLog = auditLogs.map { CrfAuditEntry(it.timestamp, it.action, it.details) }
                 )
 

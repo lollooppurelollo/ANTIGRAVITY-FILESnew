@@ -24,7 +24,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class TrainingCardRepository @Inject constructor(
-    private val trainingCardDao: TrainingCardDao
+    private val trainingCardDao: TrainingCardDao,
+    private val adaptationRuleDao: com.kinapto.fitadapt.data.local.dao.AdaptationRuleDao
 ) {
 
     // ── Lettura ──
@@ -115,6 +116,13 @@ class TrainingCardRepository @Inject constructor(
     suspend fun removeExerciseFromCard(cardExercise: CardExerciseEntity) =
         trainingCardDao.deleteCardExercise(cardExercise)
 
+    /** Sostituisce tutte le regole di una scheda */
+    suspend fun replaceRulesForCard(cardId: Long, rules: List<com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity>) {
+        adaptationRuleDao.deleteRulesForCard(cardId)
+        val rulesWithCardId = rules.map { it.copy(id = 0, cardId = cardId) }
+        adaptationRuleDao.insertAll(rulesWithCardId)
+    }
+
     // ── Gestione stato ──
 
     /** Attiva una scheda (e rende la precedente completata se presente) */
@@ -159,5 +167,69 @@ class TrainingCardRepository @Inject constructor(
         val nextCard = trainingCardDao.getNextPendingCard() ?: return false
         activateCard(nextCard.id)
         return true
+    }
+
+    // ── Gestione Regole di Adattamento ──
+
+    /** Ottiene le regole per una scheda */
+    fun getRulesForCard(cardId: Long): Flow<List<com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity>> =
+        adaptationRuleDao.getRulesForCard(cardId)
+
+    suspend fun getRulesForCardSync(cardId: Long): List<com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity> =
+        adaptationRuleDao.getRulesForCardSync(cardId)
+
+    /** Duplica una scheda applicando adattamenti granulari (anche per categoria) */
+    suspend fun duplicateAndAdaptCard(
+        cardId: Long,
+        adaptationDescription: String,
+        globalRepsDelta: Int = 0,
+        globalIntensityStep: Int = 0,
+        globalDurationDeltaPercent: Float = 0f,
+        categoryDeltas: Map<String, com.kinapto.fitadapt.domain.AdaptationDelta>? = null
+    ): Long {
+        val originalCard = getById(cardId) ?: throw IllegalArgumentException("Card not found")
+        val originalExercises = getCardExercisesSync(cardId)
+
+        val newCard = originalCard.copy(
+            id = 0,
+            title = "${originalCard.title} (Adattata)",
+            isAdapted = true,
+            status = "PENDING",
+            orderIndex = originalCard.orderIndex + 1,
+            createdAt = System.currentTimeMillis()
+        )
+        
+        val newCardId = trainingCardDao.insert(newCard)
+
+        val adaptedExercises = originalExercises.map { ce ->
+            // Recupera l'esercizio base per conoscere la categoria
+            val baseExercise = trainingCardDao.getExerciseById(ce.exerciseId)
+            val category = baseExercise?.category ?: "GENERIC"
+            
+            // Applica delta specifico per categoria o quello globale
+            val catDelta = categoryDeltas?.get(category)
+            val finalRepsDelta = globalRepsDelta + (catDelta?.reps ?: 0)
+            val finalIntensityStep = globalIntensityStep + (catDelta?.intensity ?: 0)
+            val finalDurationDelta = globalDurationDeltaPercent + (catDelta?.durationPercent ?: 0f)
+
+            val newReps = ce.customRepetitions?.let { (it + finalRepsDelta).coerceAtLeast(1) }
+            val newDuration = ce.customDurationSec?.let { (it * (1 + finalDurationDelta)).toInt().coerceAtLeast(5) }
+            
+            val intensities = listOf("bassa", "moderata", "alta")
+            val currentIdx = intensities.indexOf(ce.customIntensity ?: "moderata")
+            val newIntensityIdx = (currentIdx + finalIntensityStep).coerceIn(0, 2)
+            val newIntensity = intensities[newIntensityIdx]
+
+            ce.copy(
+                id = 0,
+                cardId = newCardId,
+                customRepetitions = newReps,
+                customDurationSec = newDuration,
+                customIntensity = newIntensity
+            )
+        }
+        trainingCardDao.insertCardExercises(adaptedExercises)
+        
+        return newCardId
     }
 }

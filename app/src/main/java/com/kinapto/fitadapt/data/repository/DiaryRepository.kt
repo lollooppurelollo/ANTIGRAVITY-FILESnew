@@ -101,7 +101,18 @@ class DiaryRepository @Inject constructor(
             "asthenia" to scaleEntryDao.averageAstheniaSince(sinceDate),
             "pain" to scaleEntryDao.averagePainSince(sinceDate),
             "restDyspnea" to scaleEntryDao.averageRestDyspneaSince(sinceDate),
-            "exertionDyspnea" to scaleEntryDao.averageExertionDyspneaSince(sinceDate)
+            "exertionDyspnea" to scaleEntryDao.averageExertionDyspneaSince(sinceDate),
+            "nausea" to scaleEntryDao.averageNauseaSince(sinceDate),
+            "appetite" to scaleEntryDao.averageAppetiteSince(sinceDate),
+            "anxiety" to scaleEntryDao.averageAnxietySince(sinceDate),
+            "lymphoedema" to scaleEntryDao.averageLymphoedemaSince(sinceDate),
+            "qol" to scaleEntryDao.averageQolSince(sinceDate),
+            "wellBeing" to scaleEntryDao.averageWellBeingSince(sinceDate),
+            "spo2" to scaleEntryDao.averageSpo2Since(sinceDate),
+            "heartRate" to scaleEntryDao.averageHeartRateSince(sinceDate),
+            "mood" to scaleEntryDao.averageMoodSince(sinceDate),
+            "sleep" to scaleEntryDao.averageSleepQualitySince(sinceDate),
+            "effort" to scaleEntryDao.averageEffortSince(sinceDate)
         )
     }
 }

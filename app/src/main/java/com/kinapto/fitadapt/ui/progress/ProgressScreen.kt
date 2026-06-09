@@ -495,9 +495,14 @@ private fun TrendChartCard(
     var showPain by remember { mutableStateOf(true) }
     var showRestDyspnea by remember { mutableStateOf(false) }
     var showExertionDyspnea by remember { mutableStateOf(false) }
-    var showNausea by remember { mutableStateOf(true) }
+    var showNausea by remember { mutableStateOf(false) }
     var showAppetite by remember { mutableStateOf(false) }
-    var showAnxiety by remember { mutableStateOf(true) }
+    var showAnxiety by remember { mutableStateOf(false) }
+    var showLymphoedema by remember { mutableStateOf(false) }
+    var showWellBeing by remember { mutableStateOf(false) }
+    var showQualityOfLife by remember { mutableStateOf(false) }
+    var showSpo2 by remember { mutableStateOf(false) }
+    var showHeartRate by remember { mutableStateOf(false) }
 
     // Colori fissi per i parametri (per coerenza con i grafici medici)
     val colorAsthenia = if (useOriginalColors) Color(0xFFFBC02D) else Color(0xFFFF9800) // Giallo/Arancio
@@ -510,6 +515,11 @@ private fun TrendChartCard(
     val colorEffort = if (useOriginalColors) Color(0xFF2196F3) else Color(0xFF03A9F4) // Blu
     val colorMood = if (useOriginalColors) Color(0xFFCDDC39) else Color(0xFFFFEB3B) // Giallo limone
     val colorSleep = if (useOriginalColors) Color(0xFF673AB7) else Color(0xFF3F51B5) // Indigo
+    val colorLymphoedema = Color(0xFF009688) // Teal
+    val colorWellBeing = Color(0xFFFF4081) // Pink
+    val colorQoL = Color(0xFF795548) // Brown
+    val colorSpo2 = Color(0xFF3F51B5) // Indigo (diverso da sleep)
+    val colorHeartRate = Color(0xFFFF5722) // Deep Orange
 
     // Unifichiamo i dati per asse X (date)
     val allDates = (completedSessions.map { it.date } + scaleEntries.map { it.date })
@@ -600,6 +610,66 @@ private fun TrendChartCard(
                         label = stringResource(R.string.label_anxiety),
                         color = colorAnxiety,
                         onClick = { showAnxiety = !showAnxiety })
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SmallFilterChip(
+                        selected = showLymphoedema,
+                        label = stringResource(R.string.label_lymphoedema),
+                        color = colorLymphoedema,
+                        onClick = { showLymphoedema = !showLymphoedema })
+                    SmallFilterChip(
+                        selected = showWellBeing,
+                        label = stringResource(R.string.label_well_being),
+                        color = colorWellBeing,
+                        onClick = { showWellBeing = !showWellBeing })
+                    SmallFilterChip(
+                        selected = showQualityOfLife,
+                        label = stringResource(R.string.label_quality_of_life),
+                        color = colorQoL,
+                        onClick = { showQualityOfLife = !showQualityOfLife })
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SmallFilterChip(
+                        selected = showSpo2,
+                        label = "SpO2",
+                        color = colorSpo2,
+                        onClick = { showSpo2 = !showSpo2 })
+                    SmallFilterChip(
+                        selected = showHeartRate,
+                        label = "FC",
+                        color = colorHeartRate,
+                        onClick = { showHeartRate = !showHeartRate })
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SmallFilterChip(
+                        selected = showWellBeing,
+                        label = stringResource(R.string.label_well_being),
+                        color = colorWellBeing,
+                        onClick = { showWellBeing = !showWellBeing })
+                    SmallFilterChip(
+                        selected = showQualityOfLife,
+                        label = stringResource(R.string.label_quality_of_life),
+                        color = colorQoL,
+                        onClick = { showQualityOfLife = !showQualityOfLife })
+                    SmallFilterChip(
+                        selected = showSpo2,
+                        label = "SpO2",
+                        color = colorSpo2,
+                        onClick = { showSpo2 = !showSpo2 })
+                    SmallFilterChip(
+                        selected = showHeartRate,
+                        label = "FC",
+                        color = colorHeartRate,
+                        onClick = { showHeartRate = !showHeartRate })
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -793,6 +863,66 @@ private fun TrendChartCard(
                             }
                             if (pts.isNotEmpty()) drawTrendLine(pts, colorAnxiety)
                         }
+                        if (showLymphoedema) {
+                            val pts = allDates.mapIndexedNotNull { i, d ->
+                                val e = scaleEntries.find {
+                                    com.kinapto.fitadapt.util.DateUtils.isSameDay(
+                                        it.date,
+                                        d
+                                    )
+                                }
+                                e?.lymphoedema?.let { i to it.toFloat() }
+                            }
+                            if (pts.isNotEmpty()) drawTrendLine(pts, colorLymphoedema)
+                        }
+                        if (showWellBeing) {
+                            val pts = allDates.mapIndexedNotNull { i, d ->
+                                val e = scaleEntries.find {
+                                    com.kinapto.fitadapt.util.DateUtils.isSameDay(
+                                        it.date,
+                                        d
+                                    )
+                                }
+                                e?.wellBeing?.let { i to it.toFloat() }
+                            }
+                            if (pts.isNotEmpty()) drawTrendLine(pts, colorWellBeing)
+                        }
+                        if (showQualityOfLife) {
+                            val pts = allDates.mapIndexedNotNull { i, d ->
+                                val e = scaleEntries.find {
+                                    com.kinapto.fitadapt.util.DateUtils.isSameDay(
+                                        it.date,
+                                        d
+                                    )
+                                }
+                                e?.qualityOfLife?.let { i to it.toFloat() }
+                            }
+                            if (pts.isNotEmpty()) drawTrendLine(pts, colorQoL)
+                        }
+                        if (showSpo2) {
+                            val pts = allDates.mapIndexedNotNull { i, d ->
+                                val e = scaleEntries.find {
+                                    com.kinapto.fitadapt.util.DateUtils.isSameDay(
+                                        it.date,
+                                        d
+                                    )
+                                }
+                                e?.spo2?.let { i to (it.toFloat() / 10f) } // Normalizziamo per il grafico 0-10 se SpO2 è 0-100? No, NRS è 0-10.
+                            }
+                            if (pts.isNotEmpty()) drawTrendLine(pts, colorSpo2)
+                        }
+                        if (showHeartRate) {
+                            val pts = allDates.mapIndexedNotNull { i, d ->
+                                val e = scaleEntries.find {
+                                    com.kinapto.fitadapt.util.DateUtils.isSameDay(
+                                        it.date,
+                                        d
+                                    )
+                                }
+                                e?.heartRate?.let { i to (it.toFloat() / 20f) } // Scaling approssimativo per grafico NRS
+                            }
+                            if (pts.isNotEmpty()) drawTrendLine(pts, colorHeartRate)
+                        }
                         if (showSleep) {
                             val pts = allDates.mapIndexedNotNull { i, d ->
                                 val s = completedSessions.find {
@@ -845,6 +975,11 @@ private fun TrendChartCard(
                     if (showNausea) stringResource(R.string.label_nausea) to colorNausea else null,
                     if (showAppetite) stringResource(R.string.label_appetite) to colorAppetite else null,
                     if (showAnxiety) stringResource(R.string.label_anxiety) to colorAnxiety else null,
+                    if (showLymphoedema) stringResource(R.string.label_lymphoedema) to colorLymphoedema else null,
+                    if (showWellBeing) stringResource(R.string.label_well_being) to colorWellBeing else null,
+                    if (showQualityOfLife) stringResource(R.string.label_quality_of_life) to colorQoL else null,
+                    if (showSpo2) "SpO2" to colorSpo2 else null,
+                    if (showHeartRate) "Frequenza Cardiaca" to colorHeartRate else null,
                     if (showEffort) stringResource(R.string.label_effort) to colorEffort else null,
                     if (showMood) stringResource(R.string.label_mood) to colorMood else null,
                     if (showSleep) stringResource(R.string.label_sleep) to colorSleep else null

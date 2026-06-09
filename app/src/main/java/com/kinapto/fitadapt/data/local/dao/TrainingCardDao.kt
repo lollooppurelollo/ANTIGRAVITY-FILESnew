@@ -13,6 +13,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import com.kinapto.fitadapt.data.local.entity.CardExerciseEntity
 import com.kinapto.fitadapt.data.local.entity.CardWithExercises
+import com.kinapto.fitadapt.data.local.entity.ExerciseEntity
 import com.kinapto.fitadapt.data.local.entity.TrainingCardEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -119,6 +120,10 @@ interface TrainingCardDao {
 
     @Query("SELECT * FROM card_exercises WHERE cardId = :cardId")
     suspend fun getCardExercisesSync(cardId: Long): List<CardExerciseEntity>
+
+    // Ottieni un esercizio specifico per ID (usato durante l'adattamento)
+    @Query("SELECT * FROM exercises WHERE id = :id")
+    suspend fun getExerciseById(id: Long): ExerciseEntity?
 
     // Elimina tutti gli esercizi di una scheda
     @Query("DELETE FROM card_exercises WHERE cardId = :cardId")

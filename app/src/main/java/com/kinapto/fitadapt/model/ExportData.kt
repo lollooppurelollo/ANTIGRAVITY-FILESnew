@@ -44,8 +44,20 @@ data class ExportSession(
     val partial: Boolean = false,
     val durationMin: Int? = null,
     val perceivedEffort: Int? = null,
+    val asthenia: Int? = null,
+    val osteoarticularPain: Int? = null,
+    val restDyspnea: Int? = null,
+    val exertionDyspnea: Int? = null,
     val mood: Int? = null,
     val sleepQuality: Int? = null,
+    val nausea: Int? = null,
+    val appetite: Int? = null,
+    val anxiety: Int? = null,
+    val lymphoedema: Int? = null,
+    val qualityOfLife: Int? = null,
+    val wellBeing: Int? = null,
+    val spo2: Int? = null,
+    val heartRate: Int? = null,
     val exercisesCompleted: List<String> = emptyList()
 )
 
@@ -55,10 +67,21 @@ data class ExportSession(
 @Serializable
 data class ExportScaleEntry(
     val date: String,
+    val perceivedEffort: Int? = null,
     val asthenia: Int? = null,
     val osteoarticularPain: Int? = null,
     val restDyspnea: Int? = null,
-    val exertionDyspnea: Int? = null
+    val exertionDyspnea: Int? = null,
+    val mood: Int? = null,
+    val sleepQuality: Int? = null,
+    val nausea: Int? = null,
+    val appetite: Int? = null,
+    val anxiety: Int? = null,
+    val lymphoedema: Int? = null,
+    val qualityOfLife: Int? = null,
+    val wellBeing: Int? = null,
+    val spo2: Int? = null,
+    val heartRate: Int? = null
 )
 
 /**

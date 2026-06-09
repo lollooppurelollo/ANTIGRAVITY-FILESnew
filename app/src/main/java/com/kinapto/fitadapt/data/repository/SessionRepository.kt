@@ -160,6 +160,10 @@ class SessionRepository @Inject constructor(
     suspend fun getLastCompletionStatuses(cardId: Long, limit: Int): List<Boolean> =
         sessionDao.getLastCompletionStatuses(cardId, limit)
 
+    /** Ottiene i motivi di fallimento delle ultime N sessioni registrate per una scheda */
+    suspend fun getLastFailureReasons(cardId: Long, limit: Int): List<String?> =
+        sessionDao.getLastFailureReasons(cardId, limit)
+
     /** Media dello sforzo percepito per una scheda nell'ultimo periodo */
     suspend fun getAverageEffortSince(cardId: Long, sinceDate: Long): Float? =
         sessionDao.getAverageEffortSince(cardId, sinceDate)

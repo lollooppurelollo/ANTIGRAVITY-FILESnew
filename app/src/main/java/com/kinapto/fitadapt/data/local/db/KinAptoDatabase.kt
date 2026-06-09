@@ -46,9 +46,11 @@ import com.kinapto.fitadapt.data.local.entity.*
         PatientProfileEntity::class,
         GoalEntity::class,
         ScheduledSessionEntity::class,
-        AuditLogEntity::class
+        AuditLogEntity::class,
+        AdaptationRuleEntity::class,
+        AdaptationLogEntity::class
     ],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -66,6 +68,8 @@ abstract class KinAptoDatabase : RoomDatabase() {
     abstract fun goalDao(): GoalDao
     abstract fun scheduledSessionDao(): ScheduledSessionDao
     abstract fun auditLogDao(): AuditLogDao
+    abstract fun adaptationRuleDao(): AdaptationRuleDao
+    abstract fun adaptationLogDao(): AdaptationLogDao
 
     companion object {
         /**

@@ -106,6 +106,10 @@ interface SessionDao {
     @Query("SELECT completed FROM sessions WHERE cardId = :cardId ORDER BY date DESC LIMIT :limit")
     suspend fun getLastCompletionStatuses(cardId: Long, limit: Int): List<Boolean>
 
+    // Ottieni i motivi di fallimento delle ultime N sessioni registrate per una scheda
+    @Query("SELECT failureReason FROM sessions WHERE cardId = :cardId ORDER BY date DESC LIMIT :limit")
+    suspend fun getLastFailureReasons(cardId: Long, limit: Int): List<String?>
+
     // Media dello sforzo percepito per una scheda nell'ultimo periodo
     @Query("SELECT AVG(perceivedEffort) FROM sessions WHERE cardId = :cardId AND date >= :sinceDate AND perceivedEffort IS NOT NULL")
     suspend fun getAverageEffortSince(cardId: Long, sinceDate: Long): Float?

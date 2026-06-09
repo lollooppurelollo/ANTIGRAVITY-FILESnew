@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity
 import com.kinapto.fitadapt.data.local.entity.CardExerciseEntity
 import com.kinapto.fitadapt.data.local.entity.ExerciseEntity
 import com.kinapto.fitadapt.data.local.entity.TrainingCardEntity
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 data class CardEditorUiState(
@@ -38,6 +40,7 @@ data class CardEditorUiState(
     val adaptationMinDifficulty: String = "",
     val adaptationAction: String? = null,
     val exercises: List<CardExerciseWithDetails> = emptyList(),
+    val rules: List<AdaptationRuleEntity> = emptyList(),
     val isLoading: Boolean = false,
     val isSaved: Boolean = false
 )
@@ -91,6 +94,7 @@ class CardEditorViewModel @Inject constructor(
                         adaptationMinDifficulty = card.adaptationMinDifficulty?.toString() ?: "",
                         adaptationAction = card.adaptationAction,
                         exercises = exercisesWithDetails,
+                        rules = cardRepository.getRulesForCardSync(cardId),
                         isLoading = false
                     )
                 }
@@ -140,6 +144,49 @@ class CardEditorViewModel @Inject constructor(
 
     fun onAdaptationActionChange(action: String?) {
         _uiState.value = _uiState.value.copy(adaptationAction = action)
+    }
+
+    // --- Dynamic Rules Management ---
+
+    fun addRule(groupId: String? = null) {
+        val newGroupId = groupId ?: UUID.randomUUID().toString()
+        val newRule = AdaptationRuleEntity(
+            cardId = cardId,
+            groupId = newGroupId,
+            triggerType = "BIOMETRIC",
+            parameter = "PAIN",
+            operator = "GT",
+            threshold = 7f,
+            actionType = "DELTA",
+            actionValue = "{\"reps\": -2}"
+        )
+        _uiState.value = _uiState.value.copy(rules = _uiState.value.rules + newRule)
+    }
+
+    fun updateRule(updatedRule: AdaptationRuleEntity) {
+        val newRules = _uiState.value.rules.map {
+            if (it.id == updatedRule.id && it.id != 0L) updatedRule 
+            else if (it === updatedRule) updatedRule // For new unsaved rules
+            else it
+        }
+        _uiState.value = _uiState.value.copy(rules = newRules)
+    }
+    
+    // Alternative update by index if needed for unsaved rules
+    fun updateRuleAtIndex(index: Int, updatedRule: AdaptationRuleEntity) {
+        val newRules = _uiState.value.rules.toMutableList()
+        if (index in newRules.indices) {
+            newRules[index] = updatedRule
+            _uiState.value = _uiState.value.copy(rules = newRules)
+        }
+    }
+
+    fun removeRule(index: Int) {
+        val newRules = _uiState.value.rules.toMutableList()
+        if (index in newRules.indices) {
+            newRules.removeAt(index)
+            _uiState.value = _uiState.value.copy(rules = newRules)
+        }
     }
 
     fun addExercise(exercise: ExerciseEntity) {
@@ -216,12 +263,15 @@ class CardEditorViewModel @Inject constructor(
             )
             
             val exercises = state.exercises.map { it.cardExercise }
-            
+            val rules = state.rules
+
             if (cardId == -1L) {
-                cardRepository.createCard(card, exercises)
+                val newId = cardRepository.createCard(card, exercises)
+                cardRepository.replaceRulesForCard(newId, rules.map { it.copy(cardId = newId) })
             } else {
                 cardRepository.updateCard(card)
                 cardRepository.replaceCardExercises(cardId, exercises)
+                cardRepository.replaceRulesForCard(cardId, rules)
             }
             
             _uiState.value = _uiState.value.copy(isSaved = true)

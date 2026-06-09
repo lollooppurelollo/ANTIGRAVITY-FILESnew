@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import com.kinapto.fitadapt.R
+import com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity
 import com.kinapto.fitadapt.data.local.entity.ExerciseEntity
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -317,6 +318,37 @@ fun CardEditorScreen(
                             }
                         }
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        "Regole Cliniche Complesse (Expert Mode)",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        "Definisci logiche AND/OR per adattamenti granulari.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    uiState.rules.forEachIndexed { index, rule ->
+                        RuleEditorItem(
+                            rule = rule,
+                            onUpdate = { viewModel.updateRuleAtIndex(index, it) },
+                            onDelete = { viewModel.removeRule(index) }
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    OutlinedButton(
+                        onClick = { viewModel.addRule() },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Aggiungi Regola Dinamica")
+                    }
                 }
                 
                 item {
@@ -358,6 +390,86 @@ fun CardEditorScreen(
                         onRemove = { viewModel.removeExercise(index) }
                     )
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RuleEditorItem(
+    rule: AdaptationRuleEntity,
+    onUpdate: (AdaptationRuleEntity) -> Unit,
+    onDelete: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Gruppo: ${rule.groupId}", style = MaterialTheme.typography.labelSmall, modifier = Modifier.weight(1f))
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
+                }
+            }
+
+            var showTypeMenu by remember { mutableStateOf(false) }
+            ExposedDropdownMenuBox(
+                expanded = showTypeMenu,
+                onExpandedChange = { showTypeMenu = !showTypeMenu }
+            ) {
+                OutlinedTextField(
+                    value = rule.triggerType,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Tipo Trigger") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showTypeMenu) },
+                    modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                )
+                ExposedDropdownMenu(expanded = showTypeMenu, onDismissRequest = { showTypeMenu = false }) {
+                    listOf("BIOMETRIC", "COMPLETION", "FAILURE_REASON").forEach { type ->
+                        DropdownMenuItem(
+                            text = { Text(type) },
+                            onClick = { onUpdate(rule.copy(triggerType = type)); showTypeMenu = false }
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    value = rule.parameter ?: "",
+                    onValueChange = { onUpdate(rule.copy(parameter = it)) },
+                    label = { Text("Parametro") },
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = rule.threshold.toString(),
+                    onValueChange = { onUpdate(rule.copy(threshold = it.toFloatOrNull() ?: 0f)) },
+                    label = { Text("Soglia") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                OutlinedTextField(
+                    value = rule.actionType,
+                    onValueChange = { onUpdate(rule.copy(actionType = it)) },
+                    label = { Text("Azione") },
+                    modifier = Modifier.weight(1f)
+                )
+                OutlinedTextField(
+                    value = rule.actionValue,
+                    onValueChange = { onUpdate(rule.copy(actionValue = it)) },
+                    label = { Text("Valore Azione") },
+                    modifier = Modifier.weight(1f)
+                )
             }
         }
     }

@@ -82,5 +82,7 @@ data class SessionEntity(
 
     val notes: String? = null,
 
+    val failureReason: String? = null, // Es. "TOO_FATIGUING", "LACK_OF_TIME", "PAIN", "OTHER"
+
     val createdAt: Long = System.currentTimeMillis()
 )

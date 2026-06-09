@@ -16,7 +16,18 @@ data class KinAptoCRF(
     val performedSessions: List<CrfPerformedSession>,
     val scaleEntries: List<CrfScaleEntry>,
     val diaryEntries: List<CrfDiaryEntry>,
+    val adaptationLogs: List<CrfAdaptationLog> = emptyList(),
     val auditLog: List<CrfAuditEntry> = emptyList()
+)
+
+@Serializable
+data class CrfAdaptationLog(
+    val timestamp: Long,
+    val originalCardId: Long?,
+    val newCardId: Long?,
+    val triggerDescription: String,
+    val actionTaken: String,
+    val notified: Boolean
 )
 
 @Serializable
@@ -95,8 +106,20 @@ data class CrfPerformedSession(
     val partial: Boolean,
     val actualDurationMin: Int?,
     val perceivedEffort: Int?, // RPE
+    val asthenia: Int? = null,
+    val osteoarticularPain: Int? = null,
+    val restDyspnea: Int? = null,
+    val exertionDyspnea: Int? = null,
     val mood: Int?,
     val sleepQuality: Int?,
+    val nausea: Int? = null,
+    val appetite: Int? = null,
+    val anxiety: Int? = null,
+    val lymphoedema: Int? = null,
+    val qualityOfLife: Int? = null,
+    val wellBeing: Int? = null,
+    val spo2: Int? = null,
+    val heartRate: Int? = null,
     val notes: String?,
     val symptomsBefore: String? = null, // Da aggiungere se disponibili o mappare da diary/scale
     val symptomsAfter: String? = null,
@@ -117,10 +140,21 @@ data class CrfPerformedExercise(
 data class CrfScaleEntry(
     val id: Long,
     val date: Long,
+    val perceivedEffort: Int? = null,
     val asthenia: Int?,
     val osteoarticularPain: Int?,
     val restDyspnea: Int?,
     val exertionDyspnea: Int?,
+    val mood: Int? = null,
+    val sleepQuality: Int? = null,
+    val nausea: Int? = null,
+    val appetite: Int? = null,
+    val anxiety: Int? = null,
+    val lymphoedema: Int? = null,
+    val qualityOfLife: Int? = null,
+    val wellBeing: Int? = null,
+    val spo2: Int? = null,
+    val heartRate: Int? = null,
     val createdAt: Long
 )
 
