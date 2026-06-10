@@ -320,15 +320,43 @@ fun RuleEditorItem(
                     ExposedDropdownMenu(expanded = showTypeMenu, onDismissRequest = { showTypeMenu = false }) {
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.rules_trigger_biometric)) },
-                            onClick = { onUpdate(rule.copy(triggerType = "BIOMETRIC", parameter = "PAIN")); showTypeMenu = false }
+                            onClick = { 
+                                onUpdate(rule.copy(
+                                    triggerType = "BIOMETRIC", 
+                                    parameter = "PAIN",
+                                    operator = "GT",
+                                    threshold = 5f,
+                                    windowDays = 15,
+                                    minOccurrences = 3,
+                                    useAverage = true
+                                ))
+                                showTypeMenu = false 
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.rules_trigger_completion)) },
-                            onClick = { onUpdate(rule.copy(triggerType = "COMPLETION", parameter = "MISSED_SESSIONS")); showTypeMenu = false }
+                            onClick = { 
+                                onUpdate(rule.copy(
+                                    triggerType = "COMPLETION", 
+                                    parameter = "MISSED_SESSIONS",
+                                    windowDays = 15,
+                                    minOccurrences = 3,
+                                    requireConsecutive = false
+                                ))
+                                showTypeMenu = false 
+                            }
                         )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.rules_trigger_failure)) },
-                            onClick = { onUpdate(rule.copy(triggerType = "FAILURE_REASON", parameter = "TOO_FATIGUING")); showTypeMenu = false }
+                            onClick = { 
+                                onUpdate(rule.copy(
+                                    triggerType = "FAILURE_REASON", 
+                                    parameter = "TOO_FATIGUING",
+                                    windowDays = 15,
+                                    minOccurrences = 2
+                                ))
+                                showTypeMenu = false 
+                            }
                         )
                     }
                 }
@@ -394,11 +422,46 @@ fun BiometricTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRule
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showParamMenu) },
             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
-        ExposedDropdownMenu(expanded = showParamMenu, onDismissRequest = { showParamMenu = false }) {
-            biometricParams.forEach { (id, label) ->
-                DropdownMenuItem(text = { Text(label) }, onClick = { onUpdate(rule.copy(parameter = id)); showParamMenu = false })
+            val biometricParams = listOf(
+                "PAIN" to stringResource(R.string.label_pain),
+                "ASTHENIA" to stringResource(R.string.label_asthenia),
+                "REST_DYSPNEA" to stringResource(R.string.label_rest_dyspnea),
+                "EXERTION_DYSPNEA" to stringResource(R.string.label_exertion_dyspnea),
+                "NAUSEA" to stringResource(R.string.label_nausea),
+                "APPETITE" to stringResource(R.string.label_appetite),
+                "ANXIETY" to stringResource(R.string.label_anxiety),
+                "MOOD" to stringResource(R.string.label_mood),
+                "SLEEP" to stringResource(R.string.label_sleep),
+                "EFFORT" to stringResource(R.string.label_effort),
+                "LYMPHOEDEMA" to stringResource(R.string.label_lymphoedema),
+                "QOL" to stringResource(R.string.label_quality_of_life),
+                "WELLBEING" to stringResource(R.string.label_well_being),
+                "SPO2" to stringResource(R.string.label_spo2),
+                "HEART_RATE" to stringResource(R.string.label_heart_rate)
+            )
+
+            ExposedDropdownMenu(expanded = showParamMenu, onDismissRequest = { showParamMenu = false }) {
+                biometricParams.forEach { (id, label) ->
+                    DropdownMenuItem(
+                        text = { Text(label) },
+                        onClick = {
+                            onUpdate(rule.copy(
+                                parameter = id,
+                                // Imposta operatori di default logici in base al parametro
+                                operator = when(id) {
+                                    "SPO2", "APPETITE", "SLEEP", "WELLBEING", "QOL" -> "LT"
+                                    else -> "GT"
+                                },
+                                threshold = when(id) {
+                                    "SPO2" -> 94f
+                                    else -> 5f
+                                }
+                            ))
+                            showParamMenu = false
+                        }
+                    )
+                }
             }
-        }
     }
     
     Spacer(modifier = Modifier.height(8.dp))

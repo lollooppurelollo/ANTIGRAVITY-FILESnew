@@ -149,18 +149,19 @@ class CardEditorViewModel @Inject constructor(
     // --- Dynamic Rules Management ---
 
     fun addRule(groupId: String? = null) {
-        val newGroupId = groupId ?: UUID.randomUUID().toString()
+        val newGroupId = groupId ?: java.util.UUID.randomUUID().toString()
         val newRule = AdaptationRuleEntity(
             cardId = cardId,
             groupId = newGroupId,
             triggerType = "BIOMETRIC",
             parameter = "PAIN",
             operator = "GT",
-            threshold = 7f,
-            windowDays = 0,
-            useAverage = false,
+            threshold = 5f,
+            windowDays = 15,
+            minOccurrences = 3,
+            useAverage = true,
             actionType = "DELTA",
-            actionValue = Json.encodeToString(AdaptationDelta(reps = -2, intensity = -1))
+            actionValue = Json.encodeToString(AdaptationDelta(reps = -1, intensity = -1))
         )
         _uiState.value = _uiState.value.copy(rules = _uiState.value.rules + newRule)
     }
@@ -186,18 +187,37 @@ class CardEditorViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(rules = rules)
     }
 
-    fun updateRuleTrigger(index: Int, type: String, param: String? = null) {
+    fun updateRuleTrigger(
+        index: Int,
+        type: String? = null,
+        param: String? = null,
+        windowDays: Int? = null,
+        minOccurrences: Int? = null,
+        requireConsecutive: Boolean? = null,
+        useAverage: Boolean? = null,
+        operator: String? = null,
+        threshold: Float? = null
+    ) {
         val rules = _uiState.value.rules.toMutableList()
         if (index !in rules.indices) return
-        
-        val updatedRule = rules[index].copy(
-            triggerType = type,
-            parameter = param ?: when(type) {
-                "BIOMETRIC" -> "PAIN"
-                "COMPLETION" -> "MISSED_SESSIONS"
-                "FAILURE_REASON" -> "TOO_FATIGUING"
-                else -> null
-            }
+
+        val currentRule = rules[index]
+        val updatedRule = currentRule.copy(
+            triggerType = type ?: currentRule.triggerType,
+            parameter = param ?: if (type != null && type != currentRule.triggerType) {
+                when (type) {
+                    "BIOMETRIC" -> "PAIN"
+                    "COMPLETION" -> "MISSED_SESSIONS"
+                    "FAILURE_REASON" -> "TOO_FATIGUING"
+                    else -> null
+                }
+            } else currentRule.parameter,
+            windowDays = windowDays ?: currentRule.windowDays,
+            minOccurrences = minOccurrences ?: currentRule.minOccurrences,
+            requireConsecutive = requireConsecutive ?: currentRule.requireConsecutive,
+            useAverage = useAverage ?: currentRule.useAverage,
+            operator = operator ?: currentRule.operator,
+            threshold = threshold ?: currentRule.threshold
         )
         rules[index] = updatedRule
         _uiState.value = _uiState.value.copy(rules = rules)

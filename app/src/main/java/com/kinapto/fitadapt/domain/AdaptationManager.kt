@@ -56,7 +56,7 @@ class AdaptationManager @Inject constructor(
         // Gruppi di regole (OR): basta che un gruppo sia soddisfatto
         val ruleGroups = rules.groupBy { it.groupId }
 
-        for ((groupId, groupRules) in ruleGroups) {
+        for ((_, groupRules) in ruleGroups) {
             // Logica AND: tutte le regole del gruppo devono essere vere
             var groupSatisfied = true
             val triggeredDetails = mutableListOf<String>()
@@ -155,39 +155,75 @@ class AdaptationManager @Inject constructor(
         val satisfied = when (rule.operator) {
             "GT" -> value > rule.threshold
             "LT" -> value < rule.threshold
-            "EQ" -> Math.abs(value - rule.threshold) < 0.1f
+            "EQ" -> kotlin.math.abs(value - rule.threshold) < 0.1f
             else -> false
         }
         
-        return RuleResult(satisfied, "$param (${String.format("%.1f", value)}) ${rule.operator} ${rule.threshold}")
+        return RuleResult(satisfied, "$param (${String.format(java.util.Locale.US, "%.1f", value)}) ${rule.operator} ${rule.threshold}")
     }
 
     private suspend fun evaluateCompletionRule(rule: com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity, cardId: Long, sinceDate: Long): RuleResult {
-        val statuses = sessionRepository.getCompletionStatuses(cardId, rule.minOccurrences, sinceDate)
-        if (statuses.size < rule.minOccurrences) return RuleResult(false, "Not enough sessions in period")
+        // Se c'è una finestra temporale, prendiamo tutte le sessioni nel periodo (fino a un limite ragionevole di 100)
+        // Se non c'è finestra, prendiamo esattamente minOccurrences
+        val fetchLimit = if (rule.windowDays > 0) 100 else rule.minOccurrences
+        val statuses = sessionRepository.getCompletionStatuses(cardId, fetchLimit, sinceDate)
+        
+        if (statuses.size < rule.minOccurrences) return RuleResult(false, "Dati insufficienti nel periodo")
 
-        val missedCount = statuses.count { !it }
         val satisfied = if (rule.requireConsecutive) {
-            statuses.all { !it }
+            // Cerca una sequenza di minOccurrences "false" (missed)
+            var consecutiveCount = 0
+            var found = false
+            for (status in statuses) {
+                if (!status) {
+                    consecutiveCount++
+                    if (consecutiveCount >= rule.minOccurrences) {
+                        found = true
+                        break
+                    }
+                } else {
+                    consecutiveCount = 0
+                }
+            }
+            found
         } else {
+            val missedCount = statuses.count { !it }
             missedCount >= rule.minOccurrences
         }
 
-        return RuleResult(satisfied, "Missed $missedCount sessions")
+        val totalMissed = statuses.count { !it }
+        return RuleResult(satisfied, "Rilevate $totalMissed sessioni saltate")
     }
 
     private suspend fun evaluateFailureReasonRule(rule: com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity, cardId: Long, sinceDate: Long): RuleResult {
-        val reasons = sessionRepository.getFailureReasons(cardId, rule.minOccurrences, sinceDate)
+        val fetchLimit = if (rule.windowDays > 0) 100 else rule.minOccurrences
+        val reasons = sessionRepository.getFailureReasons(cardId, fetchLimit, sinceDate)
         val targetReason = rule.parameter // es. "TOO_FATIGUING"
         
-        val count = reasons.count { it == targetReason }
+        if (reasons.size < rule.minOccurrences) return RuleResult(false, "Dati insufficienti nel periodo")
+
         val satisfied = if (rule.requireConsecutive) {
-            reasons.size >= rule.minOccurrences && reasons.take(rule.minOccurrences).all { it == targetReason }
+            var consecutiveCount = 0
+            var found = false
+            for (reason in reasons) {
+                if (reason == targetReason) {
+                    consecutiveCount++
+                    if (consecutiveCount >= rule.minOccurrences) {
+                        found = true
+                        break
+                    }
+                } else {
+                    consecutiveCount = 0
+                }
+            }
+            found
         } else {
+            val count = reasons.count { it == targetReason }
             count >= rule.minOccurrences
         }
 
-        return RuleResult(satisfied, "Reason $targetReason occurred $count times")
+        val totalOccurrences = reasons.count { it == targetReason }
+        return RuleResult(satisfied, "Motivo '$targetReason' rilevato $totalOccurrences volte")
     }
 
     private suspend fun applyAction(
@@ -212,7 +248,7 @@ class AdaptationManager @Inject constructor(
             }
             "DELTA" -> {
                 val delta = try {
-                    Json.decodeFromString<AdaptationDelta>(actionValue)
+                    json.decodeFromString<AdaptationDelta>(actionValue)
                 } catch (e: Exception) {
                     // Fallback di sicurezza se il JSON è malformato
                     AdaptationDelta(reps = -2, intensity = -1)
@@ -323,22 +359,16 @@ class AdaptationManager @Inject constructor(
         if (consecutiveMisses <= 0) return false
 
         // Ottieni lo stato di completamento delle ultime N sessioni registrate per questa scheda
-        val lastStatuses = sessionRepository.getLastCompletionStatuses(card.id, consecutiveMisses)
+        val lastStatuses = sessionRepository.getCompletionStatuses(card.id, consecutiveMisses)
         
         // Se non abbiamo abbastanza sessioni registrate, non possiamo far scattare la regola
         if (lastStatuses.size < consecutiveMisses) return false
         
         // Trigger se TUTTE le ultime N sessioni hanno completed = false
-        return lastStatuses.all { completed -> !completed }
+        return lastStatuses.all { !it }
     }
 
 
-    private suspend fun downregulateCard(card: TrainingCardEntity) {
-        cardRepository.duplicateAndAdaptCard(
-            cardId = card.id,
-            adaptationDescription = "Downregulation automatica (Legacy)",
-            globalIntensityStep = -1
-        )
-        cardRepository.completeCard(card.id)
-    }
+    // Metodo legacy rimosso perché sostituito da applyAction(DELTA...)
+
 }
