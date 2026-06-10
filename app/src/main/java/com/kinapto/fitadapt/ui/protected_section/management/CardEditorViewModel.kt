@@ -4,9 +4,6 @@
 // =============================================================
 package com.kinapto.fitadapt.ui.protected_section.management
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,6 +13,7 @@ import com.kinapto.fitadapt.data.local.entity.ExerciseEntity
 import com.kinapto.fitadapt.data.local.entity.TrainingCardEntity
 import com.kinapto.fitadapt.data.repository.ExerciseRepository
 import com.kinapto.fitadapt.data.repository.TrainingCardRepository
+import com.kinapto.fitadapt.domain.AdaptationDelta
 import com.kinapto.fitadapt.model.CardStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +21,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.UUID
 import javax.inject.Inject
 
@@ -157,22 +157,52 @@ class CardEditorViewModel @Inject constructor(
             parameter = "PAIN",
             operator = "GT",
             threshold = 7f,
+            windowDays = 0,
+            useAverage = false,
             actionType = "DELTA",
-            actionValue = "{\"reps\": -2}"
+            actionValue = Json.encodeToString(AdaptationDelta(reps = -2, intensity = -1))
         )
         _uiState.value = _uiState.value.copy(rules = _uiState.value.rules + newRule)
     }
 
-    fun updateRule(updatedRule: AdaptationRuleEntity) {
-        val newRules = _uiState.value.rules.map {
-            if (it.id == updatedRule.id && it.id != 0L) updatedRule 
-            else if (it === updatedRule) updatedRule // For new unsaved rules
-            else it
+    fun updateRuleActionDelta(index: Int, reps: Int? = null, intensity: Int? = null, durationPercent: Float? = null) {
+        val rules = _uiState.value.rules.toMutableList()
+        if (index !in rules.indices) return
+        val rule = rules[index]
+        
+        val currentDelta = try {
+            Json.decodeFromString<AdaptationDelta>(rule.actionValue)
+        } catch (e: Exception) {
+            AdaptationDelta()
         }
-        _uiState.value = _uiState.value.copy(rules = newRules)
+
+        val newDelta = currentDelta.copy(
+            reps = reps ?: currentDelta.reps,
+            intensity = intensity ?: currentDelta.intensity,
+            durationPercent = durationPercent ?: currentDelta.durationPercent
+        )
+        
+        rules[index] = rule.copy(actionValue = Json.encodeToString(newDelta))
+        _uiState.value = _uiState.value.copy(rules = rules)
+    }
+
+    fun updateRuleTrigger(index: Int, type: String, param: String? = null) {
+        val rules = _uiState.value.rules.toMutableList()
+        if (index !in rules.indices) return
+        
+        val updatedRule = rules[index].copy(
+            triggerType = type,
+            parameter = param ?: when(type) {
+                "BIOMETRIC" -> "PAIN"
+                "COMPLETION" -> "MISSED_SESSIONS"
+                "FAILURE_REASON" -> "TOO_FATIGUING"
+                else -> null
+            }
+        )
+        rules[index] = updatedRule
+        _uiState.value = _uiState.value.copy(rules = rules)
     }
     
-    // Alternative update by index if needed for unsaved rules
     fun updateRuleAtIndex(index: Int, updatedRule: AdaptationRuleEntity) {
         val newRules = _uiState.value.rules.toMutableList()
         if (index in newRules.indices) {

@@ -457,6 +457,25 @@
     <string name="label_edit">Modifica</string>
     <string name="label_close">Chiudi</string>
 
+    <!-- Clinical Rules UI -->
+    <string name="rules_help_title">Guida Regole di Adattamento</string>
+    <string name="rules_help_content">Le regole permettono all\'app di adattare il piano in modo autonomo.\n\n<b>Logica AND (E):</b> All\'interno di un gruppo, TUTTE le condizioni devono essere vere.\n<b>Logica OR (O):</b> Tra gruppi diversi, basta che UN solo gruppo sia soddisfatto.\n\n<b>Tipi di Trigger:</b>\n• <b>Biometrico:</b> Basato sui parametri (Dolore, SpO2, ecc.) e fatica.\n• <b>Completamento:</b> Basato sulle sessioni saltate.\n• <b>Motivo Fallimento:</b> Basato sul feedback specifico (es. troppo faticoso).\n\n<b>Finestra Temporale:</b> Se > 0, calcola la MEDIA degli ultimi giorni. Se 0, usa l\'ultimo valore.</string>
+    <string name="rules_group_title">Condizione %d</string>
+    <string name="rules_add_condition">Aggiungi parametro (AND)</string>
+    <string name="rules_add_group">Aggiungi nuova alternativa (OR)</string>
+    <string name="rules_trigger_biometric">Biometrico / Sintomi</string>
+    <string name="rules_trigger_completion">Sessioni saltate</string>
+    <string name="rules_trigger_failure">Motivo interruzione</string>
+    <string name="rules_param_last_value">Ultimo valore</string>
+    <string name="rules_param_average">Media ultimi %d gg</string>
+    <string name="rules_action_delta">Adattamento Parametrico</string>
+    <string name="rules_action_switch">Cambia Scheda</string>
+    <string name="rules_action_delta_reps">Reps</string>
+    <string name="rules_action_delta_intensity">Intensità</string>
+    <string name="rules_action_delta_duration">Durata %%</string>
+    <string name="rules_operator_gt">Maggiore di (&gt;)</string>
+    <string name="rules_operator_lt">Minore di (&lt;)</string>
+    <string name="rules_operator_eq">Uguale a (=)</string>
 </resources>
 
 

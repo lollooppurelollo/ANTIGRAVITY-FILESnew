@@ -6,6 +6,8 @@ package com.kinapto.fitadapt.di
 
 import android.content.Context
 import androidx.room.Room
+import com.kinapto.fitadapt.data.local.dao.AdaptationLogDao
+import com.kinapto.fitadapt.data.local.dao.AdaptationRuleDao
 import com.kinapto.fitadapt.data.local.dao.ArticleDao
 import com.kinapto.fitadapt.data.local.dao.AuditLogDao
 import com.kinapto.fitadapt.data.local.dao.DiaryDao
@@ -132,4 +134,10 @@ object DatabaseModule {
 
     @Provides
     fun provideAuditLogDao(db: KinAptoDatabase): AuditLogDao = db.auditLogDao()
+
+    @Provides
+    fun provideAdaptationRuleDao(db: KinAptoDatabase): AdaptationRuleDao = db.adaptationRuleDao()
+
+    @Provides
+    fun provideAdaptationLogDao(db: KinAptoDatabase): AdaptationLogDao = db.adaptationLogDao()
 }
