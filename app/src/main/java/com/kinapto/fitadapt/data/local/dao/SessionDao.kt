@@ -102,13 +102,21 @@ interface SessionDao {
     @Query("SELECT * FROM sessions WHERE completed = 1 ORDER BY date ASC")
     suspend fun getAllCompletedSessionsOrdered(): List<SessionEntity>
 
-    // Ottieni lo stato di completamento delle ultime N sessioni registrate per una scheda
-    @Query("SELECT completed FROM sessions WHERE cardId = :cardId ORDER BY date DESC LIMIT :limit")
-    suspend fun getLastCompletionStatuses(cardId: Long, limit: Int): List<Boolean>
+    // Ottiene lo stato di completamento delle sessioni registrate per una scheda in una finestra temporale (o ultime N)
+    @Query("""
+        SELECT completed FROM sessions 
+        WHERE cardId = :cardId AND (:sinceDate = 0 OR date >= :sinceDate)
+        ORDER BY date DESC LIMIT :limit
+    """)
+    suspend fun getCompletionStatuses(cardId: Long, limit: Int, sinceDate: Long = 0): List<Boolean>
 
-    // Ottieni i motivi di fallimento delle ultime N sessioni registrate per una scheda
-    @Query("SELECT failureReason FROM sessions WHERE cardId = :cardId ORDER BY date DESC LIMIT :limit")
-    suspend fun getLastFailureReasons(cardId: Long, limit: Int): List<String?>
+    // Ottiene i motivi di fallimento delle sessioni registrate per una scheda in una finestra temporale (o ultime N)
+    @Query("""
+        SELECT failureReason FROM sessions 
+        WHERE cardId = :cardId AND (:sinceDate = 0 OR date >= :sinceDate)
+        ORDER BY date DESC LIMIT :limit
+    """)
+    suspend fun getFailureReasons(cardId: Long, limit: Int, sinceDate: Long = 0): List<String?>
 
     // Media dello sforzo percepito per una scheda nell'ultimo periodo
     @Query("SELECT AVG(perceivedEffort) FROM sessions WHERE cardId = :cardId AND date >= :sinceDate AND perceivedEffort IS NOT NULL")

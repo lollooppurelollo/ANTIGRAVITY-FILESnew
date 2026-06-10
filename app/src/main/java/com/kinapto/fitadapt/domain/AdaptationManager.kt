@@ -90,13 +90,18 @@ class AdaptationManager @Inject constructor(
         val sinceDate = if (rule.windowDays > 0) {
             val cal = Calendar.getInstance()
             cal.add(Calendar.DAY_OF_YEAR, -rule.windowDays)
+            // Arrotondiamo all'inizio del giorno per coerenza
+            cal.set(Calendar.HOUR_OF_DAY, 0)
+            cal.set(Calendar.MINUTE, 0)
+            cal.set(Calendar.SECOND, 0)
+            cal.set(Calendar.MILLISECOND, 0)
             cal.timeInMillis
         } else 0L
 
         return when (rule.triggerType) {
             "SYMPTOM", "BIOMETRIC" -> evaluateBiometricRule(rule, sinceDate)
-            "COMPLETION" -> evaluateCompletionRule(rule, card.id)
-            "FAILURE_REASON" -> evaluateFailureReasonRule(rule, card.id)
+            "COMPLETION" -> evaluateCompletionRule(rule, card.id, sinceDate)
+            "FAILURE_REASON" -> evaluateFailureReasonRule(rule, card.id, sinceDate)
             else -> RuleResult(false, "Unknown trigger")
         }
     }
@@ -157,9 +162,9 @@ class AdaptationManager @Inject constructor(
         return RuleResult(satisfied, "$param (${String.format("%.1f", value)}) ${rule.operator} ${rule.threshold}")
     }
 
-    private suspend fun evaluateCompletionRule(rule: com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity, cardId: Long): RuleResult {
-        val statuses = sessionRepository.getLastCompletionStatuses(cardId, rule.minOccurrences)
-        if (statuses.size < rule.minOccurrences) return RuleResult(false, "Not enough sessions")
+    private suspend fun evaluateCompletionRule(rule: com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity, cardId: Long, sinceDate: Long): RuleResult {
+        val statuses = sessionRepository.getCompletionStatuses(cardId, rule.minOccurrences, sinceDate)
+        if (statuses.size < rule.minOccurrences) return RuleResult(false, "Not enough sessions in period")
 
         val missedCount = statuses.count { !it }
         val satisfied = if (rule.requireConsecutive) {
@@ -171,8 +176,8 @@ class AdaptationManager @Inject constructor(
         return RuleResult(satisfied, "Missed $missedCount sessions")
     }
 
-    private suspend fun evaluateFailureReasonRule(rule: com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity, cardId: Long): RuleResult {
-        val reasons = sessionRepository.getLastFailureReasons(cardId, rule.minOccurrences)
+    private suspend fun evaluateFailureReasonRule(rule: com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity, cardId: Long, sinceDate: Long): RuleResult {
+        val reasons = sessionRepository.getFailureReasons(cardId, rule.minOccurrences, sinceDate)
         val targetReason = rule.parameter // es. "TOO_FATIGUING"
         
         val count = reasons.count { it == targetReason }

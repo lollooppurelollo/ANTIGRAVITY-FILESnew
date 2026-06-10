@@ -5,10 +5,13 @@
 package com.kinapto.fitadapt.ui.protected_section.management
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.kinapto.fitadapt.R
 import com.kinapto.fitadapt.data.local.entity.AdaptationRuleEntity
@@ -138,14 +142,9 @@ fun CardEditorScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        "Regole Cliniche (Logic Builder)",
+                        stringResource(R.string.editor_card_biofeedback_header),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        "Le regole nello stesso gruppo sono in AND. Gruppi diversi sono in OR.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
 
@@ -261,7 +260,7 @@ fun RuleGroupItem(
             rules.forEachIndexed { index, rule ->
                 RuleEditorItem(
                     rule = rule,
-                    onUpdate = { onUpdateRule(index, it) },
+                    onUpdate = { updatedRule -> onUpdateRule(index, updatedRule) },
                     onDelete = { onDeleteRule(index) },
                     onUpdateDelta = { reps, intensity, dur -> onUpdateDelta(index, reps, intensity, dur) }
                 )
@@ -364,22 +363,40 @@ fun RuleEditorItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BiometricTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRuleEntity) -> Unit) {
+    val biometricParams = listOf(
+        "PAIN" to stringResource(R.string.label_pain),
+        "ASTHENIA" to stringResource(R.string.label_asthenia),
+        "REST_DYSPNEA" to stringResource(R.string.label_rest_dyspnea),
+        "EXERTION_DYSPNEA" to stringResource(R.string.label_exertion_dyspnea),
+        "NAUSEA" to stringResource(R.string.label_nausea),
+        "APPETITE" to stringResource(R.string.label_appetite),
+        "ANXIETY" to stringResource(R.string.label_anxiety),
+        "MOOD" to stringResource(R.string.label_mood),
+        "SLEEP" to stringResource(R.string.label_sleep),
+        "EFFORT" to stringResource(R.string.label_effort),
+        "LYMPHOEDEMA" to stringResource(R.string.label_lymphoedema),
+        "QOL" to stringResource(R.string.label_quality_of_life),
+        "WELLBEING" to stringResource(R.string.label_well_being),
+        "SPO2" to stringResource(R.string.label_spo2),
+        "HEART_RATE" to stringResource(R.string.label_heart_rate)
+    )
+
     var showParamMenu by remember { mutableStateOf(false) }
     ExposedDropdownMenuBox(
         expanded = showParamMenu,
         onExpandedChange = { showParamMenu = !showParamMenu }
     ) {
         OutlinedTextField(
-            value = rule.parameter ?: "",
+            value = biometricParams.find { it.first == rule.parameter }?.second ?: (rule.parameter ?: ""),
             onValueChange = {},
             readOnly = true,
-            label = { Text("Parametro") },
+            label = { Text(stringResource(R.string.rules_trigger_biometric)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showParamMenu) },
             modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
         ExposedDropdownMenu(expanded = showParamMenu, onDismissRequest = { showParamMenu = false }) {
-            listOf("PAIN", "ASTHENIA", "EFFORT", "SPO2", "HEART_RATE", "REST_DYSPNEA", "EXERTION_DYSPNEA").forEach { p ->
-                DropdownMenuItem(text = { Text(p) }, onClick = { onUpdate(rule.copy(parameter = p)); showParamMenu = false })
+            biometricParams.forEach { (id, label) ->
+                DropdownMenuItem(text = { Text(label) }, onClick = { onUpdate(rule.copy(parameter = id)); showParamMenu = false })
             }
         }
     }
@@ -402,7 +419,7 @@ fun BiometricTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRule
                 },
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("Operatore") },
+                label = { Text(stringResource(R.string.editor_card_label_threshold)) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showOpMenu) },
                 modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
             )
@@ -416,7 +433,7 @@ fun BiometricTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRule
         OutlinedTextField(
             value = rule.threshold.toString(),
             onValueChange = { onUpdate(rule.copy(threshold = it.toFloatOrNull() ?: 0f)) },
-            label = { Text("Soglia") },
+            label = { Text(stringResource(R.string.editor_card_label_threshold)) },
             modifier = Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
         )
@@ -428,29 +445,40 @@ fun BiometricTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRule
         OutlinedTextField(
             value = rule.windowDays.toString(),
             onValueChange = { onUpdate(rule.copy(windowDays = it.toIntOrNull() ?: 0)) },
-            label = { Text("Finestra (GG)") },
-            modifier = Modifier.width(100.dp),
+            label = { Text(stringResource(R.string.rules_label_window)) },
+            modifier = Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.width(16.dp))
-        Checkbox(checked = rule.useAverage, onCheckedChange = { onUpdate(rule.copy(useAverage = it)) })
-        Text("Usa Media", style = MaterialTheme.typography.bodySmall)
+        Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = rule.useAverage, onCheckedChange = { onUpdate(rule.copy(useAverage = it)) })
+            Text(stringResource(R.string.rules_param_average), style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 
 @Composable
 fun CompletionTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRuleEntity) -> Unit) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedTextField(
-            value = rule.minOccurrences.toString(),
-            onValueChange = { onUpdate(rule.copy(minOccurrences = it.toIntOrNull() ?: 1)) },
-            label = { Text("Sessioni Saltate") },
-            modifier = Modifier.weight(1f),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-        Row(modifier = Modifier.weight(1f), verticalAlignment = Alignment.CenterVertically) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = rule.windowDays.toString(),
+                onValueChange = { onUpdate(rule.copy(windowDays = it.toIntOrNull() ?: 0)) },
+                label = { Text(stringResource(R.string.rules_label_window)) },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            OutlinedTextField(
+                value = rule.minOccurrences.toString(),
+                onValueChange = { onUpdate(rule.copy(minOccurrences = it.toIntOrNull() ?: 1)) },
+                label = { Text(stringResource(R.string.rules_label_occurrences)) },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Checkbox(checked = rule.requireConsecutive, onCheckedChange = { onUpdate(rule.copy(requireConsecutive = it)) })
-            Text("Consecutive", style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.rules_label_consecutive), style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -458,23 +486,47 @@ fun CompletionTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRul
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FailureReasonTriggerFields(rule: AdaptationRuleEntity, onUpdate: (AdaptationRuleEntity) -> Unit) {
-    var showReasonMenu by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(
-        expanded = showReasonMenu,
-        onExpandedChange = { showReasonMenu = !showReasonMenu }
-    ) {
-        OutlinedTextField(
-            value = rule.parameter ?: "",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text("Motivo") },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showReasonMenu) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
-        )
-        ExposedDropdownMenu(expanded = showReasonMenu, onDismissRequest = { showReasonMenu = false }) {
-            listOf("TOO_FATIGUING", "PAIN_INCREASED", "LACK_OF_TIME", "OTHER").forEach { r ->
-                DropdownMenuItem(text = { Text(r) }, onClick = { onUpdate(rule.copy(parameter = r)); showReasonMenu = false })
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = rule.windowDays.toString(),
+                onValueChange = { onUpdate(rule.copy(windowDays = it.toIntOrNull() ?: 0)) },
+                label = { Text(stringResource(R.string.rules_label_window)) },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+            OutlinedTextField(
+                value = rule.minOccurrences.toString(),
+                onValueChange = { onUpdate(rule.copy(minOccurrences = it.toIntOrNull() ?: 1)) },
+                label = { Text(stringResource(R.string.rules_label_occurrences)) },
+                modifier = Modifier.weight(1f),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+        }
+        
+        var showReasonMenu by remember { mutableStateOf(false) }
+        ExposedDropdownMenuBox(
+            expanded = showReasonMenu,
+            onExpandedChange = { showReasonMenu = !showReasonMenu }
+        ) {
+            OutlinedTextField(
+                value = rule.parameter ?: "",
+                onValueChange = {},
+                readOnly = true,
+                label = { Text(stringResource(R.string.rules_label_failure_reason)) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = showReasonMenu) },
+                modifier = Modifier.fillMaxWidth().menuAnchor(MenuAnchorType.PrimaryNotEditable)
+            )
+            ExposedDropdownMenu(expanded = showReasonMenu, onDismissRequest = { showReasonMenu = false }) {
+                listOf("TOO_FATIGUING", "PAIN_INCREASED", "LACK_OF_TIME", "OTHER").forEach { r ->
+                    DropdownMenuItem(text = { Text(r) }, onClick = { onUpdate(rule.copy(parameter = r)); showReasonMenu = false })
+                }
             }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Checkbox(checked = rule.requireConsecutive, onCheckedChange = { onUpdate(rule.copy(requireConsecutive = it)) })
+            Text(stringResource(R.string.rules_label_consecutive), style = MaterialTheme.typography.bodySmall)
         }
     }
 }
@@ -520,18 +572,45 @@ fun DeltaIncrementer(
     suffix: String = "",
     step: Int = 1
 ) {
+    var isEditing by remember { mutableStateOf(false) }
+    var textValue by remember(value) { mutableStateOf(value.toString()) }
+
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         Text(label, style = MaterialTheme.typography.labelSmall)
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = { onValueChange(value - step) }, modifier = Modifier.size(24.dp)) {
                 Icon(Icons.Default.Remove, contentDescription = null)
             }
-            Text(
-                text = "${if (value > 0) "+" else ""}$value$suffix",
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            )
+            
+            if (isEditing) {
+                BasicTextField(
+                    value = textValue,
+                    onValueChange = { newValue: String -> textValue = newValue },
+                    modifier = Modifier
+                        .width(40.dp)
+                        .padding(horizontal = 4.dp),
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    ),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardActions = KeyboardActions(onDone = {
+                        isEditing = false
+                        textValue.toIntOrNull()?.let { onValueChange(it) }
+                    }),
+                    singleLine = true
+                )
+            } else {
+                Text(
+                    text = "${if (value > 0) "+" else ""}$value$suffix",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .clickable { isEditing = true }
+                )
+            }
+
             IconButton(onClick = { onValueChange(value + step) }, modifier = Modifier.size(24.dp)) {
                 Icon(Icons.Default.Add, contentDescription = null)
             }
