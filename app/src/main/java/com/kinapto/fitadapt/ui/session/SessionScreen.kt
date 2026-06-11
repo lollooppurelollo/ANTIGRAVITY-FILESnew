@@ -306,87 +306,87 @@ private fun DetailsPhase(
         // Durata
         OptionalSlider(
             label = stringResource(R.string.session_duration),
-            value = uiState.durationMin?.toFloat() ?: 0f,
+            value = uiState.durationMin.toFloat(),
             range = 0f..120f,
             steps = 23,
-            displayValue = "${uiState.durationMin ?: 0} min",
+            displayValue = "${uiState.durationMin} min",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateDuration(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateDuration(it.toInt()) }
         )
 
         // Fatica percepita
         OptionalSlider(
             label = stringResource(R.string.session_effort),
-            value = uiState.perceivedEffort?.toFloat() ?: 0f,
+            value = uiState.perceivedEffort.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.perceivedEffort ?: 0}/10",
+            displayValue = "${uiState.perceivedEffort}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateEffort(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateEffort(it.toInt()) }
         )
 
         // Astenia
         OptionalSlider(
             label = stringResource(R.string.session_asthenia),
-            value = uiState.asthenia?.toFloat() ?: 0f,
+            value = uiState.asthenia.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.asthenia ?: 0}/10",
+            displayValue = "${uiState.asthenia}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateAsthenia(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateAsthenia(it.toInt()) }
         )
 
         // Dolore
         OptionalSlider(
             label = stringResource(R.string.session_pain),
-            value = uiState.osteoarticularPain?.toFloat() ?: 0f,
+            value = uiState.osteoarticularPain.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.osteoarticularPain ?: 0}/10",
+            displayValue = "${uiState.osteoarticularPain}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updatePain(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updatePain(it.toInt()) }
         )
 
         // Dispnea a riposo
         OptionalSlider(
             label = stringResource(R.string.session_rest_dyspnea),
-            value = uiState.restDyspnea?.toFloat() ?: 0f,
+            value = uiState.restDyspnea.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.restDyspnea ?: 0}/10",
+            displayValue = "${uiState.restDyspnea}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateRestDyspnea(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateRestDyspnea(it.toInt()) }
         )
 
         // Dispnea sotto sforzo
         OptionalSlider(
             label = stringResource(R.string.session_exertion_dyspnea),
-            value = uiState.exertionDyspnea?.toFloat() ?: 0f,
+            value = uiState.exertionDyspnea.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.exertionDyspnea ?: 0}/10",
+            displayValue = "${uiState.exertionDyspnea}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateExertionDyspnea(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateExertionDyspnea(it.toInt()) }
         )
 
         // Nausea
         OptionalSlider(
             label = stringResource(R.string.session_nausea),
-            value = uiState.nausea?.toFloat() ?: 0f,
+            value = uiState.nausea.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.nausea ?: 0}/10",
+            displayValue = "${uiState.nausea}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateNausea(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateNausea(it.toInt()) }
         )
 
         // Umore
         OptionalSlider(
             label = stringResource(R.string.session_mood),
-            value = uiState.mood?.toFloat() ?: 5f,
+            value = uiState.mood.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.mood ?: 5}/10",
+            displayValue = "${uiState.mood}/10",
             minLabel = stringResource(R.string.session_scale_worst),
             maxLabel = stringResource(R.string.session_scale_best),
             accentColor = accentColor,
@@ -396,32 +396,32 @@ private fun DetailsPhase(
         // Ansia
         OptionalSlider(
             label = stringResource(R.string.session_anxiety),
-            value = uiState.anxiety?.toFloat() ?: 0f,
+            value = uiState.anxiety.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.anxiety ?: 0}/10",
+            displayValue = "${uiState.anxiety}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateAnxiety(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateAnxiety(it.toInt()) }
         )
 
         // Linfedema
         OptionalSlider(
             label = stringResource(R.string.label_lymphoedema),
-            value = uiState.lymphoedema?.toFloat() ?: 0f,
+            value = uiState.lymphoedema.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.lymphoedema ?: 0}/10",
+            displayValue = "${uiState.lymphoedema}/10",
             accentColor = accentColor,
-            onValueChange = { viewModel.updateLymphoedema(it.toInt().takeIf { v -> v > 0 }) }
+            onValueChange = { viewModel.updateLymphoedema(it.toInt()) }
         )
 
         // Qualità della vita
         OptionalSlider(
             label = stringResource(R.string.label_quality_of_life),
-            value = uiState.qualityOfLife?.toFloat() ?: 5f,
+            value = uiState.qualityOfLife.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.qualityOfLife ?: 5}/10",
+            displayValue = "${uiState.qualityOfLife}/10",
             minLabel = stringResource(R.string.session_scale_worst),
             maxLabel = stringResource(R.string.session_scale_best),
             accentColor = accentColor,
@@ -431,10 +431,10 @@ private fun DetailsPhase(
         // Benessere
         OptionalSlider(
             label = stringResource(R.string.label_well_being),
-            value = uiState.wellBeing?.toFloat() ?: 5f,
+            value = uiState.wellBeing.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.wellBeing ?: 5}/10",
+            displayValue = "${uiState.wellBeing}/10",
             minLabel = stringResource(R.string.session_scale_worst),
             maxLabel = stringResource(R.string.session_scale_best),
             accentColor = accentColor,
@@ -477,10 +477,10 @@ private fun DetailsPhase(
         // Qualità sonno
         OptionalSlider(
             label = stringResource(R.string.session_sleep),
-            value = uiState.sleepQuality?.toFloat() ?: 5f,
+            value = uiState.sleepQuality.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.sleepQuality ?: 5}/10",
+            displayValue = "${uiState.sleepQuality}/10",
             minLabel = stringResource(R.string.session_scale_worst),
             maxLabel = stringResource(R.string.session_scale_best),
             accentColor = accentColor,
@@ -490,10 +490,10 @@ private fun DetailsPhase(
         // Appetito
         OptionalSlider(
             label = stringResource(R.string.session_appetite),
-            value = uiState.appetite?.toFloat() ?: 5f,
+            value = uiState.appetite.toFloat(),
             range = 0f..10f,
             steps = 9,
-            displayValue = "${uiState.appetite ?: 5}/10",
+            displayValue = "${uiState.appetite}/10",
             minLabel = stringResource(R.string.session_scale_worst),
             maxLabel = stringResource(R.string.session_scale_best),
             accentColor = accentColor,

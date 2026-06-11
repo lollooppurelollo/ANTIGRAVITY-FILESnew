@@ -40,20 +40,20 @@ data class SessionUiState(
     val partial: Boolean = false,
 
     // Dettagli opzionali
-    val durationMin: Int? = null,
-    val perceivedEffort: Int? = null,
-    val asthenia: Int? = null,
-    val osteoarticularPain: Int? = null,
-    val restDyspnea: Int? = null,
-    val exertionDyspnea: Int? = null,
-    val mood: Int? = null,
-    val sleepQuality: Int? = null,
-    val nausea: Int? = null,
-    val appetite: Int? = null,
-    val anxiety: Int? = null,
-    val lymphoedema: Int? = null,
-    val qualityOfLife: Int? = null,
-    val wellBeing: Int? = null,
+    val durationMin: Int = 0,
+    val perceivedEffort: Int = 0,
+    val asthenia: Int = 0,
+    val osteoarticularPain: Int = 0,
+    val restDyspnea: Int = 0,
+    val exertionDyspnea: Int = 0,
+    val mood: Int = 5,
+    val sleepQuality: Int = 5,
+    val nausea: Int = 0,
+    val appetite: Int = 5,
+    val anxiety: Int = 0,
+    val lymphoedema: Int = 0,
+    val qualityOfLife: Int = 5,
+    val wellBeing: Int = 5,
     val spo2: String = "",
     val heartRate: String = "",
     val notes: String = "",
@@ -151,59 +151,59 @@ class SessionViewModel @Inject constructor(
 
     // ── Dettagli opzionali ──
 
-    fun updateDuration(min: Int?) {
+    fun updateDuration(min: Int) {
         _uiState.update { it.copy(durationMin = min) }
     }
 
-    fun updateEffort(value: Int?) {
+    fun updateEffort(value: Int) {
         _uiState.update { it.copy(perceivedEffort = value) }
     }
 
-    fun updateAsthenia(value: Int?) {
+    fun updateAsthenia(value: Int) {
         _uiState.update { it.copy(asthenia = value) }
     }
 
-    fun updatePain(value: Int?) {
+    fun updatePain(value: Int) {
         _uiState.update { it.copy(osteoarticularPain = value) }
     }
 
-    fun updateRestDyspnea(value: Int?) {
+    fun updateRestDyspnea(value: Int) {
         _uiState.update { it.copy(restDyspnea = value) }
     }
 
-    fun updateExertionDyspnea(value: Int?) {
+    fun updateExertionDyspnea(value: Int) {
         _uiState.update { it.copy(exertionDyspnea = value) }
     }
 
-    fun updateMood(value: Int?) {
+    fun updateMood(value: Int) {
         _uiState.update { it.copy(mood = value) }
     }
 
-    fun updateSleepQuality(value: Int?) {
+    fun updateSleepQuality(value: Int) {
         _uiState.update { it.copy(sleepQuality = value) }
     }
 
-    fun updateNausea(value: Int?) {
+    fun updateNausea(value: Int) {
         _uiState.update { it.copy(nausea = value) }
     }
 
-    fun updateAppetite(value: Int?) {
+    fun updateAppetite(value: Int) {
         _uiState.update { it.copy(appetite = value) }
     }
 
-    fun updateAnxiety(value: Int?) {
+    fun updateAnxiety(value: Int) {
         _uiState.update { it.copy(anxiety = value) }
     }
 
-    fun updateLymphoedema(value: Int?) {
+    fun updateLymphoedema(value: Int) {
         _uiState.update { it.copy(lymphoedema = value) }
     }
 
-    fun updateQualityOfLife(value: Int?) {
+    fun updateQualityOfLife(value: Int) {
         _uiState.update { it.copy(qualityOfLife = value) }
     }
 
-    fun updateWellBeing(value: Int?) {
+    fun updateWellBeing(value: Int) {
         _uiState.update { it.copy(wellBeing = value) }
     }
 
@@ -245,18 +245,18 @@ class SessionViewModel @Inject constructor(
                 date = state.selectedDate,
                 completed = state.completed,
                 partial = state.partial,
-                actualDurationMin = state.durationMin,
-                perceivedEffort = state.perceivedEffort,
-                asthenia = state.asthenia,
-                osteoarticularPain = state.osteoarticularPain,
-                restDyspnea = state.restDyspnea,
-                exertionDyspnea = state.exertionDyspnea,
+                actualDurationMin = state.durationMin.takeIf { it > 0 },
+                perceivedEffort = state.perceivedEffort.takeIf { it > 0 },
+                asthenia = state.asthenia.takeIf { it > 0 },
+                osteoarticularPain = state.osteoarticularPain.takeIf { it > 0 },
+                restDyspnea = state.restDyspnea.takeIf { it > 0 },
+                exertionDyspnea = state.exertionDyspnea.takeIf { it > 0 },
                 mood = state.mood,
                 sleepQuality = state.sleepQuality,
-                nausea = state.nausea,
+                nausea = state.nausea.takeIf { it > 0 },
                 appetite = state.appetite,
-                anxiety = state.anxiety,
-                lymphoedema = state.lymphoedema,
+                anxiety = state.anxiety.takeIf { it > 0 },
+                lymphoedema = state.lymphoedema.takeIf { it > 0 },
                 qualityOfLife = state.qualityOfLife,
                 wellBeing = state.wellBeing,
                 spo2 = state.spo2.toIntOrNull(),
@@ -315,20 +315,20 @@ class SessionViewModel @Inject constructor(
                 phase = SessionPhase.QUESTION,
                 completed = false,
                 partial = false,
-                durationMin = null,
-                perceivedEffort = null,
-                asthenia = null,
-                osteoarticularPain = null,
-                restDyspnea = null,
-                exertionDyspnea = null,
-                mood = null,
-                sleepQuality = null,
-                nausea = null,
-                appetite = null,
-                anxiety = null,
-                lymphoedema = null,
-                qualityOfLife = null,
-                wellBeing = null,
+                durationMin = 0,
+                perceivedEffort = 0,
+                asthenia = 0,
+                osteoarticularPain = 0,
+                restDyspnea = 0,
+                exertionDyspnea = 0,
+                mood = 5,
+                sleepQuality = 5,
+                nausea = 0,
+                appetite = 5,
+                anxiety = 0,
+                lymphoedema = 0,
+                qualityOfLife = 5,
+                wellBeing = 5,
                 spo2 = "",
                 heartRate = "",
                 notes = "",

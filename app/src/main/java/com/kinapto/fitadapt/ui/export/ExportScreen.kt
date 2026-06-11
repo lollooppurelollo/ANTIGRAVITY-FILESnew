@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -248,7 +249,7 @@ fun ExportScreen(
             // Sezione QR Code con supporto sequenza (Problem 3)
             uiState.qrBitmaps.let { bitmaps ->
                 if (bitmaps.isNotEmpty()) {
-                    var currentIndex by remember { mutableStateOf(0) }
+                    var currentIndex by remember { mutableIntStateOf(0) }
 
                     Column(
                         modifier = Modifier

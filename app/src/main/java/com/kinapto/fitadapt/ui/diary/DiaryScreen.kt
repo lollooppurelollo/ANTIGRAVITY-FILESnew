@@ -48,19 +48,19 @@ data class DiaryUiState(
     val showAddDiary: Boolean = false,
     val showAddScale: Boolean = false,
     val newDiaryText: String = "",
-    val scaleEffort: Float = 0f,
-    val scaleAsthenia: Float = 0f,
-    val scalePain: Float = 0f,
-    val scaleRestDyspnea: Float = 0f,
-    val scaleExertionDyspnea: Float = 0f,
-    val scaleMood: Float = 5f,
-    val scaleSleep: Float = 5f,
-    val scaleNausea: Float = 0f,
-    val scaleAppetite: Float = 5f,
-    val scaleAnxiety: Float = 0f,
-    val scaleLymphoedema: Float = 0f,
-    val scaleQualityOfLife: Float = 5f,
-    val scaleWellBeing: Float = 5f,
+    val scaleEffort: Int = 0,
+    val scaleAsthenia: Int = 0,
+    val scalePain: Int = 0,
+    val scaleRestDyspnea: Int = 0,
+    val scaleExertionDyspnea: Int = 0,
+    val scaleMood: Int = 5,
+    val scaleSleep: Int = 5,
+    val scaleNausea: Int = 0,
+    val scaleAppetite: Int = 5,
+    val scaleAnxiety: Int = 0,
+    val scaleLymphoedema: Int = 0,
+    val scaleQualityOfLife: Int = 5,
+    val scaleWellBeing: Int = 5,
     val spo2: String = "",
     val heartRate: String = "",
     val selectedTab: Int = 0,
@@ -111,19 +111,19 @@ class DiaryViewModel @Inject constructor(
     fun toggleAddScale() { _uiState.update { it.copy(showAddScale = !it.showAddScale) } }
     
     fun updateDiaryText(text: String) { _uiState.update { it.copy(newDiaryText = text) } }
-    fun updateScaleEffort(v: Float) { _uiState.update { it.copy(scaleEffort = v) } }
-    fun updateScaleAsthenia(v: Float) { _uiState.update { it.copy(scaleAsthenia = v) } }
-    fun updateScalePain(v: Float) { _uiState.update { it.copy(scalePain = v) } }
-    fun updateScaleRestDyspnea(v: Float) { _uiState.update { it.copy(scaleRestDyspnea = v) } }
-    fun updateScaleExertionDyspnea(v: Float) { _uiState.update { it.copy(scaleExertionDyspnea = v) } }
-    fun updateScaleMood(v: Float) { _uiState.update { it.copy(scaleMood = v) } }
-    fun updateScaleSleep(v: Float) { _uiState.update { it.copy(scaleSleep = v) } }
-    fun updateScaleNausea(v: Float) { _uiState.update { it.copy(scaleNausea = v) } }
-    fun updateScaleAppetite(v: Float) { _uiState.update { it.copy(scaleAppetite = v) } }
-    fun updateScaleAnxiety(v: Float) { _uiState.update { it.copy(scaleAnxiety = v) } }
-    fun updateScaleLymphoedema(v: Float) { _uiState.update { it.copy(scaleLymphoedema = v) } }
-    fun updateScaleQualityOfLife(v: Float) { _uiState.update { it.copy(scaleQualityOfLife = v) } }
-    fun updateScaleWellBeing(v: Float) { _uiState.update { it.copy(scaleWellBeing = v) } }
+    fun updateScaleEffort(v: Int) { _uiState.update { it.copy(scaleEffort = v) } }
+    fun updateScaleAsthenia(v: Int) { _uiState.update { it.copy(scaleAsthenia = v) } }
+    fun updateScalePain(v: Int) { _uiState.update { it.copy(scalePain = v) } }
+    fun updateScaleRestDyspnea(v: Int) { _uiState.update { it.copy(scaleRestDyspnea = v) } }
+    fun updateScaleExertionDyspnea(v: Int) { _uiState.update { it.copy(scaleExertionDyspnea = v) } }
+    fun updateScaleMood(v: Int) { _uiState.update { it.copy(scaleMood = v) } }
+    fun updateScaleSleep(v: Int) { _uiState.update { it.copy(scaleSleep = v) } }
+    fun updateScaleNausea(v: Int) { _uiState.update { it.copy(scaleNausea = v) } }
+    fun updateScaleAppetite(v: Int) { _uiState.update { it.copy(scaleAppetite = v) } }
+    fun updateScaleAnxiety(v: Int) { _uiState.update { it.copy(scaleAnxiety = v) } }
+    fun updateScaleLymphoedema(v: Int) { _uiState.update { it.copy(scaleLymphoedema = v) } }
+    fun updateScaleQualityOfLife(v: Int) { _uiState.update { it.copy(scaleQualityOfLife = v) } }
+    fun updateScaleWellBeing(v: Int) { _uiState.update { it.copy(scaleWellBeing = v) } }
     fun updateSpo2(v: String) { _uiState.update { it.copy(spo2 = v) } }
     fun updateHeartRate(v: String) { _uiState.update { it.copy(heartRate = v) } }
     fun updateSelectedDate(date: Long) { _uiState.update { it.copy(selectedDate = date) } }
@@ -134,19 +134,19 @@ class DiaryViewModel @Inject constructor(
             editingDiaryEntry = entry,
             editingScaleEntry = scale,
             newDiaryText = entry.text,
-            scaleEffort = scale?.perceivedEffort?.toFloat() ?: 0f,
-            scaleAsthenia = scale?.asthenia?.toFloat() ?: 0f,
-            scalePain = scale?.osteoarticularPain?.toFloat() ?: 0f,
-            scaleRestDyspnea = scale?.restDyspnea?.toFloat() ?: 0f,
-            scaleExertionDyspnea = scale?.exertionDyspnea?.toFloat() ?: 0f,
-            scaleMood = scale?.mood?.toFloat() ?: 5f,
-            scaleSleep = scale?.sleepQuality?.toFloat() ?: 5f,
-            scaleNausea = scale?.nausea?.toFloat() ?: 0f,
-            scaleAppetite = scale?.appetite?.toFloat() ?: 5f,
-            scaleAnxiety = scale?.anxiety?.toFloat() ?: 0f,
-            scaleLymphoedema = scale?.lymphoedema?.toFloat() ?: 0f,
-            scaleQualityOfLife = scale?.qualityOfLife?.toFloat() ?: 5f,
-            scaleWellBeing = scale?.wellBeing?.toFloat() ?: 5f,
+            scaleEffort = scale?.perceivedEffort ?: 0,
+            scaleAsthenia = scale?.asthenia ?: 0,
+            scalePain = scale?.osteoarticularPain ?: 0,
+            scaleRestDyspnea = scale?.restDyspnea ?: 0,
+            scaleExertionDyspnea = scale?.exertionDyspnea ?: 0,
+            scaleMood = scale?.mood ?: 5,
+            scaleSleep = scale?.sleepQuality ?: 5,
+            scaleNausea = scale?.nausea ?: 0,
+            scaleAppetite = scale?.appetite ?: 5,
+            scaleAnxiety = scale?.anxiety ?: 0,
+            scaleLymphoedema = scale?.lymphoedema ?: 0,
+            scaleQualityOfLife = scale?.qualityOfLife ?: 5,
+            scaleWellBeing = scale?.wellBeing ?: 5,
             spo2 = scale?.spo2?.toString() ?: "",
             heartRate = scale?.heartRate?.toString() ?: "",
             selectedDate = entry.date,
@@ -160,19 +160,19 @@ class DiaryViewModel @Inject constructor(
             editingScaleEntry = scale,
             editingDiaryEntry = null,
             newDiaryText = "",
-            scaleEffort = scale.perceivedEffort?.toFloat() ?: 0f,
-            scaleAsthenia = scale.asthenia?.toFloat() ?: 0f,
-            scalePain = scale.osteoarticularPain?.toFloat() ?: 0f,
-            scaleRestDyspnea = scale.restDyspnea?.toFloat() ?: 0f,
-            scaleExertionDyspnea = scale.exertionDyspnea?.toFloat() ?: 0f,
-            scaleMood = scale.mood?.toFloat() ?: 5f,
-            scaleSleep = scale.sleepQuality?.toFloat() ?: 5f,
-            scaleNausea = scale.nausea?.toFloat() ?: 0f,
-            scaleAppetite = scale.appetite?.toFloat() ?: 5f,
-            scaleAnxiety = scale.anxiety?.toFloat() ?: 0f,
-            scaleLymphoedema = scale.lymphoedema?.toFloat() ?: 0f,
-            scaleQualityOfLife = scale.qualityOfLife?.toFloat() ?: 5f,
-            scaleWellBeing = scale.wellBeing?.toFloat() ?: 5f,
+            scaleEffort = scale.perceivedEffort ?: 0,
+            scaleAsthenia = scale.asthenia ?: 0,
+            scalePain = scale.osteoarticularPain ?: 0,
+            scaleRestDyspnea = scale.restDyspnea ?: 0,
+            scaleExertionDyspnea = scale.exertionDyspnea ?: 0,
+            scaleMood = scale.mood ?: 5,
+            scaleSleep = scale.sleepQuality ?: 5,
+            scaleNausea = scale.nausea ?: 0,
+            scaleAppetite = scale.appetite ?: 5,
+            scaleAnxiety = scale.anxiety ?: 0,
+            scaleLymphoedema = scale.lymphoedema ?: 0,
+            scaleQualityOfLife = scale.qualityOfLife ?: 5,
+            scaleWellBeing = scale.wellBeing ?: 5,
             spo2 = scale.spo2?.toString() ?: "",
             heartRate = scale.heartRate?.toString() ?: "",
             selectedDate = scale.date,
@@ -194,19 +194,19 @@ class DiaryViewModel @Inject constructor(
             val scaleEntry = ScaleEntryEntity(
                 id = existingScale?.id ?: 0,
                 date = targetDate,
-                perceivedEffort = s.scaleEffort.toInt().takeIf { it > 0 },
-                asthenia = s.scaleAsthenia.toInt().takeIf { it > 0 },
-                osteoarticularPain = s.scalePain.toInt().takeIf { it > 0 },
-                restDyspnea = s.scaleRestDyspnea.toInt().takeIf { it > 0 },
-                exertionDyspnea = s.scaleExertionDyspnea.toInt().takeIf { it > 0 },
-                mood = s.scaleMood.toInt(),
-                sleepQuality = s.scaleSleep.toInt(),
-                nausea = s.scaleNausea.toInt().takeIf { it > 0 },
-                appetite = s.scaleAppetite.toInt(),
-                anxiety = s.scaleAnxiety.toInt().takeIf { it > 0 },
-                lymphoedema = s.scaleLymphoedema.toInt().takeIf { it > 0 },
-                qualityOfLife = s.scaleQualityOfLife.toInt(),
-                wellBeing = s.scaleWellBeing.toInt(),
+                perceivedEffort = s.scaleEffort.takeIf { it > 0 },
+                asthenia = s.scaleAsthenia.takeIf { it > 0 },
+                osteoarticularPain = s.scalePain.takeIf { it > 0 },
+                restDyspnea = s.scaleRestDyspnea.takeIf { it > 0 },
+                exertionDyspnea = s.scaleExertionDyspnea.takeIf { it > 0 },
+                mood = s.scaleMood,
+                sleepQuality = s.scaleSleep,
+                nausea = s.scaleNausea.takeIf { it > 0 },
+                appetite = s.scaleAppetite,
+                anxiety = s.scaleAnxiety.takeIf { it > 0 },
+                lymphoedema = s.scaleLymphoedema.takeIf { it > 0 },
+                qualityOfLife = s.scaleQualityOfLife,
+                wellBeing = s.scaleWellBeing,
                 spo2 = s.spo2.toIntOrNull(),
                 heartRate = s.heartRate.toIntOrNull()
             )
@@ -237,19 +237,19 @@ class DiaryViewModel @Inject constructor(
                 showAddDiary = false, 
                 showAddScale = false,
                 newDiaryText = "",
-                scaleEffort = 0f,
-                scaleAsthenia = 0f, 
-                scalePain = 0f, 
-                scaleRestDyspnea = 0f, 
-                scaleExertionDyspnea = 0f,
-                scaleMood = 5f,
-                scaleSleep = 5f,
-                scaleNausea = 0f,
-                scaleAppetite = 5f,
-                scaleAnxiety = 0f,
-                scaleLymphoedema = 0f,
-                scaleQualityOfLife = 5f,
-                scaleWellBeing = 5f,
+                scaleEffort = 0,
+                scaleAsthenia = 0, 
+                scalePain = 0, 
+                scaleRestDyspnea = 0, 
+                scaleExertionDyspnea = 0,
+                scaleMood = 5,
+                scaleSleep = 5,
+                scaleNausea = 0,
+                scaleAppetite = 5,
+                scaleAnxiety = 0,
+                scaleLymphoedema = 0,
+                scaleQualityOfLife = 5,
+                scaleWellBeing = 5,
                 spo2 = "",
                 heartRate = "",
                 editingDiaryEntry = null,
@@ -544,15 +544,15 @@ fun DayGroupCard(
 }
 
 @Composable
-private fun ScaleSlider(label: String, value: Float, onValueChange: (Float) -> Unit) {
+private fun ScaleSlider(label: String, value: Int, onValueChange: (Int) -> Unit) {
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurface)
-            Text("${value.toInt()}/10", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+            Text("${value}/10", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         }
                             Slider(
-                                value = value, 
-                                onValueChange = onValueChange, 
+                                value = value.toFloat(), 
+                                onValueChange = { onValueChange(it.toInt()) },
                                 valueRange = 0f..10f, 
                                 steps = 9,
                                 colors = SliderDefaults.colors(

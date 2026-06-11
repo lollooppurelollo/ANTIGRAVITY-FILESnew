@@ -41,9 +41,9 @@
     <string name="session_cancel">Annulla</string>
     <string name="session_today">Oggi</string>
     <string name="session_question">Hai fatto l\'allenamento\noggi?</string>
-    <string name="session_question_desc">Registra la tua sessione per monitorare i tuoi progressi di salute</string>
+    <string name="session_question_desc">Registra la tua sessione per monitorare i tuoi progressi di salute.</string>
     <string name="session_yes">Sì, completato!</string>
-    <string name="session_partial">Sì, ma solo in parte</string>
+    <string name="session_partial">Sì, ma solo in parte.</string>
     <string name="session_no">No, oggi no</string>
     <string name="session_partial_title">Sessione parziale</string>
     <string name="session_success_title">Ottimo lavoro! 🎉</string>
@@ -221,7 +221,7 @@
     <!-- Export Screen -->
     <string name="export_title">Export dati</string>
     <string name="export_header">Esporta i tuoi dati</string>
-    <string name="export_disclaimer">I dati esportati contengono solo il codice paziente.\nNessun dato personale viene incluso.</string>
+    <string name="export_disclaimer">I dati esportati contengono solo il codice paziente. Nessun dato personale viene incluso.</string>
     <string name="export_button">Esporta ora</string>
     <string name="export_in_progress">Esportazione...</string>
     <string name="export_qr_success">QR Code generato ✅</string>
@@ -459,7 +459,7 @@
 
     <!-- Clinical Rules UI -->
     <string name="rules_help_title">Guida Regole di Adattamento</string>
-    <string name="rules_help_content">Le regole permettono all\'app di adattare il piano in modo autonomo.\n\n<b>Logica AND (E):</b> All\'interno di un gruppo, TUTTE le condizioni devono essere vere.\n<b>Logica OR (O):</b> Tra gruppi diversi, basta che UN solo gruppo sia soddisfatto.\n\n<b>Tipi di Trigger:</b>\n• <b>Biometrico:</b> Basato sui parametri del diario (Dolore, Stanchezza, SpO2, ecc.).\n• <b>Sessioni Saltate:</b> Basato sulla frequenza degli allenamenti mancati.\n• <b>Sessioni Incomplete:</b> Basato sul motivo per cui la paziente ha interrotto la sessione.\n\n<b>Finestra Temporale (GG):</b> Definisce quanti giorni l\'algoritmo deve guardare nel passato. Se impostato a 0, l\'algoritmo considera solo l\'ultima occorrenza.\n\n<b>Usa Media:</b> Se selezionato, l\'algoritmo valuta la media dei parametri biometrici nella finestra temporale indicata, invece del singolo valore.</string>
+    <string name="rules_help_content">Le regole permettono all\'app di adattare il piano in modo autonomo. Logica AND (E): All\'interno di un gruppo, TUTTE le condizioni devono essere vere. Logica OR (O): Tra gruppi diversi, basta che UN solo gruppo sia soddisfatto. Tipi di Trigger: • Biometrico: Basato sui parametri del diario (Dolore, Stanchezza, SpO2, ecc.). • Sessioni Saltate: Basato sulla frequenza degli allenamenti mancati. • Sessioni Incomplete: Basato sul motivo per cui la paziente ha interrotto la sessione. Finestra Temporale (GG): Definisce quanti giorni l\'algoritmo deve guardare nel passato. Se impostato a 0, l\'algoritmo considera solo l\'ultima occorrenza. Usa Media: Se selezionato, l\'algoritmo valuta la media dei parametri biometrici nella finestra temporale indicata, invece del singolo valore.</string>
     <string name="rules_group_title">Condizione %d</string>
     <string name="rules_add_condition">Aggiungi parametro (AND)</string>
     <string name="rules_add_group">Aggiungi ulteriore condizione alternativa (OR)</string>

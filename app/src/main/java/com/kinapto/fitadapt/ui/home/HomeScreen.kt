@@ -68,6 +68,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Switch
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -98,7 +100,7 @@ fun HomeScreen(
     val uiState by homeViewModel.uiState.collectAsState()
     val useOriginalColors by themeViewModel.useOriginalColors.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
-    var selectedDateMillis by remember { mutableStateOf(System.currentTimeMillis()) }
+    var selectedDateMillis by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
     Column(
         modifier = Modifier
@@ -719,17 +721,17 @@ fun AddScheduledSessionDialog(
     if (title.isEmpty()) {
         title = defaultTitle
     }
-    var selectedDateMillis by remember { mutableStateOf(initialDate) }
+    var selectedDateMillis by remember { mutableLongStateOf(initialDate) }
     var startTime by remember { mutableStateOf("10:00") }
     var notificationEnabled by remember { mutableStateOf(true) }
     var recurrenceType by remember { mutableStateOf("NONE") } // NONE, WEEKLY, EVERY_X_DAYS
-    var recurrenceValue by remember { mutableStateOf(1) } // Default 1 for Every X Days
+    var recurrenceValue by remember { mutableIntStateOf(1) } // Default 1 for Every X Days
     var showDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
     
     // Imposta un endDate predefinito a 4 settimane dopo se è una ricorrenza
     var endDateMillis by remember { 
-        mutableStateOf(initialDate + 28L * 24 * 60 * 60 * 1000) 
+        mutableLongStateOf(initialDate + 28L * 24 * 60 * 60 * 1000)
     }
 
     // State for weekly days
