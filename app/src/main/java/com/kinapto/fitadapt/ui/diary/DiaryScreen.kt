@@ -31,6 +31,7 @@ import com.kinapto.fitadapt.data.local.entity.ScaleEntryEntity
 import com.kinapto.fitadapt.data.repository.DiaryRepository
 import com.kinapto.fitadapt.data.repository.TrainingCardRepository
 import com.kinapto.fitadapt.domain.AdaptationManager
+import com.kinapto.fitadapt.ui.components.ActivatableScaleSlider
 import com.kinapto.fitadapt.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,7 +67,8 @@ data class DiaryUiState(
     val selectedTab: Int = 0,
     val editingDiaryEntry: DiaryEntryEntity? = null,
     val editingScaleEntry: ScaleEntryEntity? = null,
-    val selectedDate: Long = System.currentTimeMillis()
+    val selectedDate: Long = System.currentTimeMillis(),
+    val touchedFields: Set<String> = emptySet()
 )
 
 data class DayGroup(
@@ -111,19 +113,20 @@ class DiaryViewModel @Inject constructor(
     fun toggleAddScale() { _uiState.update { it.copy(showAddScale = !it.showAddScale) } }
     
     fun updateDiaryText(text: String) { _uiState.update { it.copy(newDiaryText = text) } }
-    fun updateScaleEffort(v: Int) { _uiState.update { it.copy(scaleEffort = v) } }
-    fun updateScaleAsthenia(v: Int) { _uiState.update { it.copy(scaleAsthenia = v) } }
-    fun updateScalePain(v: Int) { _uiState.update { it.copy(scalePain = v) } }
-    fun updateScaleRestDyspnea(v: Int) { _uiState.update { it.copy(scaleRestDyspnea = v) } }
-    fun updateScaleExertionDyspnea(v: Int) { _uiState.update { it.copy(scaleExertionDyspnea = v) } }
-    fun updateScaleMood(v: Int) { _uiState.update { it.copy(scaleMood = v) } }
-    fun updateScaleSleep(v: Int) { _uiState.update { it.copy(scaleSleep = v) } }
-    fun updateScaleNausea(v: Int) { _uiState.update { it.copy(scaleNausea = v) } }
-    fun updateScaleAppetite(v: Int) { _uiState.update { it.copy(scaleAppetite = v) } }
-    fun updateScaleAnxiety(v: Int) { _uiState.update { it.copy(scaleAnxiety = v) } }
-    fun updateScaleLymphoedema(v: Int) { _uiState.update { it.copy(scaleLymphoedema = v) } }
-    fun updateScaleQualityOfLife(v: Int) { _uiState.update { it.copy(scaleQualityOfLife = v) } }
-    fun updateScaleWellBeing(v: Int) { _uiState.update { it.copy(scaleWellBeing = v) } }
+    fun updateScaleEffort(v: Int) { _uiState.update { it.copy(scaleEffort = v, touchedFields = it.touchedFields + "scaleEffort") } }
+    fun updateScaleAsthenia(v: Int) { _uiState.update { it.copy(scaleAsthenia = v, touchedFields = it.touchedFields + "scaleAsthenia") } }
+    fun updateScalePain(v: Int) { _uiState.update { it.copy(scalePain = v, touchedFields = it.touchedFields + "scalePain") } }
+    fun updateScaleRestDyspnea(v: Int) { _uiState.update { it.copy(scaleRestDyspnea = v, touchedFields = it.touchedFields + "scaleRestDyspnea") } }
+    fun updateScaleExertionDyspnea(v: Int) { _uiState.update { it.copy(scaleExertionDyspnea = v, touchedFields = it.touchedFields + "scaleExertionDyspnea") } }
+    fun updateScaleMood(v: Int) { _uiState.update { it.copy(scaleMood = v, touchedFields = it.touchedFields + "scaleMood") } }
+    fun updateScaleSleep(v: Int) { _uiState.update { it.copy(scaleSleep = v, touchedFields = it.touchedFields + "scaleSleep") } }
+    fun updateScaleNausea(v: Int) { _uiState.update { it.copy(scaleNausea = v, touchedFields = it.touchedFields + "scaleNausea") } }
+    fun updateScaleAppetite(v: Int) { _uiState.update { it.copy(scaleAppetite = v, touchedFields = it.touchedFields + "scaleAppetite") } }
+    fun updateScaleAnxiety(v: Int) { _uiState.update { it.copy(scaleAnxiety = v, touchedFields = it.touchedFields + "scaleAnxiety") } }
+    fun updateScaleLymphoedema(v: Int) { _uiState.update { it.copy(scaleLymphoedema = v, touchedFields = it.touchedFields + "scaleLymphoedema") } }
+    fun updateScaleQualityOfLife(v: Int) { _uiState.update { it.copy(scaleQualityOfLife = v, touchedFields = it.touchedFields + "scaleQualityOfLife") } }
+    fun updateScaleWellBeing(v: Int) { _uiState.update { it.copy(scaleWellBeing = v, touchedFields = it.touchedFields + "scaleWellBeing") } }
+    fun touchField(fieldName: String) { _uiState.update { it.copy(touchedFields = it.touchedFields + fieldName) } }
     fun updateSpo2(v: String) { _uiState.update { it.copy(spo2 = v) } }
     fun updateHeartRate(v: String) { _uiState.update { it.copy(heartRate = v) } }
     fun updateSelectedDate(date: Long) { _uiState.update { it.copy(selectedDate = date) } }
@@ -151,7 +154,22 @@ class DiaryViewModel @Inject constructor(
             heartRate = scale?.heartRate?.toString() ?: "",
             selectedDate = entry.date,
             showAddDiary = true,
-            showAddScale = true
+            showAddScale = true,
+            touchedFields = setOfNotNull(
+                if (scale?.perceivedEffort != null) "scaleEffort" else null,
+                if (scale?.asthenia != null) "scaleAsthenia" else null,
+                if (scale?.osteoarticularPain != null) "scalePain" else null,
+                if (scale?.restDyspnea != null) "scaleRestDyspnea" else null,
+                if (scale?.exertionDyspnea != null) "scaleExertionDyspnea" else null,
+                if (scale?.mood != null) "scaleMood" else null,
+                if (scale?.sleepQuality != null) "scaleSleep" else null,
+                if (scale?.nausea != null) "scaleNausea" else null,
+                if (scale?.appetite != null) "scaleAppetite" else null,
+                if (scale?.anxiety != null) "scaleAnxiety" else null,
+                if (scale?.lymphoedema != null) "scaleLymphoedema" else null,
+                if (scale?.qualityOfLife != null) "scaleQualityOfLife" else null,
+                if (scale?.wellBeing != null) "scaleWellBeing" else null
+            )
         ) }
     }
 
@@ -177,7 +195,22 @@ class DiaryViewModel @Inject constructor(
             heartRate = scale.heartRate?.toString() ?: "",
             selectedDate = scale.date,
             showAddDiary = true,
-            showAddScale = true
+            showAddScale = true,
+            touchedFields = setOfNotNull(
+                if (scale.perceivedEffort != null) "scaleEffort" else null,
+                if (scale.asthenia != null) "scaleAsthenia" else null,
+                if (scale.osteoarticularPain != null) "scalePain" else null,
+                if (scale.restDyspnea != null) "scaleRestDyspnea" else null,
+                if (scale.exertionDyspnea != null) "scaleExertionDyspnea" else null,
+                if (scale.mood != null) "scaleMood" else null,
+                if (scale.sleepQuality != null) "scaleSleep" else null,
+                if (scale.nausea != null) "scaleNausea" else null,
+                if (scale.appetite != null) "scaleAppetite" else null,
+                if (scale.anxiety != null) "scaleAnxiety" else null,
+                if (scale.lymphoedema != null) "scaleLymphoedema" else null,
+                if (scale.qualityOfLife != null) "scaleQualityOfLife" else null,
+                if (scale.wellBeing != null) "scaleWellBeing" else null
+            )
         ) }
     }
 
@@ -194,19 +227,19 @@ class DiaryViewModel @Inject constructor(
             val scaleEntry = ScaleEntryEntity(
                 id = existingScale?.id ?: 0,
                 date = targetDate,
-                perceivedEffort = s.scaleEffort.takeIf { it > 0 },
-                asthenia = s.scaleAsthenia.takeIf { it > 0 },
-                osteoarticularPain = s.scalePain.takeIf { it > 0 },
-                restDyspnea = s.scaleRestDyspnea.takeIf { it > 0 },
-                exertionDyspnea = s.scaleExertionDyspnea.takeIf { it > 0 },
-                mood = s.scaleMood,
-                sleepQuality = s.scaleSleep,
-                nausea = s.scaleNausea.takeIf { it > 0 },
-                appetite = s.scaleAppetite,
-                anxiety = s.scaleAnxiety.takeIf { it > 0 },
-                lymphoedema = s.scaleLymphoedema.takeIf { it > 0 },
-                qualityOfLife = s.scaleQualityOfLife,
-                wellBeing = s.scaleWellBeing,
+                perceivedEffort = s.scaleEffort.takeIf { "scaleEffort" in s.touchedFields },
+                asthenia = s.scaleAsthenia.takeIf { "scaleAsthenia" in s.touchedFields },
+                osteoarticularPain = s.scalePain.takeIf { "scalePain" in s.touchedFields },
+                restDyspnea = s.scaleRestDyspnea.takeIf { "scaleRestDyspnea" in s.touchedFields },
+                exertionDyspnea = s.scaleExertionDyspnea.takeIf { "scaleExertionDyspnea" in s.touchedFields },
+                mood = s.scaleMood.takeIf { "scaleMood" in s.touchedFields },
+                sleepQuality = s.scaleSleep.takeIf { "scaleSleep" in s.touchedFields },
+                nausea = s.scaleNausea.takeIf { "scaleNausea" in s.touchedFields },
+                appetite = s.scaleAppetite.takeIf { "scaleAppetite" in s.touchedFields },
+                anxiety = s.scaleAnxiety.takeIf { "scaleAnxiety" in s.touchedFields },
+                lymphoedema = s.scaleLymphoedema.takeIf { "scaleLymphoedema" in s.touchedFields },
+                qualityOfLife = s.scaleQualityOfLife.takeIf { "scaleQualityOfLife" in s.touchedFields },
+                wellBeing = s.scaleWellBeing.takeIf { "scaleWellBeing" in s.touchedFields },
                 spo2 = s.spo2.toIntOrNull(),
                 heartRate = s.heartRate.toIntOrNull()
             )
@@ -254,7 +287,8 @@ class DiaryViewModel @Inject constructor(
                 heartRate = "",
                 editingDiaryEntry = null,
                 editingScaleEntry = null,
-                selectedDate = System.currentTimeMillis()
+                selectedDate = System.currentTimeMillis(),
+                touchedFields = emptySet()
             ) }
         }
     }
@@ -369,19 +403,136 @@ fun DiaryScreen(diaryViewModel: DiaryViewModel) {
                             Spacer(modifier = Modifier.height(12.dp))
                             
                             Text(stringResource(R.string.diary_scales_title), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
-                            ScaleSlider(stringResource(R.string.diary_label_fatigue), uiState.scaleEffort) { diaryViewModel.updateScaleEffort(it) }
-                            ScaleSlider(stringResource(R.string.label_asthenia), uiState.scaleAsthenia) { diaryViewModel.updateScaleAsthenia(it) }
-                            ScaleSlider(stringResource(R.string.label_pain), uiState.scalePain) { diaryViewModel.updateScalePain(it) }
-                            ScaleSlider(stringResource(R.string.diary_label_dyspnea_r), uiState.scaleRestDyspnea) { diaryViewModel.updateScaleRestDyspnea(it) }
-                            ScaleSlider(stringResource(R.string.diary_label_dyspnea_s), uiState.scaleExertionDyspnea) { diaryViewModel.updateScaleExertionDyspnea(it) }
-                            ScaleSlider(stringResource(R.string.label_nausea), uiState.scaleNausea) { diaryViewModel.updateScaleNausea(it) }
-                            ScaleSlider(stringResource(R.string.label_mood), uiState.scaleMood) { diaryViewModel.updateScaleMood(it) }
-                            ScaleSlider(stringResource(R.string.diary_label_ansia), uiState.scaleAnxiety) { diaryViewModel.updateScaleAnxiety(it) }
-                            ScaleSlider(stringResource(R.string.label_sleep), uiState.scaleSleep) { diaryViewModel.updateScaleSleep(it) }
-                            ScaleSlider(stringResource(R.string.label_appetite), uiState.scaleAppetite) { diaryViewModel.updateScaleAppetite(it) }
-                            ScaleSlider(stringResource(R.string.label_lymphoedema), uiState.scaleLymphoedema) { diaryViewModel.updateScaleLymphoedema(it) }
-                            ScaleSlider(stringResource(R.string.label_quality_of_life), uiState.scaleQualityOfLife) { diaryViewModel.updateScaleQualityOfLife(it) }
-                            ScaleSlider(stringResource(R.string.label_well_being), uiState.scaleWellBeing) { diaryViewModel.updateScaleWellBeing(it) }
+                            
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.diary_label_fatigue),
+                                value = uiState.scaleEffort,
+                                isActive = "scaleEffort" in uiState.touchedFields,
+                                minLabel = "0 minima",
+                                maxLabel = "10 massima",
+                                onValueChange = { diaryViewModel.updateScaleEffort(it) },
+                                onActivated = { diaryViewModel.touchField("scaleEffort") }
+                            )
+                            
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_asthenia),
+                                value = uiState.scaleAsthenia,
+                                isActive = "scaleAsthenia" in uiState.touchedFields,
+                                minLabel = "0 nessuna/o",
+                                maxLabel = "10 intensa/o",
+                                onValueChange = { diaryViewModel.updateScaleAsthenia(it) },
+                                onActivated = { diaryViewModel.touchField("scaleAsthenia") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_pain),
+                                value = uiState.scalePain,
+                                isActive = "scalePain" in uiState.touchedFields,
+                                minLabel = "0 nessuna/o",
+                                maxLabel = "10 intensa/o",
+                                onValueChange = { diaryViewModel.updateScalePain(it) },
+                                onActivated = { diaryViewModel.touchField("scalePain") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.diary_label_dyspnea_r),
+                                value = uiState.scaleRestDyspnea,
+                                isActive = "scaleRestDyspnea" in uiState.touchedFields,
+                                minLabel = "0 nessuna/o",
+                                maxLabel = "10 intensa/o",
+                                onValueChange = { diaryViewModel.updateScaleRestDyspnea(it) },
+                                onActivated = { diaryViewModel.touchField("scaleRestDyspnea") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.diary_label_dyspnea_s),
+                                value = uiState.scaleExertionDyspnea,
+                                isActive = "scaleExertionDyspnea" in uiState.touchedFields,
+                                minLabel = "0 nessuna/o",
+                                maxLabel = "10 intensa/o",
+                                onValueChange = { diaryViewModel.updateScaleExertionDyspnea(it) },
+                                onActivated = { diaryViewModel.touchField("scaleExertionDyspnea") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_nausea),
+                                value = uiState.scaleNausea,
+                                isActive = "scaleNausea" in uiState.touchedFields,
+                                minLabel = "0 nessuna/o",
+                                maxLabel = "10 intensa/o",
+                                onValueChange = { diaryViewModel.updateScaleNausea(it) },
+                                onActivated = { diaryViewModel.touchField("scaleNausea") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_mood),
+                                value = uiState.scaleMood,
+                                isActive = "scaleMood" in uiState.touchedFields,
+                                minLabel = "0 pessimo",
+                                maxLabel = "10 ottimo",
+                                onValueChange = { diaryViewModel.updateScaleMood(it) },
+                                onActivated = { diaryViewModel.touchField("scaleMood") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.diary_label_ansia),
+                                value = uiState.scaleAnxiety,
+                                isActive = "scaleAnxiety" in uiState.touchedFields,
+                                minLabel = "0 nessuna/o",
+                                maxLabel = "10 intensa/o",
+                                onValueChange = { diaryViewModel.updateScaleAnxiety(it) },
+                                onActivated = { diaryViewModel.touchField("scaleAnxiety") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_sleep),
+                                value = uiState.scaleSleep,
+                                isActive = "scaleSleep" in uiState.touchedFields,
+                                minLabel = "0 pessima",
+                                maxLabel = "10 ottima",
+                                onValueChange = { diaryViewModel.updateScaleSleep(it) },
+                                onActivated = { diaryViewModel.touchField("scaleSleep") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_appetite),
+                                value = uiState.scaleAppetite,
+                                isActive = "scaleAppetite" in uiState.touchedFields,
+                                minLabel = "0 nessun appetito",
+                                maxLabel = "10 ottimo",
+                                onValueChange = { diaryViewModel.updateScaleAppetite(it) },
+                                onActivated = { diaryViewModel.touchField("scaleAppetite") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_lymphoedema),
+                                value = uiState.scaleLymphoedema,
+                                isActive = "scaleLymphoedema" in uiState.touchedFields,
+                                minLabel = "0 nessuna/o",
+                                maxLabel = "10 intensa/o",
+                                onValueChange = { diaryViewModel.updateScaleLymphoedema(it) },
+                                onActivated = { diaryViewModel.touchField("scaleLymphoedema") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_quality_of_life),
+                                value = uiState.scaleQualityOfLife,
+                                isActive = "scaleQualityOfLife" in uiState.touchedFields,
+                                minLabel = "0 pessima",
+                                maxLabel = "10 ottima",
+                                onValueChange = { diaryViewModel.updateScaleQualityOfLife(it) },
+                                onActivated = { diaryViewModel.touchField("scaleQualityOfLife") }
+                            )
+
+                            ActivatableScaleSlider(
+                                label = stringResource(R.string.label_well_being),
+                                value = uiState.scaleWellBeing,
+                                isActive = "scaleWellBeing" in uiState.touchedFields,
+                                minLabel = "0 pessimo",
+                                maxLabel = "10 ottimo",
+                                onValueChange = { diaryViewModel.updateScaleWellBeing(it) },
+                                onActivated = { diaryViewModel.touchField("scaleWellBeing") }
+                            )
                             
                             Spacer(modifier = Modifier.height(12.dp))
                             Row(modifier = Modifier.fillMaxWidth()) {

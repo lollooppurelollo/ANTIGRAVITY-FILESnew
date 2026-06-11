@@ -61,7 +61,8 @@ class CrfManagementViewModel @Inject constructor(
     private val exportLogDao: ExportLogDao,
     private val scheduledSessionDao: ScheduledSessionDao,
     private val auditLogDao: AuditLogDao,
-    private val crfCryptoUtils: CrfCryptoUtils
+    private val crfCryptoUtils: CrfCryptoUtils,
+    private val qrCodeGenerator: QrCodeGenerator
 ) : ViewModel() {
 
     private val _exportState = MutableStateFlow(CrfExportUiState())
@@ -174,30 +175,17 @@ class CrfManagementViewModel @Inject constructor(
                     auditLog = auditLogs.map { CrfAuditEntry(it.timestamp, it.action, it.details) }
                 )
 
-                // Serializza, Comprimi, Cifra
+                // Serializza
                 val fullJson = json.encodeToString(crf)
-                val compressed = crfCryptoUtils.compress(fullJson)
-                val encrypted = crfCryptoUtils.encrypt(compressed)
-                val base64 = crfCryptoUtils.encodeBase64(encrypted)
-                val globalChecksum = crfCryptoUtils.checksum(base64)
-
-                // Split in chunks (circa 1800 caratteri per QR per sicurezza v1.1)
-                val chunkSize = 1800
-                val totalChunks = (base64.length + chunkSize - 1) / chunkSize
-                val chunks = (0 until totalChunks).map { i ->
-                    val start = i * chunkSize
-                    val end = minOf(start + chunkSize, base64.length)
-                    val part = base64.substring(start, end)
-                    KinAptoCrfChunk(
-                        export_id = crf.metadata.exportId,
-                        patient_study_code = crf.metadata.patientStudyCode,
-                        chunk_index = i + 1,
-                        total_chunks = totalChunks,
-                        chunk_checksum = crfCryptoUtils.checksum(part),
-                        global_checksum = globalChecksum,
-                        payload = part
-                    )
-                }
+                
+                // Genera i chunk tramite l'utility dedicata (garantisce coerenza)
+                val chunks = qrCodeGenerator.generateChunks(
+                    content = fullJson,
+                    exportId = crf.metadata.exportId,
+                    patientCode = crf.metadata.patientStudyCode
+                )
+                
+                val globalChecksum = chunks.firstOrNull()?.global_checksum ?: ""
 
                 _exportState.update { it.copy(crf = crf, chunks = chunks, currentChunkIndex = 0, isLoading = false) }
                 generateQrForCurrentChunk()
@@ -237,11 +225,11 @@ class CrfManagementViewModel @Inject constructor(
         val state = _exportState.value
         if (state.chunks.isEmpty()) return
         val chunk = state.chunks[state.currentChunkIndex]
-        val chunkJson = Json.encodeToString(chunk)
+        val chunkJson = json.encodeToString(chunk)
         
         // Usiamo generateSimpleQrCode perché abbiamo già fatto compressione/base64 noi
         // e vogliamo che il lettore legga il JSON del chunk direttamente
-        val bitmap = QrCodeGenerator(crfCryptoUtils).generateSimpleQrCode(chunkJson, 800)
+        val bitmap = qrCodeGenerator.generateSimpleQrCode(chunkJson, 800)
         _exportState.update { it.copy(qrBitmap = bitmap) }
     }
 

@@ -63,7 +63,8 @@ data class SessionUiState(
 
     val selectedDate: Long = System.currentTimeMillis(),
     val isSubmitting: Boolean = false,
-    val noActiveCard: Boolean = false
+    val noActiveCard: Boolean = false,
+    val touchedFields: Set<String> = emptySet()
 )
 
 /**
@@ -151,60 +152,64 @@ class SessionViewModel @Inject constructor(
 
     // ── Dettagli opzionali ──
 
+    fun touchField(fieldName: String) {
+        _uiState.update { it.copy(touchedFields = it.touchedFields + fieldName) }
+    }
+
     fun updateDuration(min: Int) {
-        _uiState.update { it.copy(durationMin = min) }
+        _uiState.update { it.copy(durationMin = min, touchedFields = it.touchedFields + "durationMin") }
     }
 
     fun updateEffort(value: Int) {
-        _uiState.update { it.copy(perceivedEffort = value) }
+        _uiState.update { it.copy(perceivedEffort = value, touchedFields = it.touchedFields + "perceivedEffort") }
     }
 
     fun updateAsthenia(value: Int) {
-        _uiState.update { it.copy(asthenia = value) }
+        _uiState.update { it.copy(asthenia = value, touchedFields = it.touchedFields + "asthenia") }
     }
 
     fun updatePain(value: Int) {
-        _uiState.update { it.copy(osteoarticularPain = value) }
+        _uiState.update { it.copy(osteoarticularPain = value, touchedFields = it.touchedFields + "osteoarticularPain") }
     }
 
     fun updateRestDyspnea(value: Int) {
-        _uiState.update { it.copy(restDyspnea = value) }
+        _uiState.update { it.copy(restDyspnea = value, touchedFields = it.touchedFields + "restDyspnea") }
     }
 
     fun updateExertionDyspnea(value: Int) {
-        _uiState.update { it.copy(exertionDyspnea = value) }
+        _uiState.update { it.copy(exertionDyspnea = value, touchedFields = it.touchedFields + "exertionDyspnea") }
     }
 
     fun updateMood(value: Int) {
-        _uiState.update { it.copy(mood = value) }
+        _uiState.update { it.copy(mood = value, touchedFields = it.touchedFields + "mood") }
     }
 
     fun updateSleepQuality(value: Int) {
-        _uiState.update { it.copy(sleepQuality = value) }
+        _uiState.update { it.copy(sleepQuality = value, touchedFields = it.touchedFields + "sleepQuality") }
     }
 
     fun updateNausea(value: Int) {
-        _uiState.update { it.copy(nausea = value) }
+        _uiState.update { it.copy(nausea = value, touchedFields = it.touchedFields + "nausea") }
     }
 
     fun updateAppetite(value: Int) {
-        _uiState.update { it.copy(appetite = value) }
+        _uiState.update { it.copy(appetite = value, touchedFields = it.touchedFields + "appetite") }
     }
 
     fun updateAnxiety(value: Int) {
-        _uiState.update { it.copy(anxiety = value) }
+        _uiState.update { it.copy(anxiety = value, touchedFields = it.touchedFields + "anxiety") }
     }
 
     fun updateLymphoedema(value: Int) {
-        _uiState.update { it.copy(lymphoedema = value) }
+        _uiState.update { it.copy(lymphoedema = value, touchedFields = it.touchedFields + "lymphoedema") }
     }
 
     fun updateQualityOfLife(value: Int) {
-        _uiState.update { it.copy(qualityOfLife = value) }
+        _uiState.update { it.copy(qualityOfLife = value, touchedFields = it.touchedFields + "qualityOfLife") }
     }
 
     fun updateWellBeing(value: Int) {
-        _uiState.update { it.copy(wellBeing = value) }
+        _uiState.update { it.copy(wellBeing = value, touchedFields = it.touchedFields + "wellBeing") }
     }
 
     fun updateSpo2(value: String) {
@@ -245,20 +250,20 @@ class SessionViewModel @Inject constructor(
                 date = state.selectedDate,
                 completed = state.completed,
                 partial = state.partial,
-                actualDurationMin = state.durationMin.takeIf { it > 0 },
-                perceivedEffort = state.perceivedEffort.takeIf { it > 0 },
-                asthenia = state.asthenia.takeIf { it > 0 },
-                osteoarticularPain = state.osteoarticularPain.takeIf { it > 0 },
-                restDyspnea = state.restDyspnea.takeIf { it > 0 },
-                exertionDyspnea = state.exertionDyspnea.takeIf { it > 0 },
-                mood = state.mood,
-                sleepQuality = state.sleepQuality,
-                nausea = state.nausea.takeIf { it > 0 },
-                appetite = state.appetite,
-                anxiety = state.anxiety.takeIf { it > 0 },
-                lymphoedema = state.lymphoedema.takeIf { it > 0 },
-                qualityOfLife = state.qualityOfLife,
-                wellBeing = state.wellBeing,
+                actualDurationMin = state.durationMin.takeIf { "durationMin" in state.touchedFields },
+                perceivedEffort = state.perceivedEffort.takeIf { "perceivedEffort" in state.touchedFields },
+                asthenia = state.asthenia.takeIf { "asthenia" in state.touchedFields },
+                osteoarticularPain = state.osteoarticularPain.takeIf { "osteoarticularPain" in state.touchedFields },
+                restDyspnea = state.restDyspnea.takeIf { "restDyspnea" in state.touchedFields },
+                exertionDyspnea = state.exertionDyspnea.takeIf { "exertionDyspnea" in state.touchedFields },
+                mood = state.mood.takeIf { "mood" in state.touchedFields },
+                sleepQuality = state.sleepQuality.takeIf { "sleepQuality" in state.touchedFields },
+                nausea = state.nausea.takeIf { "nausea" in state.touchedFields },
+                appetite = state.appetite.takeIf { "appetite" in state.touchedFields },
+                anxiety = state.anxiety.takeIf { "anxiety" in state.touchedFields },
+                lymphoedema = state.lymphoedema.takeIf { "lymphoedema" in state.touchedFields },
+                qualityOfLife = state.qualityOfLife.takeIf { "qualityOfLife" in state.touchedFields },
+                wellBeing = state.wellBeing.takeIf { "wellBeing" in state.touchedFields },
                 spo2 = state.spo2.toIntOrNull(),
                 heartRate = state.heartRate.toIntOrNull(),
                 notes = state.notes.ifBlank { null }
@@ -333,7 +338,8 @@ class SessionViewModel @Inject constructor(
                 heartRate = "",
                 notes = "",
                 selectedDate = System.currentTimeMillis(),
-                isSubmitting = false
+                isSubmitting = false,
+                touchedFields = emptySet()
             )
         }
     }

@@ -65,8 +65,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kinapto.fitadapt.R
+import com.kinapto.fitadapt.ui.components.ActivatableScaleSlider
 import com.kinapto.fitadapt.ui.theme.ThemeViewModel
 import com.kinapto.fitadapt.util.DateUtils
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 
 /**
  * Schermata di registrazione sessione di allenamento.
@@ -301,144 +304,182 @@ private fun DetailsPhase(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Indicatore completamento
+        val totalScales = 14
+        val filledScales = uiState.touchedFields.size
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            AssistChip(
+                onClick = {},
+                label = { Text("$filledScales / $totalScales compilati") },
+                colors = AssistChipDefaults.assistChipColors(
+                    containerColor = if (filledScales == totalScales) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                    labelColor = if (filledScales == totalScales) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                ),
+                shape = RoundedCornerShape(12.dp),
+                border = null
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Durata
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_duration),
-            value = uiState.durationMin.toFloat(),
-            range = 0f..120f,
-            steps = 23,
-            displayValue = "${uiState.durationMin} min",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateDuration(it.toInt()) }
+            value = uiState.durationMin,
+            isActive = "durationMin" in uiState.touchedFields,
+            onValueChange = { viewModel.updateDuration(it) },
+            onActivated = { viewModel.touchField("durationMin") },
+            range = 0..120,
+            minLabel = "0 min",
+            maxLabel = "120 min"
         )
 
         // Fatica percepita
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_effort),
-            value = uiState.perceivedEffort.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.perceivedEffort}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateEffort(it.toInt()) }
+            value = uiState.perceivedEffort,
+            isActive = "perceivedEffort" in uiState.touchedFields,
+            onValueChange = { viewModel.updateEffort(it) },
+            onActivated = { viewModel.touchField("perceivedEffort") },
+            minLabel = "0 minima",
+            maxLabel = "10 massima"
         )
 
         // Astenia
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_asthenia),
-            value = uiState.asthenia.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.asthenia}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateAsthenia(it.toInt()) }
+            value = uiState.asthenia,
+            isActive = "asthenia" in uiState.touchedFields,
+            onValueChange = { viewModel.updateAsthenia(it) },
+            onActivated = { viewModel.touchField("asthenia") },
+            minLabel = "0 nessuna/o",
+            maxLabel = "10 intensa/o"
         )
 
         // Dolore
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_pain),
-            value = uiState.osteoarticularPain.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.osteoarticularPain}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updatePain(it.toInt()) }
+            value = uiState.osteoarticularPain,
+            isActive = "osteoarticularPain" in uiState.touchedFields,
+            onValueChange = { viewModel.updatePain(it) },
+            onActivated = { viewModel.touchField("osteoarticularPain") },
+            minLabel = "0 nessuna/o",
+            maxLabel = "10 intensa/o"
         )
 
         // Dispnea a riposo
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_rest_dyspnea),
-            value = uiState.restDyspnea.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.restDyspnea}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateRestDyspnea(it.toInt()) }
+            value = uiState.restDyspnea,
+            isActive = "restDyspnea" in uiState.touchedFields,
+            onValueChange = { viewModel.updateRestDyspnea(it) },
+            onActivated = { viewModel.touchField("restDyspnea") },
+            minLabel = "0 nessuna/o",
+            maxLabel = "10 intensa/o"
         )
 
         // Dispnea sotto sforzo
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_exertion_dyspnea),
-            value = uiState.exertionDyspnea.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.exertionDyspnea}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateExertionDyspnea(it.toInt()) }
+            value = uiState.exertionDyspnea,
+            isActive = "exertionDyspnea" in uiState.touchedFields,
+            onValueChange = { viewModel.updateExertionDyspnea(it) },
+            onActivated = { viewModel.touchField("exertionDyspnea") },
+            minLabel = "0 nessuna/o",
+            maxLabel = "10 intensa/o"
         )
 
         // Nausea
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_nausea),
-            value = uiState.nausea.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.nausea}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateNausea(it.toInt()) }
+            value = uiState.nausea,
+            isActive = "nausea" in uiState.touchedFields,
+            onValueChange = { viewModel.updateNausea(it) },
+            onActivated = { viewModel.touchField("nausea") },
+            minLabel = "0 nessuna/o",
+            maxLabel = "10 intensa/o"
         )
 
         // Umore
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_mood),
-            value = uiState.mood.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.mood}/10",
-            minLabel = stringResource(R.string.session_scale_worst),
-            maxLabel = stringResource(R.string.session_scale_best),
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateMood(it.toInt()) }
+            value = uiState.mood,
+            isActive = "mood" in uiState.touchedFields,
+            onValueChange = { viewModel.updateMood(it) },
+            onActivated = { viewModel.touchField("mood") },
+            minLabel = "0 pessimo",
+            maxLabel = "10 ottimo"
+        )
+
+        // Qualità sonno
+        ActivatableScaleSlider(
+            label = stringResource(R.string.session_sleep),
+            value = uiState.sleepQuality,
+            isActive = "sleepQuality" in uiState.touchedFields,
+            onValueChange = { viewModel.updateSleepQuality(it) },
+            onActivated = { viewModel.touchField("sleepQuality") },
+            minLabel = "0 pessima",
+            maxLabel = "10 ottima"
+        )
+
+        // Appetito
+        ActivatableScaleSlider(
+            label = stringResource(R.string.session_appetite),
+            value = uiState.appetite,
+            isActive = "appetite" in uiState.touchedFields,
+            onValueChange = { viewModel.updateAppetite(it) },
+            onActivated = { viewModel.touchField("appetite") },
+            minLabel = "0 nessun appetito",
+            maxLabel = "10 ottimo"
         )
 
         // Ansia
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.session_anxiety),
-            value = uiState.anxiety.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.anxiety}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateAnxiety(it.toInt()) }
+            value = uiState.anxiety,
+            isActive = "anxiety" in uiState.touchedFields,
+            onValueChange = { viewModel.updateAnxiety(it) },
+            onActivated = { viewModel.touchField("anxiety") },
+            minLabel = "0 nessuna/o",
+            maxLabel = "10 intensa/o"
         )
 
         // Linfedema
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.label_lymphoedema),
-            value = uiState.lymphoedema.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.lymphoedema}/10",
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateLymphoedema(it.toInt()) }
+            value = uiState.lymphoedema,
+            isActive = "lymphoedema" in uiState.touchedFields,
+            onValueChange = { viewModel.updateLymphoedema(it) },
+            onActivated = { viewModel.touchField("lymphoedema") },
+            minLabel = "0 nessuna/o",
+            maxLabel = "10 intensa/o"
         )
 
         // Qualità della vita
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.label_quality_of_life),
-            value = uiState.qualityOfLife.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.qualityOfLife}/10",
-            minLabel = stringResource(R.string.session_scale_worst),
-            maxLabel = stringResource(R.string.session_scale_best),
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateQualityOfLife(it.toInt()) }
+            value = uiState.qualityOfLife,
+            isActive = "qualityOfLife" in uiState.touchedFields,
+            onValueChange = { viewModel.updateQualityOfLife(it) },
+            onActivated = { viewModel.touchField("qualityOfLife") },
+            minLabel = "0 pessima",
+            maxLabel = "10 ottima"
         )
 
         // Benessere
-        OptionalSlider(
+        ActivatableScaleSlider(
             label = stringResource(R.string.label_well_being),
-            value = uiState.wellBeing.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.wellBeing}/10",
-            minLabel = stringResource(R.string.session_scale_worst),
-            maxLabel = stringResource(R.string.session_scale_best),
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateWellBeing(it.toInt()) }
+            value = uiState.wellBeing,
+            isActive = "wellBeing" in uiState.touchedFields,
+            onValueChange = { viewModel.updateWellBeing(it) },
+            onActivated = { viewModel.touchField("wellBeing") },
+            minLabel = "0 pessimo",
+            maxLabel = "10 ottimo"
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -474,31 +515,17 @@ private fun DetailsPhase(
             )
         }
 
-        // Qualità sonno
-        OptionalSlider(
-            label = stringResource(R.string.session_sleep),
-            value = uiState.sleepQuality.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.sleepQuality}/10",
-            minLabel = stringResource(R.string.session_scale_worst),
-            maxLabel = stringResource(R.string.session_scale_best),
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateSleepQuality(it.toInt()) }
+        // Appetito
+        ActivatableScaleSlider(
+            label = stringResource(R.string.session_appetite),
+            value = uiState.appetite,
+            isActive = "appetite" in uiState.touchedFields,
+            minLabel = "0 nessun appetito",
+            maxLabel = "10 ottimo",
+            onValueChange = { viewModel.updateAppetite(it) },
+            onActivated = { viewModel.touchField("appetite") }
         )
 
-        // Appetito
-        OptionalSlider(
-            label = stringResource(R.string.session_appetite),
-            value = uiState.appetite.toFloat(),
-            range = 0f..10f,
-            steps = 9,
-            displayValue = "${uiState.appetite}/10",
-            minLabel = stringResource(R.string.session_scale_worst),
-            maxLabel = stringResource(R.string.session_scale_best),
-            accentColor = accentColor,
-            onValueChange = { viewModel.updateAppetite(it.toInt()) }
-        )
 
         // Checklist esercizi (solo per sessioni parziali)
         if (uiState.partial && uiState.cardExercises.isNotEmpty()) {
