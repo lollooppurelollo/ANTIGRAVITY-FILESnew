@@ -348,7 +348,11 @@ fun KinAptoNavGraph(biometricHelper: BiometricHelper) {
                 val exportViewModel: ExportViewModel = hiltViewModel()
                 ExportScreen(
                     exportViewModel = exportViewModel,
-                    onBack = { navController.popBackStack() }
+                    onBack = { navController.popBackStack() },
+                    onShareExport = { path ->
+                        // Qui potresti implementare l'intent di condivisione
+                        // o delegarlo a una funzione di utility
+                    }
                 )
             }
 

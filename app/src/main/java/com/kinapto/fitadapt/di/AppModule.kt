@@ -8,20 +8,28 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 
+import com.kinapto.fitadapt.security.KeystoreManager
+import com.kinapto.fitadapt.util.CrfCryptoUtils
+import com.kinapto.fitadapt.util.QrCodeGenerator
+import dagger.Provides
+import javax.inject.Singleton
+
 /**
  * Modulo Hilt per le dipendenze generali dell'app.
- *
- * Attualmente vuoto perché:
- * - Il database è gestito da DatabaseModule
- * - La sicurezza è gestita da SecurityModule
- * - I repository usano @Inject constructor()
- *
- * Si usa questo modulo per dipendenze future che non rientrano
- * nelle altre categorie (es. serializer, utility condivise, ecc.).
  */
-@Suppress("unused") // Hilt module: consumato implicitamente dal framework DI
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    // Le dipendenze verranno aggiunte qui quando necessario
+    
+    @Provides
+    @Singleton
+    fun provideCrfCryptoUtils(keystoreManager: KeystoreManager): CrfCryptoUtils {
+        return CrfCryptoUtils(keystoreManager)
+    }
+
+    @Provides
+    @Singleton
+    fun provideQrCodeGenerator(crfCryptoUtils: CrfCryptoUtils): QrCodeGenerator {
+        return QrCodeGenerator(crfCryptoUtils)
+    }
 }

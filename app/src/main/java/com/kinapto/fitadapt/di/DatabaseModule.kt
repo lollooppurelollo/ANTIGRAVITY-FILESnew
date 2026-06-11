@@ -21,6 +21,7 @@ import com.kinapto.fitadapt.data.local.dao.SessionDao
 import com.kinapto.fitadapt.data.local.dao.TrainingCardDao
 import com.kinapto.fitadapt.data.local.db.KinAptoDatabase
 import com.kinapto.fitadapt.security.CryptoManager
+import com.kinapto.fitadapt.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -79,7 +80,7 @@ object DatabaseModule {
         val supportFactory = SupportFactory(passphraseBytes)
 
         // Passo 5: Costruisci il database Room con la factory SQLCipher
-        return Room.databaseBuilder(
+        val dbBuilder = Room.databaseBuilder(
             context.applicationContext,
             KinAptoDatabase::class.java,
             "kinapto_v1.db"       // Nome del file database su disco
@@ -91,10 +92,22 @@ object DatabaseModule {
                 KinAptoDatabase.MIGRATION_6_7,
                 KinAptoDatabase.MIGRATION_7_8,
                 KinAptoDatabase.MIGRATION_8_9,
-                KinAptoDatabase.MIGRATION_9_10
+                KinAptoDatabase.MIGRATION_9_10,
+                KinAptoDatabase.MIGRATION_10_11
             )
-            .fallbackToDestructiveMigration(dropAllTables = true)     // Se lo schema cambia e non c'è migrazione, ricrea il DB
-            .build()
+        
+        // SECURITY FIX: Fallback distruttivo solo in debug. KinApto v1.1.
+        if (BuildConfig.DEBUG) {
+            dbBuilder.fallbackToDestructiveMigration(dropAllTables = true)
+        }
+
+        val db = dbBuilder.build()
+
+        // SECURITY FIX: Azzeramento passphrase in memoria. KinApto v1.1.
+        passphraseBytes.fill(0)
+        passphrase.fill('\u0000')
+
+        return db
     }
 
     // ══════════════════════════════════════════════════════════

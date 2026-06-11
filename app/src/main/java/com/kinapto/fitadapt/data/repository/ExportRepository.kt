@@ -5,10 +5,15 @@
 package com.kinapto.fitadapt.data.repository
 
 import android.content.Context
+import com.kinapto.fitadapt.data.local.dao.AuditLogDao
 import com.kinapto.fitadapt.data.local.dao.ExportLogDao
+import com.kinapto.fitadapt.data.local.entity.AuditLogEntity
 import com.kinapto.fitadapt.data.local.entity.ExportLogEntity
 import com.kinapto.fitadapt.model.ExportData
+import com.kinapto.fitadapt.model.KinAptoCRF
+import com.kinapto.fitadapt.util.CrfCryptoUtils
 import com.kinapto.fitadapt.util.QrCodeGenerator
+import com.kinapto.fitadapt.util.RedCapExportUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -32,8 +37,11 @@ sealed class ExportResult {
     /** Export riuscito come QR code singolo */
     data class QrCode(val bitmap: android.graphics.Bitmap) : ExportResult()
 
-    /** Export riuscito come file JSON (payload troppo grande per QR) */
-    data class FileSaved(val filePath: String) : ExportResult()
+    /** Export riuscito come sequenza di QR code */
+    data class QrSequence(val bitmaps: List<android.graphics.Bitmap>) : ExportResult()
+
+    /** Export riuscito come file (JSON o ZIP) */
+    data class FileSaved(val filePath: String, val isZip: Boolean = false) : ExportResult()
 
     /** Errore durante l'export */
     data class Error(val message: String) : ExportResult()
@@ -55,10 +63,13 @@ sealed class ExportResult {
 class ExportRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val exportLogDao: ExportLogDao,
+    private val auditLogDao: AuditLogDao,
     private val sessionRepository: SessionRepository,
     private val diaryRepository: DiaryRepository,
     private val patientProfileRepository: PatientProfileRepository,
-    private val goalRepository: GoalRepository
+    private val goalRepository: GoalRepository,
+    private val crfCryptoUtils: CrfCryptoUtils,
+    private val qrCodeGenerator: QrCodeGenerator
 ) {
 
     // Formato JSON leggibile
@@ -80,31 +91,78 @@ class ExportRepository @Inject constructor(
      * Esegue l'export completo dei dati.
      *
      * @param exportData i dati già assemblati dal ViewModel
-     * @return il risultato dell'export (QR code, file, o errore)
+     * @param crf l'oggetto KinAptoCRF completo per REDCap
+     * @return il risultato dell'export
      */
-    suspend fun performExport(exportData: ExportData): ExportResult {
+    suspend fun performExport(exportData: ExportData, crf: KinAptoCRF): ExportResult {
         return withContext(Dispatchers.IO) {
+            val exportId = crf.metadata.exportId
+            val patientCode = crf.metadata.patientStudyCode
+            
             try {
+                // GCP COMPLIANCE: Audit Trail Iniziale
+                auditLogDao.insert(AuditLogEntity(
+                    action = "CRF_EXPORT_INITIATED",
+                    patientStudyCode = patientCode,
+                    exportId = exportId,
+                    details = "Format: REQUESTED, Counts: ${getDetailedRecordCounts(exportData)}"
+                ))
+
                 // Serializza in JSON
                 val jsonString = json.encodeToString(exportData)
-
-                // Calcola hash SHA-256 per integrità
                 val hash = sha256(jsonString)
 
-                // Prova a generare un QR code
-                val qrBitmap = QrCodeGenerator.generateQrCode(jsonString)
-
+                // 1. Prova QR Singolo
+                val qrBitmap = qrCodeGenerator.generateQrCode(jsonString)
                 if (qrBitmap != null) {
-                    // Il payload entra in un QR code singolo
                     logExport("QR", hash, countRecords(exportData))
-                    ExportResult.QrCode(qrBitmap)
-                } else {
-                    // Fallback: salva come file JSON
-                    val filePath = saveToFile(jsonString)
-                    logExport("FILE", hash, countRecords(exportData))
-                    ExportResult.FileSaved(filePath)
+                    auditLogDao.insert(AuditLogEntity(
+                        action = "CRF_EXPORT_COMPLETED",
+                        patientStudyCode = patientCode,
+                        exportId = exportId,
+                        details = "Format: QR, Hash: $hash",
+                        success = true
+                    ))
+                    return@withContext ExportResult.QrCode(qrBitmap)
                 }
+
+                // 2. Prova Chunked QR
+                val qrBitmaps = qrCodeGenerator.generateChunkedQrCodes(jsonString, exportId, patientCode)
+                if (qrBitmaps.isNotEmpty()) {
+                    logExport("QR_CHUNKED", hash, countRecords(exportData))
+                    auditLogDao.insert(AuditLogEntity(
+                        action = "CRF_EXPORT_COMPLETED",
+                        patientStudyCode = patientCode,
+                        exportId = exportId,
+                        details = "Format: QR_CHUNKED (${qrBitmaps.size} QRs), Hash: $hash",
+                        success = true
+                    ))
+                    return@withContext ExportResult.QrSequence(qrBitmaps)
+                }
+
+                // 3. Fallback: REDCap ZIP (Metodo più affidabile)
+                val outputDir = File(context.getExternalFilesDir(null), "exports")
+                val zipFile = RedCapExportUtils.generateRedCapZip(crf, outputDir, crfCryptoUtils)
+                
+                logExport("ZIP", hash, countRecords(exportData))
+                auditLogDao.insert(AuditLogEntity(
+                    action = "CRF_EXPORT_COMPLETED",
+                    patientStudyCode = patientCode,
+                    exportId = exportId,
+                    details = "Format: ZIP, Hash: $hash",
+                    success = true
+                ))
+                
+                ExportResult.FileSaved(zipFile.absolutePath, isZip = true)
+
             } catch (e: Exception) {
+                auditLogDao.insert(AuditLogEntity(
+                    action = "CRF_EXPORT_FAILED",
+                    patientStudyCode = patientCode,
+                    exportId = exportId,
+                    details = "Error: ${e.message}",
+                    success = false
+                ))
                 ExportResult.Error(e.message ?: "Errore sconosciuto durante l'export")
             }
         }
@@ -139,6 +197,16 @@ class ExportRepository @Inject constructor(
                 recordCount = recordCount
             )
         )
+    }
+
+    /**
+     * Conta i record per tipo per l'Audit Trail.
+     */
+    private fun getDetailedRecordCounts(data: ExportData): String {
+        val sessions = data.trainingCards.sumOf { it.sessions.size }
+        val scales = data.scaleEntries.size
+        val diary = data.diaryEntries.size
+        return "sessions:$sessions, scales:$scales, diary:$diary"
     }
 
     /**

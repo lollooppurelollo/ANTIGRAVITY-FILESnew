@@ -60,7 +60,8 @@ class CrfManagementViewModel @Inject constructor(
     private val adaptationLogDao: AdaptationLogDao,
     private val exportLogDao: ExportLogDao,
     private val scheduledSessionDao: ScheduledSessionDao,
-    private val auditLogDao: AuditLogDao
+    private val auditLogDao: AuditLogDao,
+    private val crfCryptoUtils: CrfCryptoUtils
 ) : ViewModel() {
 
     private val _exportState = MutableStateFlow(CrfExportUiState())
@@ -175,13 +176,13 @@ class CrfManagementViewModel @Inject constructor(
 
                 // Serializza, Comprimi, Cifra
                 val fullJson = json.encodeToString(crf)
-                val compressed = CrfCryptoUtils.compress(fullJson)
-                val encrypted = CrfCryptoUtils.encrypt(compressed)
-                val base64 = CrfCryptoUtils.encodeBase64(encrypted)
-                val globalChecksum = CrfCryptoUtils.checksum(base64)
+                val compressed = crfCryptoUtils.compress(fullJson)
+                val encrypted = crfCryptoUtils.encrypt(compressed)
+                val base64 = crfCryptoUtils.encodeBase64(encrypted)
+                val globalChecksum = crfCryptoUtils.checksum(base64)
 
-                // Split in chunks (circa 1500 caratteri per QR per sicurezza)
-                val chunkSize = 1200
+                // Split in chunks (circa 1800 caratteri per QR per sicurezza v1.1)
+                val chunkSize = 1800
                 val totalChunks = (base64.length + chunkSize - 1) / chunkSize
                 val chunks = (0 until totalChunks).map { i ->
                     val start = i * chunkSize
@@ -192,7 +193,7 @@ class CrfManagementViewModel @Inject constructor(
                         patient_study_code = crf.metadata.patientStudyCode,
                         chunk_index = i + 1,
                         total_chunks = totalChunks,
-                        chunk_checksum = CrfCryptoUtils.checksum(part),
+                        chunk_checksum = crfCryptoUtils.checksum(part),
                         global_checksum = globalChecksum,
                         payload = part
                     )
@@ -240,7 +241,7 @@ class CrfManagementViewModel @Inject constructor(
         
         // Usiamo generateSimpleQrCode perché abbiamo già fatto compressione/base64 noi
         // e vogliamo che il lettore legga il JSON del chunk direttamente
-        val bitmap = QrCodeGenerator.generateSimpleQrCode(chunkJson, 800)
+        val bitmap = QrCodeGenerator(crfCryptoUtils).generateSimpleQrCode(chunkJson, 800)
         _exportState.update { it.copy(qrBitmap = bitmap) }
     }
 
@@ -260,7 +261,7 @@ class CrfManagementViewModel @Inject constructor(
             }
 
             // Verifica checksum blocco
-            if (CrfCryptoUtils.checksum(chunk.payload) != chunk.chunk_checksum) {
+            if (crfCryptoUtils.checksum(chunk.payload) != chunk.chunk_checksum) {
                 throw Exception("Checksum blocco errato")
             }
 
@@ -301,13 +302,13 @@ class CrfManagementViewModel @Inject constructor(
                 
                 // Verifica checksum globale
                 val firstChunk = state.receivedChunks[1]!!
-                if (CrfCryptoUtils.checksum(fullBase64) != firstChunk.global_checksum) {
+                if (crfCryptoUtils.checksum(fullBase64) != firstChunk.global_checksum) {
                     throw Exception("Checksum globale non corrisponde. Dati corrotti.")
                 }
 
-                val encrypted = CrfCryptoUtils.decodeBase64(fullBase64)
-                val compressed = CrfCryptoUtils.decrypt(encrypted)
-                val fullJson = CrfCryptoUtils.decompress(compressed)
+                val encrypted = crfCryptoUtils.decodeBase64(fullBase64)
+                val compressed = crfCryptoUtils.decrypt(encrypted)
+                val fullJson = crfCryptoUtils.decompress(compressed)
                 
                 val crf = json.decodeFromString<KinAptoCRF>(fullJson)
                 _importState.update { it.copy(reconstructedCrf = crf, importSuccess = true) }
@@ -332,7 +333,7 @@ class CrfManagementViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val downloadsDir = File(context.getExternalFilesDir(null), "RedCapExports")
-                val zipFile = RedCapExportUtils.generateRedCapZip(crf, downloadsDir)
+                val zipFile = RedCapExportUtils.generateRedCapZip(crf, downloadsDir, crfCryptoUtils)
                 _exportState.update { it.copy(redcapFilePath = zipFile.absolutePath, exportComplete = true) }
                 
                 auditLogDao.insert(AuditLogEntity(

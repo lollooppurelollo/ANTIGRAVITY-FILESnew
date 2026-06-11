@@ -66,6 +66,17 @@
                 tools:node="remove" />
         </provider>
 
+        <!-- Boot Receiver per ripristinare le notifiche al riavvio -->
+        <receiver
+            android:name=".notification.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+
     </application>
 
 </manifest>

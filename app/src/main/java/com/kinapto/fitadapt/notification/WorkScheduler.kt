@@ -41,23 +41,33 @@ class WorkScheduler @Inject constructor(
      * Usa KEEP per non creare duplicati se i worker sono già schedulati.
      */
     fun scheduleAll() {
-        scheduleDailyReminder()
-        scheduleMissedSessionCheck()
-        scheduleMotivationalMessages()
+        val constraints = defaultConstraints()
+
+        scheduleDailyReminder(constraints)
+        scheduleMissedSessionCheck(constraints)
+        scheduleMotivationalMessages(constraints)
     }
+
+    private fun defaultConstraints() = androidx.work.Constraints.Builder()
+        .setRequiredNetworkType(androidx.work.NetworkType.NOT_REQUIRED)
+        .setRequiresBatteryNotLow(false)
+        .setRequiresCharging(false)
+        .setRequiresDeviceIdle(false)
+        .build()
 
     /**
      * Promemoria allenamento — ogni 24 ore.
-     * L'orario esatto dipende da quando viene schedulato + l'intervallo minimo.
-     * WorkManager non garantisce esecuzione esatta, ma entro una finestra.
      */
-    private fun scheduleDailyReminder() {
+    private fun scheduleDailyReminder(constraints: androidx.work.Constraints) {
         val reminderWork = PeriodicWorkRequestBuilder<ReminderWorker>(
             repeatInterval = 24,
             repeatIntervalTimeUnit = TimeUnit.HOURS,
             flexTimeInterval = 2,
             flexTimeIntervalUnit = TimeUnit.HOURS
-        ).build()
+        )
+            .setConstraints(constraints)
+            .setBackoffCriteria(androidx.work.BackoffPolicy.LINEAR, 15, TimeUnit.MINUTES)
+            .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             ReminderWorker.WORK_NAME,
@@ -69,13 +79,16 @@ class WorkScheduler @Inject constructor(
     /**
      * Controllo sessione saltata — ogni 24 ore.
      */
-    private fun scheduleMissedSessionCheck() {
+    private fun scheduleMissedSessionCheck(constraints: androidx.work.Constraints) {
         val missedWork = PeriodicWorkRequestBuilder<MissedSessionWorker>(
             repeatInterval = 24,
             repeatIntervalTimeUnit = TimeUnit.HOURS,
             flexTimeInterval = 2,
             flexTimeIntervalUnit = TimeUnit.HOURS
-        ).build()
+        )
+            .setConstraints(constraints)
+            .setBackoffCriteria(androidx.work.BackoffPolicy.LINEAR, 15, TimeUnit.MINUTES)
+            .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             MissedSessionWorker.WORK_NAME,
@@ -87,13 +100,15 @@ class WorkScheduler @Inject constructor(
     /**
      * Messaggi motivazionali — ogni 2 giorni.
      */
-    fun scheduleMotivationalMessages() {
+    fun scheduleMotivationalMessages(constraints: androidx.work.Constraints = defaultConstraints()) {
         val motivationalWork = PeriodicWorkRequestBuilder<MotivationalWorker>(
             repeatInterval = 48,
             repeatIntervalTimeUnit = TimeUnit.HOURS,
             flexTimeInterval = 6,
             flexTimeIntervalUnit = TimeUnit.HOURS
-        ).build()
+        )
+            .setConstraints(constraints)
+            .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
             MotivationalWorker.WORK_NAME,

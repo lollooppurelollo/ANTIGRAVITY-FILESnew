@@ -13,6 +13,9 @@ import com.google.zxing.common.BitMatrix
 import com.google.zxing.qrcode.QRCodeWriter
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel
 import android.util.Base64
+import com.kinapto.fitadapt.model.KinAptoCrfChunk
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPOutputStream
 
@@ -23,19 +26,76 @@ import java.util.zip.GZIPOutputStream
  * 1. Comprime il testo con GZIP per ridurre la dimensione
  * 2. Codifica in Base64 per garantire la compatibilità con tutti i lettori (ASCII-safe)
  * 3. Se il payload risultante entra in un QR code (≤ 2953 byte), genera il QR
- * 4. Se è troppo grande, restituisce null → il chiamante usa il fallback file
+ * 4. Se è troppo grande, restituisce null → il chiamante usa il fallback file o il chunking
  */
-object QrCodeGenerator {
+/**
+ * Genera QR code a partire da stringhe di testo.
+ * 
+ * SECURITY FIX: Utilizza AES-256-GCM (via CrfCryptoUtils) per cifrare i dati prima del QR.
+ * KinApto v1.1.
+ */
+@javax.inject.Singleton
+class QrCodeGenerator @javax.inject.Inject constructor(
+    private val crfCryptoUtils: CrfCryptoUtils
+) {
 
     // Dimensione del QR code in pixel
-    private const val QR_SIZE = 800
+    private val QR_SIZE = 800
 
     // Limite massimo per il payload di un QR code binario (Version 40, L)
-    private const val MAX_QR_BYTES = 2953
+    // Con crittografia e IV, il limite utile si riduce.
+    private val MAX_QR_BYTES = 2953
+    
+    // Limite conservativo per i chunk QR (Version 40, M)
+    private val CHUNK_MAX_BYTES = 1800
+
+    /**
+     * Genera una lista di QR code chunked per payload di grandi dimensioni.
+     * KinApto v1.1 implementation for Problem 3.
+     */
+    fun generateChunkedQrCodes(
+        content: String, 
+        exportId: String, 
+        patientCode: String
+    ): List<Bitmap> {
+        // 1. Comprimere, cifrare e codificare il payload completo
+        val compressed = gzipCompress(content)
+        val encrypted = crfCryptoUtils.encrypt(compressed)
+        val fullBase64 = crfCryptoUtils.encodeBase64(encrypted)
+        val globalChecksum = crfCryptoUtils.checksum(fullBase64)
+
+        // 2. Suddivisione in chunk
+        val totalChunks = (fullBase64.length + CHUNK_MAX_BYTES - 1) / CHUNK_MAX_BYTES
+        val chunks = mutableListOf<KinAptoCrfChunk>()
+        
+        for (i in 0 until totalChunks) {
+            val start = i * CHUNK_MAX_BYTES
+            val end = minOf(start + CHUNK_MAX_BYTES, fullBase64.length)
+            val part = fullBase64.substring(start, end)
+            
+            chunks.add(
+                KinAptoCrfChunk(
+                    export_id = exportId,
+                    patient_study_code = patientCode,
+                    chunk_index = i + 1,
+                    total_chunks = totalChunks,
+                    chunk_checksum = crfCryptoUtils.checksum(part),
+                    global_checksum = globalChecksum,
+                    payload = part
+                )
+            )
+        }
+
+        // 3. Generazione Bitmap
+        return chunks.mapNotNull { chunk ->
+            val chunkJson = Json.encodeToString(chunk)
+            generateSimpleQrCode(chunkJson, QR_SIZE, ErrorCorrectionLevel.M)
+        }
+    }
 
     /**
      * Genera un QR code da una stringa di testo (JSON).
-     * Flusso: Content -> GZIP -> Base64 -> QR
+     * Flusso: Content -> GZIP -> ENCRYPT -> Base64 -> QR
      *
      * @param content il testo da codificare
      * @param size dimensione del QR in pixel
@@ -46,10 +106,11 @@ object QrCodeGenerator {
             // 1. Comprime con GZIP
             val compressed = gzipCompress(content)
 
-            // 2. Codifica in Base64 (ASCII safe per i lettori QR standard)
-            // L'overhead del Base64 è ~33%, ma garantisce che il QR sia leggibile
-            // dalle app fotocamera standard senza corruzione di byte binari.
-            val base64Encoded = Base64.encodeToString(compressed, Base64.NO_WRAP)
+            // 2. SECURITY FIX: Cifra con Keystore
+            val encrypted = crfCryptoUtils.encrypt(compressed)
+
+            // 3. Codifica in Base64
+            val base64Encoded = crfCryptoUtils.encodeBase64(encrypted)
 
             if (base64Encoded.length > MAX_QR_BYTES) {
                 return null
@@ -58,7 +119,7 @@ object QrCodeGenerator {
             val writer = QRCodeWriter()
             val hints = mapOf(
                 EncodeHintType.CHARACTER_SET to "UTF-8",
-                EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.L,
+                EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M, // Più robusto di L
                 EncodeHintType.MARGIN to 2
             )
 
@@ -81,15 +142,19 @@ object QrCodeGenerator {
      *
      * @param content il testo da codificare
      * @param size dimensione del QR in pixel
+     * @param errorCorrection livello di correzione errore
      * @return Bitmap con il QR code
      */
-    @Suppress("unused") // Usata per QR code semplici (URI brevi)
-    fun generateSimpleQrCode(content: String, size: Int = QR_SIZE): Bitmap? {
+    fun generateSimpleQrCode(
+        content: String, 
+        size: Int = QR_SIZE, 
+        errorCorrection: ErrorCorrectionLevel = ErrorCorrectionLevel.M
+    ): Bitmap? {
         return try {
             val writer = QRCodeWriter()
             val hints = mapOf(
                 EncodeHintType.CHARACTER_SET to "UTF-8",
-                EncodeHintType.ERROR_CORRECTION to ErrorCorrectionLevel.M,
+                EncodeHintType.ERROR_CORRECTION to errorCorrection,
                 EncodeHintType.MARGIN to 2
             )
 

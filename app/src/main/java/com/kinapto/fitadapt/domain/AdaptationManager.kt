@@ -244,14 +244,35 @@ class AdaptationManager @Inject constructor(
                     cardRepository.activateCard(targetCardId)
                     actionTakenMsg = "Switched to card ID $targetCardId"
                     newCardId = targetCardId
+                } else {
+                    // SECURITY FIX: Fallback silenzioso rimosso per conformità clinica. KinApto v1.1.
+                    android.util.Log.e("AdaptationManager", "targetCardId non valido per SWITCH: $actionValue")
+                    adaptationLogDao.insert(
+                        com.kinapto.fitadapt.data.local.entity.AdaptationLogEntity(
+                            originalCardId = card.id,
+                            newCardId = null,
+                            triggerDescription = reasonDescription,
+                            actionTaken = "ERRORE: targetCardId non valido, nessun adattamento applicato"
+                        )
+                    )
+                    return
                 }
             }
             "DELTA" -> {
                 val delta = try {
                     json.decodeFromString<AdaptationDelta>(actionValue)
                 } catch (e: Exception) {
-                    // Fallback di sicurezza se il JSON è malformato
-                    AdaptationDelta(reps = -2, intensity = -1)
+                    // SECURITY FIX: Fallback silenzioso rimosso per conformità clinica. KinApto v1.1.
+                    android.util.Log.e("AdaptationManager", "actionValue malformato per DELTA card ${card.id}: $actionValue", e)
+                    adaptationLogDao.insert(
+                        com.kinapto.fitadapt.data.local.entity.AdaptationLogEntity(
+                            originalCardId = card.id,
+                            newCardId = null,
+                            triggerDescription = reasonDescription,
+                            actionTaken = "ERRORE: regola malformata, nessun adattamento applicato"
+                        )
+                    )
+                    return
                 }
 
                 newCardId = cardRepository.duplicateAndAdaptCard(

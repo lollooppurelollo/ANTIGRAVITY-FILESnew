@@ -139,6 +139,17 @@ abstract class KinAptoDatabase : RoomDatabase() {
                 )
             }
         }
+
+        /**
+         * MIGRATION_10_11: No-op migration per allineamento schema trial clinico.
+         * SECURITY & COMPLIANCE: Mantenere esplicita per evitare destructive migration.
+         * KinApto v1.1.
+         */
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Nessuna modifica allo schema rilevata tra v10 e v11
+            }
+        }
     }
 }
 

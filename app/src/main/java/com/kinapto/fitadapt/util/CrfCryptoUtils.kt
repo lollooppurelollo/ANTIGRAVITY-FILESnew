@@ -1,26 +1,34 @@
+// =============================================================
+// KinApto - Attività Fisica Adattata
+// Utility per la protezione dei dati CRF
+// =============================================================
 package com.kinapto.fitadapt.util
 
 import android.util.Base64
-import java.security.MessageDigest
-import javax.crypto.Cipher
-import javax.crypto.spec.SecretKeySpec
-import java.io.ByteArrayOutputStream
+import com.kinapto.fitadapt.security.KeystoreManager
 import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Utility per la protezione dei dati CRF:
  * - Compressione GZIP
- * - Cifratura AES (con chiave derivata dal patient_study_code o fissa per il progetto)
+ * - Cifratura AES-256-GCM (via KeystoreManager)
  * - Base64 URL-safe
  * - Checksum SHA-256
+ *
+ * SECURITY FIX: Rimosse chiavi hardcoded e ECB mode. 
+ * Ora utilizza AES-256-GCM con chiavi hardware-backed nel Keystore Android.
+ * KinApto v1.1.
  */
-object CrfCryptoUtils {
-
-    // Nota: In un ambiente reale, la chiave dovrebbe essere gestita via Keystore
-    // Per questa implementazione usiamo una chiave derivata o fissa per semplicità di demo/scambio tra app.
-    private const val AES_KEY = "KinApto_Secure_CRF_Key_2024_KAP"
+@Singleton
+class CrfCryptoUtils @Inject constructor(
+    private val keystoreManager: KeystoreManager
+) {
 
     fun compress(data: String): ByteArray {
         val bos = ByteArrayOutputStream(data.length)
@@ -33,22 +41,35 @@ object CrfCryptoUtils {
         GZIPInputStream(bis).use { it.bufferedReader(Charsets.UTF_8).use { reader -> return reader.readText() } }
     }
 
+    /**
+     * Cifra i dati usando il KeystoreManager. 
+     * Il risultato contiene l'IV seguito dai dati cifrati.
+     */
     fun encrypt(data: ByteArray): ByteArray {
-        val sha = MessageDigest.getInstance("SHA-256")
-        val key = sha.digest(AES_KEY.toByteArray(Charsets.UTF_8)).copyOf(16) // 128 bit
-        val secretKey = SecretKeySpec(key, "AES")
-        val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey)
-        return cipher.doFinal(data)
+        val (encrypted, iv) = keystoreManager.encrypt(data)
+        // Combiniamo IV e dati cifrati: [IV_SIZE_BYTE (1)][IV][DATA]
+        // GCM IV è tipicamente 12 byte. KeystoreManager usa AES/GCM/NoPadding.
+        val result = ByteArray(1 + iv.size + encrypted.size)
+        result[0] = iv.size.toByte()
+        System.arraycopy(iv, 0, result, 1, iv.size)
+        System.arraycopy(encrypted, 0, result, 1 + iv.size, encrypted.size)
+        return result
     }
 
-    fun decrypt(encrypted: ByteArray): ByteArray {
-        val sha = MessageDigest.getInstance("SHA-256")
-        val key = sha.digest(AES_KEY.toByteArray(Charsets.UTF_8)).copyOf(16)
-        val secretKey = SecretKeySpec(key, "AES")
-        val cipher = Cipher.getInstance("AES/ECB/PKCS5Padding")
-        cipher.init(Cipher.DECRYPT_MODE, secretKey)
-        return cipher.doFinal(encrypted)
+    /**
+     * Decifra i dati usando il KeystoreManager.
+     * Si aspetta il formato generato da encrypt: [IV_SIZE][IV][DATA]
+     */
+    fun decrypt(encryptedWithIv: ByteArray): ByteArray {
+        val ivSize = encryptedWithIv[0].toInt()
+        val iv = ByteArray(ivSize)
+        System.arraycopy(encryptedWithIv, 1, iv, 0, ivSize)
+        
+        val dataSize = encryptedWithIv.size - 1 - ivSize
+        val encryptedData = ByteArray(dataSize)
+        System.arraycopy(encryptedWithIv, 1 + ivSize, encryptedData, 0, dataSize)
+        
+        return keystoreManager.decrypt(encryptedData, iv)
     }
 
     fun encodeBase64(data: ByteArray): String {

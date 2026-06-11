@@ -12,28 +12,29 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.QrCode
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kinapto.fitadapt.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kinapto.fitadapt.data.local.entity.ExportLogEntity
-import com.kinapto.fitadapt.data.repository.ExportRepository
-import com.kinapto.fitadapt.data.repository.ExportResult
 import com.kinapto.fitadapt.model.*
-import com.kinapto.fitadapt.data.repository.SessionRepository
-import com.kinapto.fitadapt.data.repository.DiaryRepository
-import com.kinapto.fitadapt.data.repository.GoalRepository
-import com.kinapto.fitadapt.data.repository.PatientProfileRepository
-import com.kinapto.fitadapt.data.repository.TrainingCardRepository
+import com.kinapto.fitadapt.data.local.entity.ExportLogEntity
+import com.kinapto.fitadapt.data.repository.*
 import com.kinapto.fitadapt.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,8 +48,9 @@ import javax.inject.Inject
 
 data class ExportUiState(
     val isExporting: Boolean = false,
-    val qrBitmap: Bitmap? = null,
+    val qrBitmaps: List<Bitmap> = emptyList(),
     val filePath: String? = null,
+    val isZip: Boolean = false,
     val error: String? = null,
     val lastExport: ExportLogEntity? = null
 )
@@ -72,7 +74,7 @@ class ExportViewModel @Inject constructor(
     }
 
     fun performExport() {
-        _uiState.update { it.copy(isExporting = true, qrBitmap = null, filePath = null, error = null) }
+        _uiState.update { it.copy(isExporting = true, qrBitmaps = emptyList(), filePath = null, error = null) }
         viewModelScope.launch {
             try {
                 val profile = profileRepository.getProfileSync()
@@ -130,10 +132,64 @@ class ExportViewModel @Inject constructor(
                     )
                 )
 
-                when (val result = exportRepository.performExport(exportData)) {
-                    is ExportResult.QrCode -> _uiState.update { it.copy(isExporting = false, qrBitmap = result.bitmap) }
-                    is ExportResult.FileSaved -> _uiState.update { it.copy(isExporting = false, filePath = result.filePath) }
-                    is ExportResult.Error -> _uiState.update { it.copy(isExporting = false, error = result.message) }
+                    val crf = KinAptoCRF(
+                        metadata = CrfMetadata(
+                            patientStudyCode = profile?.patientCode ?: "PENDING",
+                            exportId = "EXP_${System.currentTimeMillis()}",
+                            appVersion = "1.1.0",
+                            exportTimestamp = System.currentTimeMillis()
+                        ),
+                        patientProfile = CrfPatientProfile(
+                            patientStudyCode = profile?.patientCode ?: "PENDING",
+                            createdAt = profile?.createdAt ?: 0L,
+                            appInitialized = profile?.appInitialized ?: false,
+                            biometricsEnabled = profile?.biometricsEnabled ?: false,
+                            lastAccessAt = profile?.lastAccessAt
+                        ),
+                        goals = goals.map {
+                            CrfGoal(it.id, it.title, it.description, it.targetType, it.targetValue, it.currentValue, it.silverValue, it.goldValue, it.parentGoalId, it.isActive, it.createdAt, it.updatedAt)
+                        },
+                        trainingProgram = cards.map { card ->
+                            CrfTrainingCard(card.id, card.title, card.startDate, card.endDate, card.status, card.orderIndex, emptyList())
+                        },
+                        scheduledCalendar = emptyList(),
+                        performedSessions = sessions.map { s ->
+                            CrfPerformedSession(
+                                id = s.id, cardId = s.cardId, date = s.date, completed = s.completed, partial = s.partial,
+                                actualDurationMin = s.actualDurationMin, perceivedEffort = s.perceivedEffort,
+                                asthenia = s.asthenia, osteoarticularPain = s.osteoarticularPain,
+                                restDyspnea = s.restDyspnea, exertionDyspnea = s.exertionDyspnea,
+                                mood = s.mood, sleepQuality = s.sleepQuality,
+                                nausea = s.nausea, appetite = s.appetite, anxiety = s.anxiety,
+                                lymphoedema = s.lymphoedema, qualityOfLife = s.qualityOfLife,
+                                wellBeing = s.wellBeing, spo2 = s.spo2, heartRate = s.heartRate,
+                                notes = s.notes, exercises = emptyList()
+                            )
+                        },
+                        scaleEntries = scaleEntries.map { s ->
+                            CrfScaleEntry(
+                                s.id, s.date, s.perceivedEffort, s.asthenia, s.osteoarticularPain,
+                                s.restDyspnea, s.exertionDyspnea, s.mood, s.sleepQuality, s.nausea,
+                                s.appetite, s.anxiety, s.lymphoedema, s.qualityOfLife, s.wellBeing,
+                                s.spo2, s.heartRate, s.createdAt
+                            )
+                        },
+                        diaryEntries = diaryEntries.map { d -> CrfDiaryEntry(d.id, d.date, d.text, d.date) }
+                    )
+
+                    when (val result = exportRepository.performExport(exportData, crf)) {
+                    is ExportResult.QrSequence -> _uiState.update { 
+                        it.copy(isExporting = false, qrBitmaps = result.bitmaps) 
+                    }
+                    is ExportResult.QrCode -> _uiState.update { 
+                        it.copy(isExporting = false, qrBitmaps = listOf(result.bitmap)) 
+                    }
+                    is ExportResult.FileSaved -> _uiState.update { 
+                        it.copy(isExporting = false, filePath = result.filePath, isZip = result.isZip) 
+                    }
+                    is ExportResult.Error -> _uiState.update { 
+                        it.copy(isExporting = false, error = result.message)
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isExporting = false, error = e.message ?: "Errore") }
@@ -146,7 +202,11 @@ class ExportViewModel @Inject constructor(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
+fun ExportScreen(
+    exportViewModel: ExportViewModel, 
+    onBack: () -> Unit,
+    onShareExport: (String) -> Unit
+) {
     val uiState by exportViewModel.uiState.collectAsState()
 
     Scaffold(
@@ -185,30 +245,121 @@ fun ExportScreen(exportViewModel: ExportViewModel, onBack: () -> Unit) {
                 }
             }
 
-            // Risultato: QR code
-            uiState.qrBitmap?.let { bitmap ->
-                Spacer(modifier = Modifier.height(24.dp))
-                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface), elevation = CardDefaults.cardElevation(2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(stringResource(R.string.export_qr_success), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Image(bitmap = bitmap.asImageBitmap(), contentDescription = stringResource(R.string.export_qr_desc), modifier = Modifier.size(280.dp))
+            // Sezione QR Code con supporto sequenza (Problem 3)
+            uiState.qrBitmaps.let { bitmaps ->
+                if (bitmaps.isNotEmpty()) {
+                    var currentIndex by remember { mutableStateOf(0) }
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = if (bitmaps.size > 1) "QR Code ${currentIndex + 1} di ${bitmaps.size}" else "QR Code Esportazione",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(stringResource(R.string.export_qr_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+                        Card(
+                            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color.White)
+                        ) {
+                            Image(
+                                bitmap = bitmaps[currentIndex].asImageBitmap(),
+                                contentDescription = "QR Code ${currentIndex + 1}",
+                                modifier = Modifier
+                                    .size(280.dp)
+                                    .padding(16.dp),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+
+                        if (bitmaps.size > 1) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 16.dp),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                IconButton(
+                                    onClick = { if (currentIndex > 0) currentIndex-- },
+                                    enabled = currentIndex > 0
+                                ) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = "Precedente")
+                                }
+                                
+                                Text(
+                                    text = "${currentIndex + 1} / ${bitmaps.size}",
+                                    modifier = Modifier.padding(horizontal = 24.dp),
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+
+                                IconButton(
+                                    onClick = { if (currentIndex < bitmaps.size - 1) currentIndex++ },
+                                    enabled = currentIndex < bitmaps.size - 1
+                                ) {
+                                    Icon(Icons.Default.ArrowForward, contentDescription = "Successivo")
+                                }
+                            }
+                        }
+                        
+                        Text(
+                            text = "Scansiona tutti i QR in sequenza su REDCap",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
                     }
                 }
             }
 
-            // Risultato: file
+            // ZIP Export Option (Problem 3 - Priorità visiva)
             uiState.filePath?.let { path ->
                 Spacer(modifier = Modifier.height(24.dp))
-                Card(shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.export_file_success), style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.secondary)
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                "Esportazione ZIP completata",
+                                style = MaterialTheme.typography.titleSmall
+                            )
+                        }
+                        
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text(stringResource(R.string.export_file_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onPrimaryContainer)
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(path, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        
+                        Text(
+                            "File salvato in:\n$path",
+                            style = MaterialTheme.typography.bodySmall,
+                            fontFamily = FontFamily.Monospace
+                        )
+                        
+                        Button(
+                            onClick = { onShareExport(path) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp)
+                        ) {
+                            Icon(Icons.Default.Share, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Condividi / Invia ZIP")
+                        }
                     }
                 }
             }
